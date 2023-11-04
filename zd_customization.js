@@ -104,7 +104,7 @@ function copyElToClipboard(htmlEl) {
 /*  Function setUpKeyboardShortcuts
 	Sets up the keyboard listeners to the page */
 function setUpKeyboardShortcuts() {
-	document.addEventListener("keyup", selectCuInfo);
+	document.addEventListener("keyup", selectAppInfo);
 	document.addEventListener("keyup", selectComment);
 	document.addEventListener("keyup", selectDNEInfo);
 	document.addEventListener("keyup", selectHumEmailInfo);
@@ -114,9 +114,9 @@ function setUpKeyboardShortcuts() {
 
 
 /*  Function unloadZD
-	Sets up the keyboard listeners to the page */
+	Removes the keyboard listeners from the page */
 function unloadZD() {
-	document.removeEventListener("keyup", selectCuInfo);
+	document.removeEventListener("keyup", selectAppInfo);
 	document.removeEventListener("keyup", selectComment);
 	document.removeEventListener("keyup", selectDNEInfo);
 	document.removeEventListener("keyup", selectHumEmailInfo);
@@ -167,7 +167,7 @@ function setFocusToNoteEl(evt) {
 /*** FOCUS SUBJECT LINE ***/
 
 /*  Function getSubjLineEl
-	Selects the correct node that contains the cu's processed and formatted info */
+	Gets the subject element */
 function getSubjLineEl() {
 	var firstInfoElList = $('.fr-focus [placeholder="Subject"]');
 	if (firstInfoElList.length == 0) {
@@ -178,7 +178,7 @@ function getSubjLineEl() {
 }
 
 /*  Function subjectFocus
-	Event function that selects the Subject line */
+	Event function that selects the Subject line, and focuses the cursor at the start */
 function subjectFocus(evt) {
 	// CTRL + SHIFT + S //s for subject
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
@@ -209,7 +209,8 @@ function isRegularRFI(el) {
 }
 
 /*  Function getFirstCommentEl
-	Selects the correct node that contains the cu's processed and formatted info */
+	Selects the el that contains the cu's info, which is the first comment.
+	Returns null if not in a format recognized */
 function getFirstCommentEl() {
 	var firstInfoElList = $('.fr-focus div.zd-comment')[0];
 
@@ -220,11 +221,10 @@ function getFirstCommentEl() {
 
 	console.warn("First comment does not look like for an RFI");
 	return null;
-
 }
 
 /*  Function processDevotedRFIComment
-	Event function that selects and copies the correct node containing the cu's processed and formatted info */
+	Processes the content of a Devoted RFI initial comment into the standardized format */
 function processDevotedRFIComment(el) {
 	var rfiParts= el.innerHTML.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
 
@@ -243,7 +243,7 @@ function processDevotedRFIComment(el) {
 }
 
 /*  Function selectComment
-	Event function that selects and copies the correct node containing the cu's processed and formatted info */
+	Event function that selects and copies the initial comment containing the RFI's info */
 function selectComment(evt) {
 	// CTRL + SHIFT + F //(f for "first")
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
@@ -267,14 +267,14 @@ function selectComment(evt) {
 /*** SELECT DNE INFO ***/
 
 /*  Function getCuName
-	Selects the correct node that contains the cu's processed and formatted info */
+	Get's the cu's name from the page */
 function getCuName() {
 	var cuName = $('.fr-focus [data-test-id=essentials-header-title]');
  	return cuName[0].innerHTML;
 }
 
 /*  Function getLeadID
-	Selects the correct node that contains the cu's processed and formatted info */
+	Get's the lead id from the page */
 function getLeadID() {
 	var searchAry = $('.fr-focus div:contains("@gohealth.com")');
 	var leadID = searchAry[searchAry.length-1].innerHTML;
@@ -283,7 +283,8 @@ function getLeadID() {
 }
 
 /*  Function selectDNEInfo
-	Event function that selects and copies the correct node containing the cu's processed and formatted info */
+	Get's the info needed for a DNE from the page.
+	Also formats it into a tabbed format and copies for pasting into a spreadsheet */
 function selectDNEInfo(evt) {
 	// CTRL + SHIFT + E // (e for "engage")
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
@@ -319,7 +320,7 @@ function selectHumEmailInfo(evt) {
 		}
 
 		//If not an RFI w/a cu el
-		var cuInfo = getCuInfoEl();
+		var cuInfo = getAppInfoEl();
 		if(cuInfo = null) {
 			notAHMPlan();
 			return;
@@ -363,9 +364,9 @@ function selectHumEmailInfo(evt) {
 
 /*** CU INFO SELECT ***/
 
-/*  Function getCuInfoEl
-	Selects the correct node that contains the cu's processed and formatted info */
-function getCuInfoEl() {
+/*  Function getAppInfoEl
+	Gets the most recent comment with the app's processed and formatted info */
+function getAppInfoEl() {
 	var cuInfoElList = $('.fr-focus div.zd-comment:contains("Cu/Agent Info")');
 	var cuInfoElListLn = cuInfoElList.length;
 	if (cuInfoElListLn == 0) {
@@ -376,16 +377,16 @@ function getCuInfoEl() {
 	}
 }
 
-/*  Function selectCuInfo
-	Event function that selects and copies the correct node containing the cu's processed and formatted info */
-function selectCuInfo(evt) {
-	// CTRL + SHIFT + X
+/*  Function selectAppInfo
+	Event function that copies the most recent comment with the app's processed and formatted info */
+function selectAppInfo(evt) {
+	// CTRL + SHIFT + X  //x b/c convenient
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
 		if(isDB()) {
 					console.warn("debug on");
 		}
 
-		copyElToClipboard(getCuInfoEl());
+		copyElToClipboard(getAppInfoEl());
 	}
 }
 
