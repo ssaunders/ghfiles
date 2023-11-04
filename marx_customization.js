@@ -1,5 +1,8 @@
 // TODO: 
 
+// TODO: Add timestamp to "tried it"
+// TODO: Rework hideShowFn > name better
+// TODO: Rework addscript > break into two, doc is optional
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -42,7 +45,10 @@ function endDB() {
 	document.mxdebug = false;	
 }
 
-//Executed on main doc, outside o/iframe
+
+/*  Function getIframe
+	Gets the iframe that contains the MARx cu lookup
+	Executed on main doc, outside o/iframe */
 function getIframe() {
 	if(this.iframe == undefined) {
         this.iframe = document.querySelectorAll("iframe")[0];
@@ -50,12 +56,14 @@ function getIframe() {
     return this.iframe;    
 }
 
+/*  Function getIframe
+	Gets the document belonging to the cu lookup iframe */
 function getIframeDoc() {
 	return getIframe().contentDocument;   
 }
 
 /*  Function setUpKeyboardShortcuts
-	Selects the top part of the MARx page */
+	Sets up the listeners for the keyboard shortcuts */
 function setUpKeyboardShortcuts() {
 	if(isDB()) {
 		console.warn(">> debug on");
@@ -68,7 +76,7 @@ function setUpKeyboardShortcuts() {
 }
 
 /*  Function setUpLoadListeners
-	Sets up all the load listeners */
+	Sets up all the load listeners, so that when site loads new cu, logic is re-added */
 function setUpLoadListeners() {
 	if(isDB()) {
 		console.warn(">> debug on");
@@ -109,18 +117,50 @@ function addScript(doc, scriptText, cssText) {
 	}
 }
 
+/*  Function copyStringToClipboard
+	Copies a string to the computer clipboard */
+function copyStringToClipboard(string) {
+	if(string == null) {
+		console.warn("Nothing to copy");
+		return;
+	}
+
+	navigator.clipboard.writeText(string).then(() => {
+	  console.log('Content copied to clipboard');
+	},() => {
+	  console.error('Failed to copy');
+	});
+}
+
+/*  Function copyElToClipboard
+	Copies the content of an el to the computer clipboard */
+function copyElToClipboard(htmlEl) {
+	if(htmlEl == null) {
+		console.warn("Nothing to copy");
+		return;
+	}
+
+    var range = document.createRange();
+    var sel = document.getSelection();
+
+    sel.removeAllRanges();
+    range.selectNodeContents(htmlEl);
+	sel.addRange(range);
+	document.execCommand("Copy");
+}
+
 /*** SET UP TOGGLE BUTTON ***/
 
 /*  Function setUpToggleBtn
-	Creates and adds the toggle button and its logic. We can use "document" here b/c of the context it's running in */
+	Creates and adds to the DOM the toggle button and its logic. 
+	We can use "document" here b/c it's running inside the iframe */
 function setUpToggleBtn () {
-	/* if(isDB()) {
-	 	console.warn("debug on");
-	   }*/
-
+	// Get the parent el, where we'll put the button.
 	document
 		.querySelectorAll('.eligTable4 tr:nth-child(2)')[0]
 		.classList.toggle('disp-none');
+
+	// Make the button 
 	const toggleFSHideBtn = document.createElement('button');
 	toggleFSHideBtn.innerHTML = '>';
 	toggleFSHideBtn.type='button';
@@ -133,6 +173,8 @@ function setUpToggleBtn () {
 			this.innerHTML = 'v';
 		}
 	};
+
+	// Append button
 	document.querySelectorAll('.eligTable4 tr:first-child td:first-child')[0].appendChild(toggleFSHideBtn);
 }
 
@@ -150,17 +192,14 @@ function hideShowFn(evt) {
 		return;
 	}
 
-	/*Make style element*/
+	// Make style content 
 	var cssContent = "\
 		.eligTable4 .disp-none { \
 			display:none;\
 		}";
 
-	/*Make js element content
-	  Strip new lines and tabs, to prevent interpreter errors */
-	var jsContent = "("+setUpToggleBtn.toString()
-		.replaceAll("\n","")
-		.replaceAll("\t","")+")();";
+    // Make the button creation auto-executing upon add
+	var jsContent = "("+setUpToggleBtn.toString()+")();";
 
 	addScript(iframeDoc, jsContent, cssContent);
 }
@@ -168,14 +207,15 @@ function hideShowFn(evt) {
 /*** AUTONAV ***/
 
 /*  Function autoNav
-	Creates and adds the toggle button and its logic */
+	Navigates from wherever you are in the "get to MARx" process to MARx */
 function autoNav(){
 	//temporary don't screw things up escape
 	return;
 
 	var innerDoc = getIframeDoc();
+	var currStepNum = getStep();
 
-	switch(document.stepNumber || 1) {
+	switch(currStepNum || 1) {
 		default: break;
 		case 1: 
 			document.stepNumber = 2;
@@ -201,8 +241,8 @@ function autoNav(){
 
 /*** AUTO REFRESHER ***/
 
-/*  Function autoRefresh
-	Creates and adds the toggle button and its logic */
+/*  Function getSubmitBtn
+	Gets the "Submit" button that sends off a request.*/
 function getSubmitBtn() {
 	if(this.submitBtn == undefined) {
         this.submitBtn = getIframeDoc().querySelectorAll("button[name='submitBtn']")[0];
@@ -211,7 +251,7 @@ function getSubmitBtn() {
 }
 
 /*  Function autoRefresh
-	Creates and adds the toggle button and its logic */
+	Auto-refreshes the interation w/MARx by re-submitting search*/
 function autoRefresher(evt){
 	var iframeDoc = getIframeDoc();
 
@@ -220,14 +260,14 @@ function autoRefresher(evt){
 	}
 
 	console.log(">> started autoRefresher");
-	//message to let me know it's going
+	// message to let me know it's going
 	setInterval(function () {
 		console.log(">> Refresher active");
 	}, 10*60*1000);
 	setInterval(function () {
-		/* click on "Find", so it reloads the iframe */
+		// click on "Find", so it reloads the iframe
 		getSubmitBtn().click();
-		console.log(">> !!!!!!!!!!!!!!!!!! Tried it!");
+		console.log("<<< clicked submit button >>>");
 	}, 14.75*60*1000);
 	iframeDoc.refresherActive = true;
 }
@@ -242,6 +282,7 @@ function getSearchBox() {
 /*  Function selectSearchBox
 	Event listener to focus the MARx search box */
 function selectSearchBox(evt) {
+	// CTRL + SHIFT + S // s for search
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
 		if(isDB()) {
 			console.warn(">> debug on");
@@ -255,7 +296,8 @@ function selectSearchBox(evt) {
 
 /*** CU INFO SELECT ***/
 
-/*  Function getCuInfoTable */
+/*  Function getCuInfoTable 
+	Gets the info HTML table that contains the cu's info */
 function getCuInfoTable() {
 	return getIframeDoc().getElementsByClassName('paraTitle alignR')[0].parentElement.parentElement;
 
@@ -264,6 +306,7 @@ function getCuInfoTable() {
 /*  Function selectCuInfo
 	Selects the top part of the MARx page */
 function selectCuInfo(evt) {
+	// CTRL + SHIFT + X // x b/c it's like copy
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
 		if(isDB()) {
 			console.warn("debug on");
@@ -273,10 +316,12 @@ function selectCuInfo(evt) {
 	    var range = iframeDoc.createRange();
 	    var sel = iframeDoc.getSelection();
 
-	    sel.removeAllRanges();
-	    range.selectNodeContents(getCuInfoTable());
-		sel.addRange(range);
-		iframeDoc.execCommand("Copy");
+	    copyElToClipboard(getCuInfoTable());
+
+	    // sel.removeAllRanges();
+	    // range.selectNodeContents(getCuInfoTable());
+		// sel.addRange(range);
+		// iframeDoc.execCommand("Copy");
 	}
 }
 
