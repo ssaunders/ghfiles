@@ -2,7 +2,6 @@
 
 // TODO: Add timestamp to "tried it"
 // TODO: Rework hideShowFn > name better
-// TODO: Rework addscript > break into two, doc is optional
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -12,7 +11,8 @@
 
 
 //DONE 
-// TODO: Fix setUpKeyboardShortcuts to use addEventListener
+	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
+	// TODO: Rework addscript > break into two, doc is optional
 	// TODO: Fix it so it doesn't run if it sees the button already there.
 	// TODO: actually use getIframe in code ?
 	// TODO: Add shortcuts? 
@@ -25,26 +25,72 @@
  * FUNCTIONS
  *************/
 
+/*** LIBRARY ***/
+
+	/*  Function alreadyPresent
+		alerts that the code already exists */
+	function alreadyPresent() {
+		console.warn(">> MARx Code already present");
+	}
+
+	/*  Function DEBUG FUNCTIONS
+		tests for/starts/stops debug */
+	function isDB() {
+		return document.mxdebug;
+	}
+	function startDB() {
+		document.mxdebug = true;
+	}
+	function endDB() {
+		document.mxdebug = false;	
+	}
+
+	/*  Function setUpKeyboardShortcuts
+		Sets up the listeners for the keyboard shortcuts */
+	function setUpKeyboardShortcuts() {
+		if(isDB()) {
+			console.warn(">> debug on");
+		}
+
+		var doc = getIframeDoc();
+		doc.addEventListener("keyup", selectCuInfo);
+		doc.addEventListener("keyup", selectSearchBox);
+		console.log(">> set up shortcuts");
+	}
+
+	/*  Function copyStringToClipboard
+		Copies a string to the computer clipboard */
+	function copyStringToClipboard(string) {
+		if(string == null) {
+			console.warn("Nothing to copy");
+			return;
+		}
+
+		navigator.clipboard.writeText(string).then(() => {
+		  console.log('Content copied to clipboard');
+		},() => {
+		  console.error('Failed to copy');
+		});
+	}
+
+	/*  Function copyElToClipboard
+		Copies the content of an el to the computer clipboard */
+	function copyElToClipboard(htmlEl) {
+		if(htmlEl == null) {
+			console.warn("Nothing to copy");
+			return;
+		}
+
+	    var range = document.createRange();
+	    var sel = document.getSelection();
+
+	    sel.removeAllRanges();
+	    range.selectNodeContents(htmlEl);
+		sel.addRange(range);
+		document.execCommand("Copy");
+	}
+
 /*** UTILITY ***/
-
-/*  Function alreadyPresent
-	alerts that the code already exists */
-function alreadyPresent() {
-	console.warn(">> MARx Code already present");
-}
-
-/*  Function DEBUG FUNCTIONS
-	tests for/starts/stops debug */
-function isDB() {
-	return document.mxdebug;
-}
-function startDB() {
-	document.mxdebug = true;
-}
-function endDB() {
-	document.mxdebug = false;	
-}
-
 
 /*  Function getIframe
 	Gets the iframe that contains the MARx cu lookup
@@ -60,19 +106,6 @@ function getIframe() {
 	Gets the document belonging to the cu lookup iframe */
 function getIframeDoc() {
 	return getIframe().contentDocument;   
-}
-
-/*  Function setUpKeyboardShortcuts
-	Sets up the listeners for the keyboard shortcuts */
-function setUpKeyboardShortcuts() {
-	if(isDB()) {
-		console.warn(">> debug on");
-	}
-
-	var doc = getIframeDoc();
-	doc.addEventListener("keyup", selectCuInfo);
-	doc.addEventListener("keyup", selectSearchBox);
-	console.log(">> set up shortcuts");
 }
 
 /*  Function setUpLoadListeners
@@ -97,6 +130,29 @@ function setUpLoadListeners() {
 
 /*  Function addScript
 	Adds the passed in script text and CSS text to the document body */
+function addCssEl(cssText, doc) {
+	doc = (doc == null || doc == undefined) ? document : doc;
+
+	if (cssText!=null) {
+		const css_el = doc.createElement("style");
+		css_el.textContent = cssText;
+		doc.childNodes[1].appendChild(css_el);
+	}
+}
+/*  Function addScript
+	Adds the passed in script text and CSS text to the document body */
+function addJsScript(scriptText, doc) {
+	doc = (doc == null || doc == undefined) ? document : doc;
+
+	if (scriptText!=null) {
+		const js_el = doc.createElement("script");
+		js_el.textContent = scriptText;
+		doc.childNodes[1].appendChild(js_el);
+	}
+}
+
+/*  Function addScript
+	Adds the passed in script text and CSS text to the document body */
 function addScript(doc, scriptText, cssText) {
 	if(isDB()) {
 		console.warn(">> debug on");
@@ -115,38 +171,6 @@ function addScript(doc, scriptText, cssText) {
 		js_el.textContent = scriptText;
 		doc.childNodes[1].appendChild(js_el);
 	}
-}
-
-/*  Function copyStringToClipboard
-	Copies a string to the computer clipboard */
-function copyStringToClipboard(string) {
-	if(string == null) {
-		console.warn("Nothing to copy");
-		return;
-	}
-
-	navigator.clipboard.writeText(string).then(() => {
-	  console.log('Content copied to clipboard');
-	},() => {
-	  console.error('Failed to copy');
-	});
-}
-
-/*  Function copyElToClipboard
-	Copies the content of an el to the computer clipboard */
-function copyElToClipboard(htmlEl) {
-	if(htmlEl == null) {
-		console.warn("Nothing to copy");
-		return;
-	}
-
-    var range = document.createRange();
-    var sel = document.getSelection();
-
-    sel.removeAllRanges();
-    range.selectNodeContents(htmlEl);
-	sel.addRange(range);
-	document.execCommand("Copy");
 }
 
 /*** SET UP TOGGLE BUTTON ***/
@@ -201,7 +225,9 @@ function hideShowFn(evt) {
     // Make the button creation auto-executing upon add
 	var jsContent = "("+setUpToggleBtn.toString()+")();";
 
-	addScript(iframeDoc, jsContent, cssContent);
+	// addScript(iframeDoc, jsContent, cssContent);
+	addJsScript(jsContent, iframeDoc);
+	addCssEl(cssContent, iframeDoc)
 }
 
 /*** AUTONAV ***/
