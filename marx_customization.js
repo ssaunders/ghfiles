@@ -1,7 +1,6 @@
 // TODO: 
 
 // TODO: Add timestamp to "tried it"
-// TODO: Rework hideShowFn > name better
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -11,6 +10,7 @@
 
 
 //DONE 
+	// TODO: Rework hideShowFn > name better
 	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
 	// TODO: Rework addscript > break into two, doc is optional
 	// TODO: Fix it so it doesn't run if it sees the button already there.
@@ -117,8 +117,8 @@ function setUpLoadListeners() {
 	var iframe = getIframe();
 
 	/*** Add Button to Hide/Show Search ***/
-	iframe.addEventListener("load", hideShowFn);
-	hideShowFn();
+	iframe.addEventListener("load", addToggleBtn);
+	addToggleBtn();
 
 	/*** Add Auto-refresh Attempt Functionality ***/
 	iframe.addEventListener("load", autoRefresher);
@@ -190,6 +190,7 @@ function setUpToggleBtn () {
 	toggleFSHideBtn.type='button';
 	toggleFSHideBtn.id='toggleBtn';
 	toggleFSHideBtn.onclick=function () {
+		// Toggle (hide/show) display:none, get resulting state, store in wasHidden
 		var wasHidden = document.querySelectorAll('.eligTable4 tr:nth-child(2)')[0].classList.toggle('disp-none');
 		if (wasHidden) {
 			this.innerHTML = '>';
@@ -202,9 +203,9 @@ function setUpToggleBtn () {
 	document.querySelectorAll('.eligTable4 tr:first-child td:first-child')[0].appendChild(toggleFSHideBtn);
 }
 
-/*  Function hideShowFn
+/*  Function addToggleBtn
 	Creates and adds the css/script elements needed to format/execute the button logic */
-function hideShowFn(evt) {
+function addToggleBtn(evt) {
 	if(isDB()) {
 		console.warn(">> debug on");
 	}
@@ -371,4 +372,3 @@ if(document.ranSetup != true) {
 } else {
 	document.alreadyPresent();
 }
-
