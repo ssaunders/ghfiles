@@ -9,6 +9,7 @@
 	// TODO: make it so that if the MX button is pushed, it'll still go
 
 
+	// TODO: Make unloadMx fn
 //DONE 
 	// TODO: Rework hideShowFn > name better
 	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
@@ -45,19 +46,6 @@
 		document.mxdebug = false;	
 	}
 
-	/*  Function setUpKeyboardShortcuts
-		Sets up the listeners for the keyboard shortcuts */
-	function setUpKeyboardShortcuts() {
-		if(isDB()) {
-			console.warn(">> debug on");
-		}
-
-		var doc = getIframeDoc();
-		doc.addEventListener("keyup", selectCuInfo);
-		doc.addEventListener("keyup", selectSearchBox);
-		console.log(">> set up shortcuts");
-	}
-
 	/*  Function copyStringToClipboard
 		Copies a string to the computer clipboard */
 	function copyStringToClipboard(string) {
@@ -90,6 +78,29 @@
 		document.execCommand("Copy");
 	}
 
+	/*  Function addCssEl
+		Adds the passed in CSS text to the document body */
+	function addCssEl(cssText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (cssText!=null) {
+			const css_el = doc.createElement("style");
+			css_el.textContent = cssText;
+			doc.childNodes[1].appendChild(css_el);
+		}
+	}
+	/*  Function addJsScript
+		Adds the passed in script text to the document body */
+	function addJsScript(scriptText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (scriptText!=null) {
+			const js_el = doc.createElement("script");
+			js_el.textContent = scriptText;
+			doc.childNodes[1].appendChild(js_el);
+		}
+	}
+
 /*** UTILITY ***/
 
 /*  Function getIframe
@@ -106,6 +117,19 @@ function getIframe() {
 	Gets the document belonging to the cu lookup iframe */
 function getIframeDoc() {
 	return getIframe().contentDocument;   
+}
+
+/*  Function setUpKeyboardShortcuts
+	Sets up the listeners for the keyboard shortcuts */
+function setUpKeyboardShortcuts() {
+	if(isDB()) {
+		console.warn(">> debug on");
+	}
+
+	var doc = getIframeDoc();
+	doc.addEventListener("keyup", selectCuInfo);
+	doc.addEventListener("keyup", selectSearchBox);
+	console.log(">> set up shortcuts");
 }
 
 /*  Function setUpLoadListeners
@@ -128,49 +152,22 @@ function setUpLoadListeners() {
 	iframe.addEventListener("load", setUpKeyboardShortcuts);
 }
 
-/*  Function addScript
-	Adds the passed in script text and CSS text to the document body */
-function addCssEl(cssText, doc) {
-	doc = (doc == null || doc == undefined) ? document : doc;
+/*  Function unloadZD
+	Removes the keyboard listeners from the page */
+function unloadZD() {
+	// remove load events
+	var iframe = getIframe();
+	iframe.removeEventListener("load", addToggleBtn);
+	iframe.removeEventListener("load", autoRefresher);
+	iframe.removeEventListener("load", setUpKeyboardShortcuts);
 
-	if (cssText!=null) {
-		const css_el = doc.createElement("style");
-		css_el.textContent = cssText;
-		doc.childNodes[1].appendChild(css_el);
-	}
-}
-/*  Function addScript
-	Adds the passed in script text and CSS text to the document body */
-function addJsScript(scriptText, doc) {
-	doc = (doc == null || doc == undefined) ? document : doc;
+	// remove keyup events
+	var doc = getIframeDoc();
+	doc.removeEventListener("keyup", selectCuInfo);
+	doc.removeEventListener("keyup", selectSearchBox);
 
-	if (scriptText!=null) {
-		const js_el = doc.createElement("script");
-		js_el.textContent = scriptText;
-		doc.childNodes[1].appendChild(js_el);
-	}
-}
-
-/*  Function addScript
-	Adds the passed in script text and CSS text to the document body */
-function addScript(doc, scriptText, cssText) {
-	if(isDB()) {
-		console.warn(">> debug on");
-	}
-
-	/*Add style element*/
-	if (cssText!=null) {
-		const css_el = doc.createElement("style");
-		css_el.textContent = cssText;
-		doc.childNodes[1].appendChild(css_el);
-	}
-
-	/*Add js element*/
-	if (scriptText!=null) {
-		const js_el = doc.createElement("script");
-		js_el.textContent = scriptText;
-		doc.childNodes[1].appendChild(js_el);
-	}
+	console.log("removed shortcuts");
+	document.ranSetup = false;
 }
 
 /*** SET UP TOGGLE BUTTON ***/
@@ -226,7 +223,6 @@ function addToggleBtn(evt) {
     // Make the button creation auto-executing upon add
 	var jsContent = "("+setUpToggleBtn.toString()+")();";
 
-	// addScript(iframeDoc, jsContent, cssContent);
 	addJsScript(jsContent, iframeDoc);
 	addCssEl(cssContent, iframeDoc)
 }
@@ -268,6 +264,17 @@ function autoNav(){
 
 /*** AUTO REFRESHER ***/
 
+const refreshCount = {
+	refreshCount: 0,
+	getValue: function() {
+		if (this.refreshCount == undefined) this.refreshCount = 0;
+		return this.refreshCount;
+	},
+	increment: function(){
+		return this.refreshCount++;
+	}
+}
+
 /*  Function getSubmitBtn
 	Gets the "Submit" button that sends off a request.*/
 function getSubmitBtn() {
@@ -286,15 +293,16 @@ function autoRefresher(evt){
 		return;
 	}
 
-	console.log(">> started autoRefresher");
+	console.log(">> started autoRefresher ("+refreshCount.getValue()+")");
 	// message to let me know it's going
 	setInterval(function () {
-		console.log(">> Refresher active");
+		console.log(">> Refresher active ("+refreshCount.getValue()+")");
 	}, 10*60*1000);
 	setInterval(function () {
 		// click on "Find", so it reloads the iframe
 		getSubmitBtn().click();
-		console.log("<<< clicked submit button >>>");
+		refreshCount.increment();
+		console.log("<<< clicked submit button ("+refreshCount.getValue()+") >>>");
 	}, 14.75*60*1000);
 	iframeDoc.refresherActive = true;
 }
@@ -372,3 +380,4 @@ if(document.ranSetup != true) {
 } else {
 	document.alreadyPresent();
 }
+
