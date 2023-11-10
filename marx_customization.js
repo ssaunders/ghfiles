@@ -1,16 +1,16 @@
 // TODO: 
 
-// TODO: Add timestamp to "tried it"
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
 	// TODO: beneficiaries
 	// TODO: eligibility
 	// TODO: make it so that if the MX button is pushed, it'll still go
-
-
 	// TODO: Make unloadMx fn
+
+
 //DONE 
+// TODO: Add timestamp to "tried it"
 	// TODO: Rework hideShowFn > name better
 	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
 	// TODO: Rework addscript > break into two, doc is optional
@@ -89,6 +89,7 @@
 			doc.childNodes[1].appendChild(css_el);
 		}
 	}
+
 	/*  Function addJsScript
 		Adds the passed in script text to the document body */
 	function addJsScript(scriptText, doc) {
@@ -99,6 +100,12 @@
 			js_el.textContent = scriptText;
 			doc.childNodes[1].appendChild(js_el);
 		}
+	}
+
+	/*  Function getCurrentTimestamp
+		Returns a string of the current timestamp */
+	function getCurrentTimestamp() {
+		return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
 	}
 
 /*** UTILITY ***/
@@ -302,10 +309,12 @@ function autoRefresher(evt){
 		// click on "Find", so it reloads the iframe
 		getSubmitBtn().click();
 		refreshCount.increment();
-		console.log("<<< clicked submit button ("+refreshCount.getValue()+") >>>");
+		console.log("<<< clicked submit button ("+refreshCount.getValue()+"/"+getCurrentTimestamp()+") >>>");
 	}, 14.75*60*1000);
 	iframeDoc.refresherActive = true;
 }
+
+
 
 /*** SEARCH BOX SELECT ***/
 
