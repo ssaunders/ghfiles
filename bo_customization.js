@@ -1,33 +1,29 @@
 // TODO: 
 
-// TODO: Make Ctrl+Shift+S also focus search bar
-// TODO: Make view refresher that sends me a notification if certain views have stuff available.
-// TODO: make shortcut to focus on internal note 
-// TODO: Make a subject sorter...for just the page.
+// TODO: Pipe dream--create page that wraps BO in an iframe, so I can keep my shortcuts/apply them auto on refresh
+	//TODO: Make it so the bol search calls that page
+	//TODO: Make it so the Start of Day shortcut works w/it
+// TODO: make tooltip that will show newlines
+	// TODO: figure out how to get content w/new lines in it
+	// TODO: add CSS styling
+// TODO: shortcut to add note
+// TODO: shortcut to submit note
 
-/** DONE **/
-// TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
-	// TODO: Make Ct+Sh+x get PI header, too
-	// TODO: Make it so that I can copy HM email directly from the ticket
-	// TODO: Make shortcut for DNE (name, email, first)
-	// TODO: Figure out why the debug isn't working
-	// TODO: Figure out why there are multiple div's w/Cu/Agent Info...and how to fix it. (Lead ID: XX?)
-	// TODO: Make shortcut to pull first comment. use "Agent Name:" ?
-	// TODO: get key binding that won't interfere
-	// TODO: Figure out what to do if multiple fit
-	// TODO: Figure out how to get/select/copy the particular element containing the thing
-	// TODO: Make an unload fn
+/** DONE: **/
+// TODO: Make it so that an Alt Addr is created, attached to the bottom of the copy fn. City, ST Zip
+// TODO: Add the name of T3 AOR, for non-standard RFI's
+// TODO: Add the effective date, for non-standard RFI's
+	// TODO: The one shortcut to rule them all: have it copy the AOR, sub date, plan name and #, and wrap it into a single copy command
+		// TODO: shortcut to copy AOR name (not number)
+		// TODO: shortcut to copy sub date
+		// TODO: shortcut to copy plan name
+		// TODO: Figure out if can return just plain text.
+	// TODO: Make unloadBO fn
+
+
 
 /* Function DEFAULT
-   NOTES_ON_FN */
-
-/** Random notes:
- {{ticket.requester.customfields.state}} 
- {{ticket.requester.customfields.carrier}}
- {{ticket.title}}
-**/
-
-
+	NOTES_ON_FN */
 
 /*************
  * FUNCTIONS
@@ -36,9 +32,9 @@
 /*** LIBRARY ***/
 
 	/* Function alreadyPresent
-		alerts that the code already exists */
+		Alerts that the code already exists */
 	function alreadyPresent() {
-		console.warn(">> MARx Code already present");
+		console.warn(">> BO Code already present");
 	}
 
 	/* Function DEBUG FUNCTIONS
@@ -119,326 +115,267 @@
 /*** UTILITY ***/
 
 /* Function setUpKeyboardShortcuts
-   Sets up the keyboard listeners to the page */
+	Sets up the keyboard listeners to the page */
 function setUpKeyboardShortcuts() {
 	document.addEventListener("keyup", selectAppInfo);
-	document.addEventListener("keyup", selectComment);
-	document.addEventListener("keyup", selectDNEInfo);
-	document.addEventListener("keyup", selectHumEmailInfo);
-	document.addEventListener("keyup", subjectFocus);
-	document.addEventListener("keyup", searchBoxFocus);
-	console.warn("set up shortcuts");
+	console.log("set up shortcuts");
 }
 
-/* Function unloadZD
-   Removes the keyboard listeners from the page */
-function unloadZD() {
+/* Function unloadBO
+	Removes the keyboard listeners from the page */
+function unloadBO() {
 	document.removeEventListener("keyup", selectAppInfo);
-	document.removeEventListener("keyup", selectComment);
-	document.removeEventListener("keyup", selectDNEInfo);
-	document.removeEventListener("keyup", selectHumEmailInfo);
-	document.removeEventListener("keyup", subjectFocus);
-	document.removeEventListener("keyup", searchBoxFocus);
 	console.log("removed shortcuts");
 	document.ranSetup = false;
 }
 
 
-/*** FOCUS INTERNAL NOTE ***/
+/*** TOOLTIP SETUP ***/
+	// ??? Should I just make the note el change on hover?
 
-/* Function getNoteEl
-   Selects the correct node that contains the cu's processed and formatted info */
-function getNoteEl() {
-	// var firstInfoElList = $('div.zd-comment:contains("Agent Name:")');
-	// var firstInfoElListLn = firstInfoElList.length;
-	// if (firstInfoElListLn == 0) {
-	// 	return null;
-	// } else {
-	// 	return firstInfoElList[firstInfoElListLn-1];
+	// <span class="tooltip">This is my tooltip</span>
+
+	// const myDiv = document.getElementById("myDiv");
+	// myDiv.addEventListener("mouseover", showTooltip);
+	// myDiv.addEventListener("mouseout", hideTooltip);
+
+	// function showTooltip() {
+	//    const tooltip = document.querySelector(".tooltip");
+	//    tooltip.style.display = "block";
 	// }
-}
-
-/* Function setFocusToNoteEl
-   Event function that selects and copies the correct node containing the cu's processed and formatted info */
-function setFocusToNoteEl(evt) {
-	// CTRL + SHIFT + ?
-	// if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
-	// 	if(isDB()) {
-	// 				console.warn("debug on");
-	// 	}
-	// 	var firstInfoEl = getFirstCommentEl(); 
-	// 	if(firstInfoEl == null) {
-	// 		console.log("Could not find an element containing 'Agent Name:'");
-	// 		return;
-	// 	}
-
-	//     var range = document.createRange();
-	//     var sel = document.getSelection();
-
-	//     sel.removeAllRanges();
-	//     range.selectNodeContents(firstInfoEl);
-	// 	sel.addRange(range);
-	// 	document.execCommand("Copy");
+	// function hideTooltip() {
+	// 	//get through "target?"
+	//    const tooltip = document.querySelector(".tooltip");
+	//    tooltip.style.display = "none";
 	// }
+
+	// .tooltip {
+	//    display: none;
+	//    background-color: yellow;
+	//    color: black;
+	// }
+
+
+	// get all note div's
+		// lead-notes-1 > div > table
+		// foreach
+			//skip first
+			// get second tr > td of tbody
+			// get element's innerHTML
+			// make it the content of a tooltip (template?)
+			// add mouseover fn to tr to show tooltip
+			// add mouseout fn to tr to hide tooltip
+
+
+/*** PLAN INFO SELECT ***/
+
+//// GET PIP'S ////
+
+/* Function getNumPIPs
+	Gets the number PIP's.
+	1 - expected a T2 sale
+	2 - expected a DTC sale
+	3+- expected mult sales // how to find most recent?
+	*/
+function getNumPIPs() {
+	return $$('#appInfoContainer > *').length;
 }
 
+/* Function getMostRecentSalePip
+	Gets the most recent sales PIP, if there is one to get. */
+function getMostRecentSalePip() {
+	// TODO: check for just one page...or a page w/o a Medicare Advantage
 
-/*** FOCUS SUBJECT LINE ***/
-
-/* Function getSubjLineEl
-   Gets the subject element */
-function getSubjLineEl() {
-	var firstInfoElList = $('.fr-focus [placeholder="Subject"]');
-	if (firstInfoElList.length == 0) {
-		return null;
-	} else {
-		return firstInfoElList[0];
+	/* Could also use:
+		$$('#appInfoContainer div:contains("Off-Exchange")');
+		I don't remember why I didn't/changed it from this
+	*/
+	var salePIP = $$('#appInfoContainer div:contains("Medicare Advantage")');
+	if(salePIP[0] == undefined) {
+		console.warn("Could not find sale PIP");
+		return undefined;
 	}
+
+	return salePIP[0];
 }
 
-/* Function subjectFocus
-   Event function that selects the Subject line, and focuses the cursor at the start */
-function subjectFocus(evt) {
-	// CTRL + SHIFT + S //s for subject
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
-		var subjLineEl = getSubjLineEl(); 
-		if(subjLineEl == null) {
-			console.log("Could not find a Subject line");
-			return;
+/* Function getMostRecentDtcPip
+	Gets the DTC PIP, if there is one to get. */
+function getMostRecentDtcPip() {
+	// TODO: check for just one page...or a page w/o a DTC
+
+	var dtcPip = $$('#appInfoContainer div:contains("DTC Transfer")');
+	if(dtcPip[0] == undefined) {
+		console.warn("Could not find T2 PIP");
+		return undefined;
+	}
+
+	return dtcPip[0];
+}
+
+//// GET INFO FROM PIP'S ////
+
+/* Function getT2AgentName
+	Gets the T2 agent's name from the DTC PIP or the sales PIP */
+function getT2AgentName() {
+	var planPIP = getMostRecentDtcPip();
+	if (planPIP == undefined) {
+		planPIP = getMostRecentSalePip();
+		if (planPIP == undefined) {
+			return "-";
 		}
-
-		subjLineEl.focus();
-		subjLineEl.selectionStart = 0;
-		subjLineEl.selectionEnd = 0;
-	}
-}
-
-
-/*** FOCUS ACTIVE SEARCH ***/
-
-/* Function getSearchBox
-   Gets the search Box */
-function getSearchBox() {
-	var searchBox = $('.search[style="display: block;"] [data-garden-id="forms.faux_input"] input')[0];
-	if (searchBox == undefined) {
-		return null;
-	} else {
-		return searchBox;
-	}
-}
-
-/* Function searchBoxFocus
-   Event fn that moves the focus to the active search box */
-function searchBoxFocus(evt) {
-	// CTRL + SHIFT + S //s for Search
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
-		var searchBoxEl = getSearchBox(); 
-		console.log(searchBoxEl);
-		if(searchBoxEl == null) {
-			console.log("Could not find an active search box ",searchBoxEl);
-			return;
-		}
-
-		searchBoxEl.focus();
-		searchBoxEl.select();
-	}
-}
-
-
-/*** FIRST COMMENT SELECT ***/
-
-/* Function isDevotedRFI
-   Decides if the el passed in is the first comment on a Dev RFI*/
-function isDevotedRFI(el) {
-	return el.innerHTML.search(/<table>/) == 0;
-}
-
-/* Function isRegularRFI
-   Decides if the el passed in is the first comment on a regular RFI */
-function isRegularRFI(el) {
-	return el.innerHTML.search(/Agent Name\:/) == 14;
-}
-
-/* Function getFirstCommentEl
-   Selects the el that contains the cu's info, which is the first comment.
-	Returns null if not in a format recognized */
-function getFirstCommentEl() {
-	var firstInfoElList = $('.fr-focus div.zd-comment')[0];
-
-	// Reg RFI vs Devoted one
-	if(isDevotedRFI(firstInfoElList) || isRegularRFI(firstInfoElList)) {
-		return firstInfoElList;
 	}
 
-	console.warn("First comment does not look like for an RFI");
-	return null;
+	var t2AgentData = planPIP.querySelector('div[data-testid="agent-of-record"]').innerHTML;
+
+	return t2AgentData.replace(/(.*) \(\d+\)/,"$1");
 }
 
-/* Function processDevotedRFIComment
-   Processes the content of a Devoted RFI initial comment into the standardized format */
-function processDevotedRFIComment(el) {
-	var rfiParts= el.innerHTML.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
+/* Function getT3AgentName
+	Gets the T3 agent's name from the sale PIP */
+function getT3AgentName() {
+	// check for a DTC PIP, to know there is a seperate sale PIP
+	var dtcPip = getMostRecentDtcPip();
+	if (dtcPip == undefined) 
+		return "-";
 
-	var returnVal = "Agent Name: "+rfiParts[1]+
-	" Agent NPN/Party ID: "+rfiParts[2]+
-	" Agent Writing Number/SAN :"+
-	" Medicare ID: "+rfiParts[8]+
-	" Sub Date: "+rfiParts[5]+
-	" Due Date:"+
-	" Case Worker (Cigna*)/Broker Phone (Aetna/United*):"+
-	" Case Number (Cigna*)/Broker Email (Aetna/United*):"+
-	" Policy ID/Application ID:"+
-	" Reason: "+rfiParts[10];
+	var salePIP = getMostRecentSalePip();
+	var t2AgentData = salePIP.querySelector('div[data-testid="agent-of-record"]').innerHTML;
 
-	return returnVal;
+	return t2AgentData.replace(/(.*) \(\d+\)/,"$1");
 }
 
-/* Function selectComment
-   Event function that selects and copies the initial comment containing the RFI's info */
-function selectComment(evt) {
-	// CTRL + SHIFT + F //(f for "first")
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
-		if(isDB()) {
-			console.warn("debug on");
-		}
+/* Function getPlanData
+	Gets the plan's name and code from the sale PIP */
+function getPlanData() {
+	//get the Medicare Advantage page
+	var salePIP = getMostRecentSalePip();
+	if (salePIP == undefined) 
+		return "";
 
-		var firstCommentEl = getFirstCommentEl();
+	var planName = salePIP.querySelector('div[data-testid="plan-name"]').title;
+	var planId = salePIP.querySelector('div[data-testid="plan-id"]').innerHTML.replace(/(\s+)(.*)(\s+)/,"$2");
 
-		if(firstCommentEl == null) {
-			return;
-		} else if(isRegularRFI(firstCommentEl)) {
-			copyElToClipboard(getFirstCommentEl());
-		} else if(isDevotedRFI(firstCommentEl)) {
-			copyStringToClipboard(processDevotedRFIComment(firstCommentEl));
-		}
+	return planName + " " + planId;
+}
 
+/* Function getSep
+	Gets the SEP used from the sale PIP */
+function getSep() {
+	// TODO: check for just one page...or a page w/o a Medicare Advantage
+
+	//get the Medicare Advantage page
+	var salePIP = getMostRecentSalePip();
+	if (salePIP == undefined) 
+		return "";
+
+	var subDate = salePIP.querySelector('td[data-testid="sep-code"]').children[0].innerHTML;
+	
+	return subDate.replace(/(\s+)(.*)(\s+)/,"$2");
+}
+
+/* Function getSubDate
+	Gets the T2 Agent's Name from the sale PIP */
+function getSubDate() {
+	// TODO: check for just one page...or a page w/o a Medicare Advantage
+
+	//get the Medicare Advantage page
+	var salePIP = getMostRecentSalePip();
+	if (salePIP == undefined) 
+		return "";
+
+	var subDate = salePIP.querySelector('div[data-testid="date-created"]').innerHTML;
+	
+	return subDate.replace(/([\d\/]+) (.*)/,"$1");
+}
+
+/* Function getEffDate
+	Gets the plan's effective date from the sale PIP */
+function getEffDate() {
+	// TODO: check for just one page...or a page w/o a Medicare Advantage
+
+	var salePIP = getMostRecentSalePip();
+	if (salePIP == undefined) 
+		return "";
+
+	var effDate = salePIP.querySelector('td[data-testid="requested-effective-date"] > div').innerHTML;
+	
+	return effDate;
+}
+
+//// ADDR STUFF ////
+
+/* Function getCuInfoPg
+	Gets the cu's info page */
+function getCuInfoPg() {
+	return $$('#contact-info-2')[0];
+}
+
+/* Function getCurrAddr
+	Gets the cu's address or '' */
+function getCurrAddr() {
+	return $$('#address_1_street1')[0].innerHTML;
+} 
+
+/* Function getCity
+	Gets the city */
+function getCity() {
+	return $$('#address_1_city')[0].innerHTML;
+}
+/* Function getState
+	Gets the state */
+function getState() {
+	return $$('#address_1_state')[0].innerHTML;
+}
+/* Function getZip
+	Gets the zip */
+function getZip() {
+	return $$('#address_1_zip')[0].innerHTML;
+}
+
+/* Function getAltAddr
+	Gets the alt address */
+function getAltAddr() {
+	if(getCurrAddr() != '') {
+		return '-';
 	}
+
+	return getCity() +", "+getState()+" "+getZip();
 }
 
-
-/*** SELECT DNE INFO ***/
-
-/* Function getCuName
-   Get's the cu's name from the page */
-function getCuName() {
-	var cuName = $('.fr-focus [data-test-id=essentials-header-title]');
- 	return cuName[0].innerHTML;
-}
-
-/* Function getLeadID
-   Get's the lead id from the page */
-function getLeadID() {
-	var searchAry = $('.fr-focus div:contains("@gohealth.com")');
-	var leadID = searchAry[searchAry.length-1].innerHTML;
-
-	return leadID.replace('@gohealth.com','');
-}
-
-/* Function selectDNEInfo
-   Get's the info needed for a DNE from the page.
-	Also formats it into a tabbed format and copies for pasting into a spreadsheet */
-function selectDNEInfo(evt) {
-	// CTRL + SHIFT + E // (e for "engage")
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
-		if(isDB()) {
-			console.warn("debug on");
-		}
-
-		var finalString = 
-			getCuName()+"\t"+
-			getLeadID()+"\t"+
-			getFirstCommentEl().children[0].innerHTML;
-
-		copyStringToClipboard(finalString);
-
-		return;
-	}
-}
-
-
-/*** SELECT HM EMAIL INFO ***/
-/* Function notAHMPlan
-   Copies "Not a HM Plan" to the clipboard */
-function notAHMPlan() {
-	copyStringToClipboard("Not a Humana Plan");
-}
-
-/* Function selectHumEmailInfo
-   Copies cu info and formats it to the HM Email format*/
-function selectHumEmailInfo(evt) {
-	// CTRL + SHIFT + H // (h for "Humana")
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
-		if(isDB()) {
-			console.warn("debug on");
-		}
-
-		//If not an RFI w/a cu el
-		var cuInfo = getAppInfoEl();
-		if(cuInfo = null) {
-			notAHMPlan();
-			return;
-		}
-
-		// If the plan in the rfi isn't an HM plan
-		cuInfo = cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
-		if(cuInfo[15].replace(/Plan: */,"").slice(0,6) != "Humana"){
-			notAHMPlan();
-			return;
-		}
-
-		var leadID = cuInfo[1].replace(/Lead ID: */,""),
-			cuName = cuInfo[2].replace(/Customer Name: */,""),
-			cuDOB  = cuInfo[3].replace(/DOB: */,""),
-			cuZip  = cuInfo[4].slice(-5),
-			cuMBI  = cuInfo[5].slice(-11),
-			agentName = cuInfo[9].replace(/Agent Name: */,""),
-			agentSAN  = cuInfo[11].slice(-7),
-			reason = cuInfo[13].replace(/Reason: */,""),
-			subDt  = cuInfo[17].replace(/Sub Date: */,"");
-
-		var finalString = 
-			reason + '\t' +
-			leadID + '\t' +
-			subDt + '\t' +
-			agentName + '\t' +
-			agentSAN + '\t' +
-			cuName + '\t' +
-			cuDOB + '\t' +
-			cuZip + '\t' +
-			cuMBI + '\t';
-
-		copyStringToClipboard(finalString);
-
-		return;
-	}
-}
-
-
-/*** CU INFO SELECT ***/
-
-/* Function getAppInfoEl
-   Gets the most recent comment with the app's processed and formatted info */
-function getAppInfoEl() {
-	var cuInfoElList = $('.fr-focus div.zd-comment:contains("Cu/Agent Info")');
-	var cuInfoElListLn = cuInfoElList.length;
-	if (cuInfoElListLn == 0) {
-		console.warn("Could not find an element containing 'Cu/Agent Info'");
-		return null;
-	} else {
-		return cuInfoElList[cuInfoElListLn-1];
-	}
-}
+//// PUT IT TOGETHER ////
 
 /* Function selectAppInfo
-   Event function that copies the most recent comment with the app's processed and formatted info */
+	Event function that selects and copies the correct node containing the cu's processed and formatted info 
+
+	OUTPUT:
+		T2 Agent:
+		T3 Agent:
+		Plan:
+		SEP:
+		Sub Date:
+		Eff Date:
+		Alt Address:
+	*/
 function selectAppInfo(evt) {
-	// CTRL + SHIFT + X  //x b/c convenient
+	// CTRL + SHIFT + X
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-		if(isDB()) {
-					console.warn("debug on");
+		if(document.bodebug == true) {
+			console.warn("debug on");
 		}
 
-		copyElToClipboard(getAppInfoEl());
+		var finalString = 
+			"T2 Agent:\t"+getT2AgentName()+
+			"\nT3 Agent:\t"+getT3AgentName()+
+			"\nPlan:\t"+getPlanData()+
+			"\nSEP:\t"+getSep()+
+			"\nSub Date:\t"+getSubDate()+
+			"\nEff Date:\t"+getEffDate()+
+			"\nAlt Address:\t"+getAltAddr();
+
+		copyStringToClipboard(finalString);
+
+		return;
 	}
 }
 
@@ -446,21 +383,18 @@ function selectAppInfo(evt) {
 /*************
  * LOGIC
  *************/
+document.bodebug = false; // TODO: Make this survive minif.
 if(document.ranSetup != true) {
-
 	setUpKeyboardShortcuts();
 
 	document.ranSetup = true;
-	document.unloadZD = unloadZD;
+	document.unloadBO = unloadBO;
 	document.alreadyPresent = alreadyPresent;
 	evt = { // For debugging/testing
-	    ctrlKey:true,
-	    shiftKey:true,
-	    which:70
+		ctrlKey:true,
+		shiftKey:true,
+		which:70
 	}
 } else {
 	document.alreadyPresent();
 }
-
-// TODO: Make document hold ref's to all these things, so can test/call/replace
-//document.zd.THING
