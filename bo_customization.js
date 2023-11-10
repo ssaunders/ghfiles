@@ -32,7 +32,7 @@
 /*** LIBRARY ***/
 
 	/* Function alreadyPresent
-		alerts that the code already exists */
+		Alerts that the code already exists */
 	function alreadyPresent() {
 		console.warn(">> BO Code already present");
 	}
@@ -122,7 +122,7 @@ function setUpKeyboardShortcuts() {
 }
 
 /* Function unloadBO
-	Sets up the keyboard listeners to the page */
+	Removes the keyboard listeners from the page */
 function unloadBO() {
 	document.removeEventListener("keyup", selectAppInfo);
 	console.log("removed shortcuts");
@@ -182,8 +182,7 @@ function getNumPIPs() {
 }
 
 /* Function getMostRecentSalePip
-	Gets the most recent Medicare Advantage PIP, if there is one to get. 
-	*/
+	Gets the most recent sales PIP, if there is one to get. */
 function getMostRecentSalePip() {
 	// TODO: check for just one page...or a page w/o a Medicare Advantage
 
@@ -201,7 +200,7 @@ function getMostRecentSalePip() {
 }
 
 /* Function getMostRecentDtcPip
-	gets the DTC PIP, if there is one to get. */
+	Gets the DTC PIP, if there is one to get. */
 function getMostRecentDtcPip() {
 	// TODO: check for just one page...or a page w/o a DTC
 
@@ -217,7 +216,7 @@ function getMostRecentDtcPip() {
 //// GET INFO FROM PIP'S ////
 
 /* Function getT2AgentName
-	Gets the T2 agent's name from the DTC PIP or the sales PIP*/
+	Gets the T2 agent's name from the DTC PIP or the sales PIP */
 function getT2AgentName() {
 	var planPIP = getMostRecentDtcPip();
 	if (planPIP == undefined) {
