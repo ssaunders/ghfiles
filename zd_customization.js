@@ -1,11 +1,13 @@
 // TODO: 
 
+// TODO: Make Ctrl+Shift+S also focus search bar
 // TODO: Make view refresher that sends me a notification if certain views have stuff available.
-// TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
 // TODO: make shortcut to focus on internal note 
 // TODO: Make a subject sorter...for just the page.
 
 /** DONE **/
+	// TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
+	// TODO: Make Ct+Sh+x get PI header, too
 	// TODO: Make it so that I can copy HM email directly from the ticket
 	// TODO: Make shortcut for DNE (name, email, first)
 	// TODO: Figure out why the debug isn't working
@@ -16,8 +18,8 @@
 	// TODO: Figure out how to get/select/copy the particular element containing the thing
 	// TODO: Make an unload fn
 
-/*  Function DEFAULT
-	NOTES_ON_FN */
+/* Function DEFAULT
+   NOTES_ON_FN */
 
 /** Random notes:
  {{ticket.requester.customfields.state}} 
@@ -26,101 +28,116 @@
 **/
 
 
-
 /*************
  * FUNCTIONS
  *************/
 
+/*** LIBRARY ***/
+
+	/* Function alreadyPresent
+		alerts that the code already exists */
+	function alreadyPresent() {
+		console.warn(">> ZD Code already present");
+	}
+
+	/* Function DEBUG FUNCTIONS
+		tests for/starts/stops debug */
+	function isDB() {
+		return document.mxdebug;
+	}
+	function startDB() {
+		document.mxdebug = true;
+	}
+	function endDB() {
+		document.mxdebug = false;	
+	}
+
+	/* Function copyStringToClipboard
+		Copies a string to the computer clipboard */
+	function copyStringToClipboard(string) {
+		if(string == null) {
+			console.warn("Nothing to copy");
+			return;
+		}
+
+		navigator.clipboard.writeText(string).then(() => {
+		  console.log('Content copied to clipboard');
+		},() => {
+		  console.error('Failed to copy');
+		});
+	}
+
+	/* Function copyElToClipboard
+		Copies the content of an el to the computer clipboard */
+	function copyElToClipboard(htmlEl) {
+		if(htmlEl == null) {
+			console.warn("Nothing to copy");
+			return;
+		}
+
+	    var range = document.createRange();
+	    var sel = document.getSelection();
+
+	    sel.removeAllRanges();
+	    range.selectNodeContents(htmlEl);
+		sel.addRange(range);
+		document.execCommand("Copy");
+	}
+
+	/*  Function addCssEl
+		Adds the passed in CSS text to the document body */
+	function addCssEl(cssText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (cssText!=null) {
+			const css_el = doc.createElement("style");
+			css_el.textContent = cssText;
+			doc.childNodes[1].appendChild(css_el);
+		}
+	}
+
+	/*  Function addJsScript
+		Adds the passed in script text to the document body */
+	function addJsScript(scriptText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (scriptText!=null) {
+			const js_el = doc.createElement("script");
+			js_el.textContent = scriptText;
+			doc.childNodes[1].appendChild(js_el);
+		}
+	}
+
+	/* Function getCurrentTimestamp
+		Returns a string of the current timestamp */
+	function getCurrentTimestamp() {
+		return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+	}
+
+
 /*** UTILITY ***/
 
-/*  Function alreadyPresent
-	alerts that the code already exists */
-function alreadyPresent() {
-	console.warn("ZD Code already present");
-}
-
-/*  Function DEBUG FUNCTIONS
-	tests for/starts/stops debug */
-function isDB() {
-	return document.zddebug;
-}
-function startDB() {
-	document.zddebug = true;
-}
-function endDB() {
-	document.zddebug = false;	
-}
-
-/*  Function addScript
-	Adds the passed in script text and CSS text to the document body */
-function addScript(scriptText, cssText) {
-	/*Add style element*/
-	if (cssText!=null) {
-		const css_el = document.createElement("style");
-		css_el.textContent = cssText;
-		document.childNodes[1].appendChild(css_el);
-	}
-
-	/*Add js element*/
-	if (scriptText!=null) {
-		const js_el = document.createElement("script");
-		js_el.textContent = scriptText;
-		document.childNodes[1].appendChild(js_el);
-	}
-}
-
-/*  Function copyStringToClipboard
-	Copies a string to the computer clipboard */
-function copyStringToClipboard(string) {
-	if(string == null) {
-		console.warn("Nothing to copy");
-		return;
-	}
-
-	navigator.clipboard.writeText(string).then(() => {
-	  console.log('Content copied to clipboard');
-	},() => {
-	  console.error('Failed to copy');
-	});
-}
-
-/*  Function copyElToClipboard
-	Copies the content of an el to the computer clipboard */
-function copyElToClipboard(htmlEl) {
-	if(htmlEl == null) {
-		console.warn("Nothing to copy");
-		return;
-	}
-
-    var range = document.createRange();
-    var sel = document.getSelection();
-
-    sel.removeAllRanges();
-    range.selectNodeContents(htmlEl);
-	sel.addRange(range);
-	document.execCommand("Copy");
-}
-
-/*  Function setUpKeyboardShortcuts
-	Sets up the keyboard listeners to the page */
+/* Function setUpKeyboardShortcuts
+   Sets up the keyboard listeners to the page */
 function setUpKeyboardShortcuts() {
 	document.addEventListener("keyup", selectAppInfo);
 	document.addEventListener("keyup", selectComment);
 	document.addEventListener("keyup", selectDNEInfo);
 	document.addEventListener("keyup", selectHumEmailInfo);
 	document.addEventListener("keyup", subjectFocus);
+	document.addEventListener("keyup", searchBoxFocus);
 	console.warn("set up shortcuts");
 }
 
-
-/*  Function unloadZD
-	Removes the keyboard listeners from the page */
+/* Function unloadZD
+   Removes the keyboard listeners from the page */
 function unloadZD() {
 	document.removeEventListener("keyup", selectAppInfo);
 	document.removeEventListener("keyup", selectComment);
 	document.removeEventListener("keyup", selectDNEInfo);
 	document.removeEventListener("keyup", selectHumEmailInfo);
 	document.removeEventListener("keyup", subjectFocus);
+	document.removeEventListener("keyup", searchBoxFocus);
 	console.log("removed shortcuts");
 	document.ranSetup = false;
 }
@@ -128,8 +145,8 @@ function unloadZD() {
 
 /*** FOCUS INTERNAL NOTE ***/
 
-/*  Function getNoteEl
-	Selects the correct node that contains the cu's processed and formatted info */
+/* Function getNoteEl
+   Selects the correct node that contains the cu's processed and formatted info */
 function getNoteEl() {
 	// var firstInfoElList = $('div.zd-comment:contains("Agent Name:")');
 	// var firstInfoElListLn = firstInfoElList.length;
@@ -140,8 +157,8 @@ function getNoteEl() {
 	// }
 }
 
-/*  Function setFocusToNoteEl
-	Event function that selects and copies the correct node containing the cu's processed and formatted info */
+/* Function setFocusToNoteEl
+   Event function that selects and copies the correct node containing the cu's processed and formatted info */
 function setFocusToNoteEl(evt) {
 	// CTRL + SHIFT + ?
 	// if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
@@ -164,10 +181,11 @@ function setFocusToNoteEl(evt) {
 	// }
 }
 
+
 /*** FOCUS SUBJECT LINE ***/
 
-/*  Function getSubjLineEl
-	Gets the subject element */
+/* Function getSubjLineEl
+   Gets the subject element */
 function getSubjLineEl() {
 	var firstInfoElList = $('.fr-focus [placeholder="Subject"]');
 	if (firstInfoElList.length == 0) {
@@ -177,8 +195,8 @@ function getSubjLineEl() {
 	}
 }
 
-/*  Function subjectFocus
-	Event function that selects the Subject line, and focuses the cursor at the start */
+/* Function subjectFocus
+   Event function that selects the Subject line, and focuses the cursor at the start */
 function subjectFocus(evt) {
 	// CTRL + SHIFT + S //s for subject
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
@@ -194,22 +212,54 @@ function subjectFocus(evt) {
 	}
 }
 
+
+/*** FOCUS ACTIVE SEARCH ***/
+
+/* Function getSearchBox
+   Gets the search Box */
+function getSearchBox() {
+	var searchBox = $('.search[style="display: block;"] [data-garden-id="forms.faux_input"] input')[0];
+	if (searchBox == undefined) {
+		return null;
+	} else {
+		return searchBox;
+	}
+}
+
+/* Function searchBoxFocus
+   Event fn that moves the focus to the active search box */
+function searchBoxFocus(evt) {
+	// CTRL + SHIFT + S //s for Search
+	if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
+		var searchBoxEl = getSearchBox(); 
+		console.log(searchBoxEl);
+		if(searchBoxEl == null) {
+			console.log("Could not find an active search box ",searchBoxEl);
+			return;
+		}
+
+		searchBoxEl.focus();
+		searchBoxEl.select();
+	}
+}
+
+
 /*** FIRST COMMENT SELECT ***/
 
-/*  Function isDevotedRFI
-	Decides if the el passed in is the first comment on a Dev RFI*/
+/* Function isDevotedRFI
+   Decides if the el passed in is the first comment on a Dev RFI*/
 function isDevotedRFI(el) {
 	return el.innerHTML.search(/<table>/) == 0;
 }
 
-/*  Function isRegularRFI
-	Decides if the el passed in is the first comment on a regular RFI */
+/* Function isRegularRFI
+   Decides if the el passed in is the first comment on a regular RFI */
 function isRegularRFI(el) {
 	return el.innerHTML.search(/Agent Name\:/) == 14;
 }
 
-/*  Function getFirstCommentEl
-	Selects the el that contains the cu's info, which is the first comment.
+/* Function getFirstCommentEl
+   Selects the el that contains the cu's info, which is the first comment.
 	Returns null if not in a format recognized */
 function getFirstCommentEl() {
 	var firstInfoElList = $('.fr-focus div.zd-comment')[0];
@@ -223,8 +273,8 @@ function getFirstCommentEl() {
 	return null;
 }
 
-/*  Function processDevotedRFIComment
-	Processes the content of a Devoted RFI initial comment into the standardized format */
+/* Function processDevotedRFIComment
+   Processes the content of a Devoted RFI initial comment into the standardized format */
 function processDevotedRFIComment(el) {
 	var rfiParts= el.innerHTML.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
 
@@ -242,8 +292,8 @@ function processDevotedRFIComment(el) {
 	return returnVal;
 }
 
-/*  Function selectComment
-	Event function that selects and copies the initial comment containing the RFI's info */
+/* Function selectComment
+   Event function that selects and copies the initial comment containing the RFI's info */
 function selectComment(evt) {
 	// CTRL + SHIFT + F //(f for "first")
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
@@ -264,17 +314,18 @@ function selectComment(evt) {
 	}
 }
 
+
 /*** SELECT DNE INFO ***/
 
-/*  Function getCuName
-	Get's the cu's name from the page */
+/* Function getCuName
+   Get's the cu's name from the page */
 function getCuName() {
 	var cuName = $('.fr-focus [data-test-id=essentials-header-title]');
  	return cuName[0].innerHTML;
 }
 
-/*  Function getLeadID
-	Get's the lead id from the page */
+/* Function getLeadID
+   Get's the lead id from the page */
 function getLeadID() {
 	var searchAry = $('.fr-focus div:contains("@gohealth.com")');
 	var leadID = searchAry[searchAry.length-1].innerHTML;
@@ -282,8 +333,8 @@ function getLeadID() {
 	return leadID.replace('@gohealth.com','');
 }
 
-/*  Function selectDNEInfo
-	Get's the info needed for a DNE from the page.
+/* Function selectDNEInfo
+   Get's the info needed for a DNE from the page.
 	Also formats it into a tabbed format and copies for pasting into a spreadsheet */
 function selectDNEInfo(evt) {
 	// CTRL + SHIFT + E // (e for "engage")
@@ -303,15 +354,16 @@ function selectDNEInfo(evt) {
 	}
 }
 
+
 /*** SELECT HM EMAIL INFO ***/
-/*  Function notAHMPlan
-	Copies "Not a HM Plan" to the clipboard */
+/* Function notAHMPlan
+   Copies "Not a HM Plan" to the clipboard */
 function notAHMPlan() {
 	copyStringToClipboard("Not a Humana Plan");
 }
 
-/*  Function selectHumEmailInfo
-	Copies cu info and formats it to the HM Email format*/
+/* Function selectHumEmailInfo
+   Copies cu info and formats it to the HM Email format*/
 function selectHumEmailInfo(evt) {
 	// CTRL + SHIFT + H // (h for "Humana")
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
@@ -361,11 +413,10 @@ function selectHumEmailInfo(evt) {
 }
 
 
-
 /*** CU INFO SELECT ***/
 
-/*  Function getAppInfoEl
-	Gets the most recent comment with the app's processed and formatted info */
+/* Function getAppInfoEl
+   Gets the most recent comment with the app's processed and formatted info */
 function getAppInfoEl() {
 	var cuInfoElList = $('.fr-focus div.zd-comment:contains("Cu/Agent Info")');
 	var cuInfoElListLn = cuInfoElList.length;
@@ -377,8 +428,8 @@ function getAppInfoEl() {
 	}
 }
 
-/*  Function selectAppInfo
-	Event function that copies the most recent comment with the app's processed and formatted info */
+/* Function selectAppInfo
+   Event function that copies the most recent comment with the app's processed and formatted info */
 function selectAppInfo(evt) {
 	// CTRL + SHIFT + X  //x b/c convenient
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
@@ -401,7 +452,7 @@ if(document.ranSetup != true) {
 	document.ranSetup = true;
 	document.unloadZD = unloadZD;
 	document.alreadyPresent = alreadyPresent;
-	evt = {
+	evt = { // For debugging/testing
 	    ctrlKey:true,
 	    shiftKey:true,
 	    which:70
@@ -412,4 +463,3 @@ if(document.ranSetup != true) {
 
 // TODO: Make document hold ref's to all these things, so can test/call/replace
 //document.zd.THING
-
