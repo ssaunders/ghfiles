@@ -63,26 +63,24 @@
 
 	/*  Function copyElToClipboard
 		Copies the content of an el to the computer clipboard */
-	function copyElToClipboard(htmlEl) {
+	function copyElToClipboard(htmlEl, doc=document) {
 		if(htmlEl == null) {
 			console.warn("Nothing to copy");
 			return;
 		}
 
-	    var range = document.createRange();
-	    var sel = document.getSelection();
+	    var range = doc.createRange();
+	    var sel = doc.getSelection();
 
 	    sel.removeAllRanges();
 	    range.selectNodeContents(htmlEl);
 		sel.addRange(range);
-		document.execCommand("Copy");
+		doc.execCommand("Copy");
 	}
 
 	/*  Function addCssEl
 		Adds the passed in CSS text to the document body */
-	function addCssEl(cssText, doc) {
-		doc = (doc == null || doc == undefined) ? document : doc;
-
+	function addCssEl(cssText, doc=document) {
 		if (cssText!=null) {
 			const css_el = doc.createElement("style");
 			css_el.textContent = cssText;
@@ -92,9 +90,7 @@
 
 	/*  Function addJsScript
 		Adds the passed in script text to the document body */
-	function addJsScript(scriptText, doc) {
-		doc = (doc == null || doc == undefined) ? document : doc;
-
+	function addJsScript(scriptText, doc=document) {
 		if (scriptText!=null) {
 			const js_el = doc.createElement("script");
 			js_el.textContent = scriptText;
@@ -159,9 +155,9 @@ function setUpLoadListeners() {
 	iframe.addEventListener("load", setUpKeyboardShortcuts);
 }
 
-/*  Function unloadZD
+/*  Function unloadMx
 	Removes the keyboard listeners from the page */
-function unloadZD() {
+function unloadMx() {
 	// remove load events
 	var iframe = getIframe();
 	iframe.removeEventListener("load", addToggleBtn);
@@ -356,16 +352,7 @@ function selectCuInfo(evt) {
 			console.warn("debug on");
 		}
 
-		var iframeDoc = getIframeDoc();
-	    var range = iframeDoc.createRange();
-	    var sel = iframeDoc.getSelection();
-
-	    copyElToClipboard(getCuInfoTable());
-
-	    // sel.removeAllRanges();
-	    // range.selectNodeContents(getCuInfoTable());
-		// sel.addRange(range);
-		// iframeDoc.execCommand("Copy");
+		copyElToClipboard(getCuInfoTable(), getIframeDoc());
 	}
 }
 
