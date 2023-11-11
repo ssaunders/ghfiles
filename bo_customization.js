@@ -1,3 +1,5 @@
+//~~~~ BO CUSTOMIZATION ~~~~//
+
 // TODO: 
 
 // TODO: Pipe dream--create page that wraps BO in an iframe, so I can keep my shortcuts/apply them auto on refresh
@@ -10,20 +12,22 @@
 // TODO: shortcut to submit note
 
 /** DONE: **/
-// TODO: Make it so that an Alt Addr is created, attached to the bottom of the copy fn. City, ST Zip
-// TODO: Add the name of T3 AOR, for non-standard RFI's
-// TODO: Add the effective date, for non-standard RFI's
-	// TODO: The one shortcut to rule them all: have it copy the AOR, sub date, plan name and #, and wrap it into a single copy command
-		// TODO: shortcut to copy AOR name (not number)
-		// TODO: shortcut to copy sub date
-		// TODO: shortcut to copy plan name
-		// TODO: Figure out if can return just plain text.
-	// TODO: Make unloadBO fn
-
-
+	// TODO: TEST to see if it actually works on mult pages 119212107 (it does)
+	// TODO: TEST to see if it actually works on only one page 120577746 (it does)
+	// TODO: Make it so that an Alt Addr is created, attached to the bottom of the copy fn. City, ST Zip
+	// TODO: Add the name of T3 AOR, for non-standard RFI's
+	// TODO: Add the effective date, for non-standard RFI's
+		// TODO: The one shortcut to rule them all: have it copy the AOR, sub date, plan name and #, and wrap it into a single copy command
+			// TODO: shortcut to copy AOR name (not number)
+			// TODO: shortcut to copy sub date
+			// TODO: shortcut to copy plan name
+			// TODO: Figure out if can return just plain text.
+		// TODO: Make unloadBO fn
 
 /* Function DEFAULT
 	NOTES_ON_FN */
+
+
 
 /*************
  * FUNCTIONS
@@ -184,7 +188,14 @@ function getNumPIPs() {
 /* Function getMostRecentSalePip
 	Gets the most recent sales PIP, if there is one to get. */
 function getMostRecentSalePip() {
-	// TODO: check for just one page...or a page w/o a Medicare Advantage
+/* T2 Agent:	Mitsuko Martindale
+	T3 Agent:	LaWanda Wells
+	Plan:	Anthem Dual Advantage (HMO D-SNP) H3447-030-0
+	SEP:	AEP
+	Sub Date:	10/31/2023
+	Eff Date:	01/01/2024
+	Alt Address:	-
+
 
 	/* Could also use:
 		$$('#appInfoContainer div:contains("Off-Exchange")');
@@ -206,7 +217,7 @@ function getMostRecentDtcPip() {
 
 	var dtcPip = $$('#appInfoContainer div:contains("DTC Transfer")');
 	if(dtcPip[0] == undefined) {
-		console.warn("Could not find T2 PIP");
+		console.warn("Could not find DTC PIP");
 		return undefined;
 	}
 
@@ -383,7 +394,7 @@ function selectAppInfo(evt) {
 /*************
  * LOGIC
  *************/
-document.bodebug = false; // TODO: Make this survive minif.
+document.bodebug = true; // TODO: Make this survive minif.
 if(document.ranSetup != true) {
 	setUpKeyboardShortcuts();
 
