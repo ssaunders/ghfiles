@@ -1,11 +1,15 @@
+//~~~~ ZD CUSTOMIZATION ~~~~//
+
 // TODO: 
 
-// TODO: Make Ctrl+Shift+S also focus search bar
+// TODO: TEST to see if HM email copy fn actually filters out correct plans
+// TODO: Make Ctrl+Shift+E also work for Dev RFI'S
 // TODO: Make view refresher that sends me a notification if certain views have stuff available.
 // TODO: make shortcut to focus on internal note 
 // TODO: Make a subject sorter...for just the page.
 
 /** DONE **/
+// TODO: Make Ctrl+Shift+S also focus search bar
 	// TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
 	// TODO: Make Ct+Sh+x get PI header, too
 	// TODO: Make it so that I can copy HM email directly from the ticket
@@ -142,6 +146,14 @@ function unloadZD() {
 	document.ranSetup = false;
 }
 
+/* Function isCarrierPlan
+   Copies "Not a HM Plan" to the clipboard */
+function isCarrierPlan(cuInfo,carrierName) {
+	if(carrierName == undefined || carrierName == null) return false;
+	var regExp = new RegExp("Plan:\s"+carrierName);
+	return cuInfo.innerHTML.replaceAll("&nbsp;"," ").search(regExp) == -1
+}
+
 
 /*** FOCUS INTERNAL NOTE ***/
 
@@ -218,7 +230,7 @@ function subjectFocus(evt) {
 /* Function getSearchBox
    Gets the search Box */
 function getSearchBox() {
-	var searchBox = $('.search[style="display: block;"] [data-garden-id="forms.faux_input"] input')[0];
+	var searchBox = $('.search [data-garden-id="forms.faux_input"] input')[0];
 	if (searchBox == undefined) {
 		return null;
 	} else {
@@ -356,44 +368,41 @@ function selectDNEInfo(evt) {
 
 
 /*** SELECT HM EMAIL INFO ***/
-/* Function notAHMPlan
-   Copies "Not a HM Plan" to the clipboard */
-function notAHMPlan() {
-	copyStringToClipboard("Not a Humana Plan");
-}
 
 /* Function selectHumEmailInfo
-   Copies cu info and formats it to the HM Email format*/
+   Copies cu info and formats it to the HM Email format
+
+	OUTPUT:
+	Reason	Lead ID	Sub Date	v Agent	SAN	Client Name	DOB	ZIP	MBI
+   */
 function selectHumEmailInfo(evt) {
 	// CTRL + SHIFT + H // (h for "Humana")
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
 		if(isDB()) {
-			console.warn("debug on");
+			console.warn("debug on: selectHumEmailInfo");
 		}
 
 		//If not an RFI w/a cu el
 		var cuInfo = getAppInfoEl();
-		if(cuInfo = null) {
-			notAHMPlan();
+		if(cuInfo == undefined) {
+			return;
+		}
+		if(!isCarrierPlan(cuInfo, "Humana")) {
+			copyStringToClipboard("Not a Humana Plan");
 			return;
 		}
 
-		// If the plan in the rfi isn't an HM plan
-		cuInfo = cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
-		if(cuInfo[15].replace(/Plan: */,"").slice(0,6) != "Humana"){
-			notAHMPlan();
-			return;
-		}
+		parsedCuInfo = cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
 
-		var leadID = cuInfo[1].replace(/Lead ID: */,""),
-			cuName = cuInfo[2].replace(/Customer Name: */,""),
-			cuDOB  = cuInfo[3].replace(/DOB: */,""),
-			cuZip  = cuInfo[4].slice(-5),
-			cuMBI  = cuInfo[5].slice(-11),
-			agentName = cuInfo[9].replace(/Agent Name: */,""),
-			agentSAN  = cuInfo[11].slice(-7),
-			reason = cuInfo[13].replace(/Reason: */,""),
-			subDt  = cuInfo[17].replace(/Sub Date: */,"");
+		var leadID = parsedCuInfo[1].replace(/Lead ID: */,""),
+			cuName = parsedCuInfo[2].replace(/Customer Name: */,""),
+			cuDOB  = parsedCuInfo[3].replace(/DOB: */,""),
+			cuZip  = parsedCuInfo[4].slice(-5),
+			cuMBI  = parsedCuInfo[5].slice(-11),
+			agentName = parsedCuInfo[9].replace(/Agent Name: */,""),
+			agentSAN  = parsedCuInfo[11].slice(-7),
+			reason = parsedCuInfo[13].replace(/Reason: */,""),
+			subDt  = parsedCuInfo[17].replace(/Sub Date: */,"");
 
 		var finalString = 
 			reason + '\t' +
