@@ -7,6 +7,8 @@
 // TODO: Make view refresher that sends me a notification if certain views have stuff available.
 // TODO: make shortcut to focus on internal note 
 // TODO: Make a subject sorter...for just the page.
+	// (needs to ignore !)
+	// (sort groups of things seperately)
 
 /** DONE **/
 // TODO: Make Ctrl+Shift+S also focus search bar
@@ -150,8 +152,8 @@ function unloadZD() {
    Copies "Not a HM Plan" to the clipboard */
 function isCarrierPlan(cuInfo,carrierName) {
 	if(carrierName == undefined || carrierName == null) return false;
-	var regExp = new RegExp("Plan:\s"+carrierName);
-	return cuInfo.innerHTML.replaceAll("&nbsp;"," ").search(regExp) == -1
+	var regExp = new RegExp("Plan:\\s+"+carrierName);
+	return cuInfo.innerHTML.replaceAll("&nbsp;"," ").search(regExp) != -1;
 }
 
 
@@ -373,7 +375,7 @@ function selectDNEInfo(evt) {
    Copies cu info and formats it to the HM Email format
 
 	OUTPUT:
-	Reason	Lead ID	Sub Date	v Agent	SAN	Client Name	DOB	ZIP	MBI
+	Reason	Lead ID	Sub_Date	Agent_SAN	Client_Name	DOB	ZIP	MBI
    */
 function selectHumEmailInfo(evt) {
 	// CTRL + SHIFT + H // (h for "Humana")
