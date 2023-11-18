@@ -8,10 +8,11 @@
 	// TODO: beneficiaries
 	// TODO: eligibility
 	// TODO: make it so that if the MX button is pushed, it'll still go
-	// TODO: Make unloadMx fn
-
+		// TODO: Have it delay the addition of the stuff until the end
+		
 
 //DONE 
+// TODO: Make unloadMx fn
 // TODO: Add timestamp to "tried it"
 	// TODO: Rework hideShowFn > name better
 	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
@@ -134,7 +135,7 @@ function setUpKeyboardShortcuts() {
 	var doc = getIframeDoc();
 	doc.addEventListener("keyup", selectCuInfo);
 	doc.addEventListener("keyup", selectSearchBox);
-	console.log(">> set up shortcuts");
+	console.log(">> set up shortcuts "+getCurrentTimestamp());
 }
 
 /*  Function setUpLoadListeners
@@ -298,7 +299,7 @@ function autoRefresher(evt){
 		return;
 	}
 
-	console.log(">> started autoRefresher ("+refreshCount.getValue()+")");
+	console.log(">> started autoRefresher ("+refreshCount.getValue()+") @ "+getCurrentTimestamp());
 	// message to let me know it's going
 	setInterval(function () {
 		console.log(">> Refresher active ("+refreshCount.getValue()+")");
@@ -308,7 +309,7 @@ function autoRefresher(evt){
 		getSubmitBtn().click();
 		refreshCount.increment();
 		console.log("<<< clicked submit button ("+refreshCount.getValue()+"/"+getCurrentTimestamp()+") >>>");
-	}, 14.75*60*1000);
+	}, 14.5*60*1000);
 	iframeDoc.refresherActive = true;
 }
 
@@ -374,6 +375,7 @@ if(document.ranSetup != true) {
 	setUpKeyboardShortcuts();
 
 	document.ranSetup = true;
+	document.unloadMX = unloadMX;
 	document.alreadyPresent = alreadyPresent;
 } else {
 	document.alreadyPresent();
