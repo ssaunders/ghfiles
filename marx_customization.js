@@ -2,6 +2,7 @@
 
 // TODO: 
 
+//TODO: Make a setup fn, to be called from autonav
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -116,13 +117,14 @@ function getIframe() {
 	if(this.iframe == undefined) {
         this.iframe = document.querySelectorAll("iframe")[0];
     }
-    return this.iframe;    
+    return this.iframe;
 }
 
-/*  Function getIframe
+/*  Function getIframeDoc
 	Gets the document belonging to the cu lookup iframe */
 function getIframeDoc() {
-	return getIframe().contentDocument;   
+	var iframe = getIframe();
+	return iframe == undefined ? undefined : getIframe().contentDocument;   
 }
 
 /*  Function setUpKeyboardShortcuts
@@ -130,6 +132,10 @@ function getIframeDoc() {
 function setUpKeyboardShortcuts() {
 	if(isDB()) {
 		console.warn(">> debug on");
+	}
+
+	if(document.ranSetup) {
+		return;
 	}
 
 	var doc = getIframeDoc();
@@ -151,11 +157,14 @@ function setUpLoadListeners() {
 	addToggleBtn();
 
 	/*** Add Auto-refresh Attempt Functionality ***/
-	iframe.addEventListener("load", autoRefresher);
-	autoRefresher();
+	iframe.addEventListener("load", setUpAutoRefresher);
+	setUpAutoRefresher();
 
 	/*** Add Shortcut Functionality ***/
 	iframe.addEventListener("load", setUpKeyboardShortcuts);
+
+	/*** Add AutoNav Functionality ***/
+	iframe.addEventListener("load", autoNav);
 }
 
 /*  Function unloadMx
@@ -164,7 +173,7 @@ function unloadMx() {
 	// remove load events
 	var iframe = getIframe();
 	iframe.removeEventListener("load", addToggleBtn);
-	iframe.removeEventListener("load", autoRefresher);
+	iframe.removeEventListener("load", setUpAutoRefresher);
 	iframe.removeEventListener("load", setUpKeyboardShortcuts);
 
 	// remove keyup events
@@ -233,40 +242,77 @@ function addToggleBtn(evt) {
 	addCssEl(cssContent, iframeDoc)
 }
 
+
 /*** AUTONAV ***/
 
+/*  Function getIframeJqry
+	Searches for specific elements on the DOM to decide the current step the nave is at. */
+function getIframeJqry() {
+	var iframeDoc = getIframeDoc();
+	this.iFrameJqry = undefined;
+
+	if (iframeDoc != undefined) {
+		this.iFrameJqry = iframeDoc.querySelector('.pgTtle').ownerDocument.defaultView.$;
+	}
+
+	return this.iFrameJqry;
+}
+
+/*  Function getCurrStepNum
+	Searches for specific elements on the DOM to decide the current step the nave is at. */
+function getCurrStepNum() {
+	var iFrameJqry = getIframeJqry() || $;
+
+	if ($("#cms-marxaws-tile").length > 0) { // no iframe on this step
+		console.log("returned 1");
+		return 1;
+	} else if ($('#userRole').length > 0) {
+		console.log("returned 2");
+		return 2;
+	} else if (iFrameJqry('.pageTitle')) {
+		console.log("returned 3");
+		return 3;
+	} else if (iFrameJqry('.pageTitle')) {
+		console.log("returned 4");
+		return 4;
+	} else if (iFrameJqry('.pageTitle')) {
+		return 5;
+	}
+
+	console.log("returned 0");
+	return 0;
+}
+
 /*  Function autoNav
-	Navigates from wherever you are in the "get to MARx" process to MARx */
+	Navigates from wherever you are in the "get to MARx" process to the next step in MARX. 
+	Utilizes "Load" even to decide where to go. 
+	Executed in context of main frame AND in context iframe.
+	Uses '$' when in main frame, uses iFrameJqry when in iframe.
+*/
 function autoNav(){
-	//temporary don't screw things up escape
-	return;
-
-	var innerDoc = getIframeDoc();
-	var currStepNum = getStep();
-
-	switch(currStepNum || 1) {
-		default: break;
+	var iFrameJqry = getIframeJqry();
+	switch(getCurrStepNum()) {
+		default: 
+			break;
+		// nav to https://portal.cms.gov/myportal/wps/myportal/cmsportal/marxaws/verticalRedirect/application
 		case 1: 
-			document.stepNumber = 2;
-			// nav to https://portal.cms.gov/myportal/wps/myportal/cmsportal/marxaws/verticalRedirect/application
-			//allow cascade to 2 for now
+			$("#cms-marxaws-tile").click();
+			$('.cms-myapps-link')[0].click()
+			break;
 		case 2: 
-			innerDoc.getElementById('userRole').click();
-			document.stepNumber = 3;
+	 		$('#userRole').click()
 			break;
 		case 3: 
-			innerDoc.getElementsByClassName('navsm')[0].click();
-			document.stepNumber = 4;
+	 		iFrameJqry('a:contains("Beneficiaries")')[0].click();
 			break;
 		case 4: 
-			innerDoc.getElementsByClassName('navsm')[2].click();
-			document.stepNumber = 5;
+	 		iFrameJqry('a:contains("Eligibility")').click();
+			break;
+		case 5: //we have arrived
 			break;
 	}
-	/*
-	Test if things can be working in step1 by having a timer go off on the new page--actually, tie to onload
-	*/
 }
+
 
 /*** AUTO REFRESHER ***/
 
@@ -277,6 +323,7 @@ const refreshCount = {
 		return this.refreshCount;
 	},
 	increment: function(){
+		console.log("incremented refreshCount @ "+getCurrentTimestamp());
 		return this.refreshCount++;
 	}
 }
@@ -292,18 +339,21 @@ function getSubmitBtn() {
 
 /*  Function autoRefresh
 	Auto-refreshes the interation w/MARx by re-submitting search*/
-function autoRefresher(evt){
+function setUpAutoRefresher(){
 	var iframeDoc = getIframeDoc();
 
 	if(iframeDoc.refresherActive) {
+		console.log(">> autoRefresher running, cutoff ("+refreshCount.getValue()+")");
 		return;
 	}
 
 	console.log(">> started autoRefresher ("+refreshCount.getValue()+") @ "+getCurrentTimestamp());
+
 	// message to let me know it's going
 	setInterval(function () {
 		console.log(">> Refresher active ("+refreshCount.getValue()+")");
 	}, 10*60*1000);
+
 	setInterval(function () {
 		// click on "Find", so it reloads the iframe
 		getSubmitBtn().click();
@@ -365,7 +415,7 @@ function selectCuInfo(evt) {
  * LOGIC
  *************/
 /*** Run auto-nav ***/
-// autoNav();
+autoNav();  //TODO: Make a fn out of below, so that it can be called from here
 
 // Set up 
 if(document.ranSetup != true) {
