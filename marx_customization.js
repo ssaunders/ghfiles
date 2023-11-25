@@ -2,7 +2,6 @@
 
 // TODO: 
 
-//TODO: Make a setup fn, to be called from autonav
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -13,8 +12,9 @@
 		
 
 //DONE 
-// TODO: Make unloadMx fn
-// TODO: Add timestamp to "tried it"
+	//TODO: Make a setup fn, to be called from autonav
+	// TODO: Make unloadMx fn
+	// TODO: Add timestamp to "tried it"
 	// TODO: Rework hideShowFn > name better
 	// TODO: Fix setUpKeyboardShortcuts to use addEventListener
 	// TODO: Rework addscript > break into two, doc is optional
@@ -162,9 +162,6 @@ function setUpLoadListeners() {
 
 	/*** Add Shortcut Functionality ***/
 	iframe.addEventListener("load", setUpKeyboardShortcuts);
-
-	/*** Add AutoNav Functionality ***/
-	iframe.addEventListener("load", autoNav);
 }
 
 /*  Function unloadMx
@@ -245,14 +242,21 @@ function addToggleBtn(evt) {
 
 /*** AUTONAV ***/
 
+/*  Function endAutoNav
+	Removes the autonav logic when we have arrived, to prevent issues when reloading */
+function endAutoNav() {
+	getIframeDoc().removeEventListener("load", autoNav);
+}
 /*  Function getIframeJqry
 	Searches for specific elements on the DOM to decide the current step the nave is at. */
 function getIframeJqry() {
-	var iframeDoc = getIframeDoc();
+	var iframeDoc = getIframeDoc(),
+		 el;
 	this.iFrameJqry = undefined;
 
 	if (iframeDoc != undefined) {
-		this.iFrameJqry = iframeDoc.querySelector('.pgTtle').ownerDocument.defaultView.$;
+		el = iframeDoc.querySelector('#pgTtle') != null ? iframeDoc.querySelector('#pgTtle') : iframeDoc.querySelector('.pageTitle');
+		this.iFrameJqry = el.ownerDocument.defaultView.$;
 	}
 
 	return this.iFrameJqry;
@@ -263,19 +267,19 @@ function getIframeJqry() {
 function getCurrStepNum() {
 	var iFrameJqry = getIframeJqry() || $;
 
-	if ($("#cms-marxaws-tile").length > 0) { // no iframe on this step
+	if ($("#cms-marxaws-tile") != null && $("#cms-marxaws-tile").length != 0) { // no iframe on this step
 		console.log("returned 1");
 		return 1;
-	} else if ($('#userRole').length > 0) {
+	} else if ($('#userRole').length != 0) {
 		console.log("returned 2");
 		return 2;
-	} else if (iFrameJqry('.pageTitle')) {
+	} else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Welcome (M101)') {
 		console.log("returned 3");
 		return 3;
-	} else if (iFrameJqry('.pageTitle')) {
+	} else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiaries: Find (M201)') {
 		console.log("returned 4");
 		return 4;
-	} else if (iFrameJqry('.pageTitle')) {
+	} else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiary: Eligibility (M232)') {
 		return 5;
 	}
 
@@ -306,9 +310,10 @@ function autoNav(){
 	 		iFrameJqry('a:contains("Beneficiaries")')[0].click();
 			break;
 		case 4: 
-	 		iFrameJqry('a:contains("Eligibility")').click();
+	 		iFrameJqry('a:contains("Eligibility")')[0].click();
 			break;
-		case 5: //we have arrived
+		case 5: //we have arrived, run the usual stuff
+			setup();
 			break;
 	}
 }
@@ -414,20 +419,30 @@ function selectCuInfo(evt) {
 /*************
  * LOGIC
  *************/
-/*** Run auto-nav ***/
-autoNav();  //TODO: Make a fn out of below, so that it can be called from here
-
 // Set up 
-if(document.ranSetup != true) {
-	document.mxdebug = false;
+function setup(doc) {
+	if(doc.ranSetup != true) {
+		doc.mxdebug = false;
 
-	setUpLoadListeners();
-	setUpKeyboardShortcuts();
+		setUpLoadListeners();
+		setUpKeyboardShortcuts();
 
-	document.ranSetup = true;
-	document.unloadMX = unloadMX;
-	document.alreadyPresent = alreadyPresent;
-} else {
-	document.alreadyPresent();
+		doc.ranSetup = true;
+		doc.unloadMX = unloadMX;
+		doc.alreadyPresent = alreadyPresent;
+	} else {
+		doc.alreadyPresent();
+	}
 }
 
+/*** Run auto-nav ***/
+
+/*** Add AutoNav Functionality ***/
+var iframeDoc = getIframeDoc();
+if(iframeDoc != undefined) {
+	// need to add the listener, so it starts the loop for the navigation until we arrive
+	// this is only important if you enter when there is an iframe
+	iframeDoc.addEventListener("load", autoNav);
+}
+
+autoNav();
