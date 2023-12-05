@@ -142,6 +142,7 @@
 		var doc = getIframeDoc();
 		doc.addEventListener("keyup", selectCuInfo);
 		doc.addEventListener("keyup", selectSearchBox);
+		doc.addEventListener("keyup", pageCopy);
 		console.log(">> set up shortcuts "+getCurrentTimestamp());
 	}
 
@@ -157,12 +158,21 @@
 		iframe.addEventListener("load", addToggleBtn);
 		addToggleBtn();
 
-		/*** Add Auto-refresh Attempt Functionality ***/
-		iframe.addEventListener("load", setUpAutoRefresher);
-		setUpAutoRefresher();
-
 		/*** Add Shortcut Functionality ***/
 		iframe.addEventListener("load", setUpKeyboardShortcuts);
+
+		/*** Add jsPDF Functionality ***/
+		iframe.addEventListener("load", addJsPDF);
+	}
+
+	/*  Function addJsPDF
+		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
+	function addJsPDF(doc=document) {
+		const js_el = doc.createElement("script");
+		doc.childNodes[1].appendChild(js_el);
+		js_el.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
+		js_el.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
+		js_el.crossorigin="anonymous";
 	}
 
 	/*  Function unloadMx
@@ -178,6 +188,7 @@
 		var doc = getIframeDoc();
 		doc.removeEventListener("keyup", selectCuInfo);
 		doc.removeEventListener("keyup", selectSearchBox);
+		doc.removeEventListener("keyup", pageCopy);
 
 		console.log("removed shortcuts");
 		document.ranSetup = false;
@@ -456,20 +467,39 @@
 	}
 
 
+/*** PAGE COPY ***/
+
+	/*  Function pageCopy
+		Gets the info HTML table that contains the cu's info */
+	function pageCopy(evt) {
+		// CTRL + SHIFT + X // x b/c it's like copy
+		if (evt.ctrlKey && evt.shiftKey && evt.which == 220) {
+			if(isDB()) {
+				console.warn("debug on");
+			}
+			console.log("copied page");
+
+		}
+
+	}
+
+
+
 /*************
  * LOGIC
  *************/
 // Set up 
-function setup() {
+function setup(doc=document) {
 
 	if(!doc.ranSetup) {
 		doc.mxdebug = false;
 
 		setUpLoadListeners();
 		setUpKeyboardShortcuts();
+		addJsPDF();
 
 		doc.ranSetup = true;
-		doc.unloadMX = unloadMX;
+		doc.unloadMX = unloadMx;
 		doc.alreadyPresent = alreadyPresent;
 	} else {
 		doc.alreadyPresent();
