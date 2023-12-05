@@ -3,9 +3,7 @@
 // TODO: 
 
 
-// TODO: pageCopy logic--get it to copy
-// TODO: pageCopy logic--get it to auto-download
-// TODO: pageCopy logic testing
+// TODO: figure out why i have to hit the shortcut buttons twice
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -16,8 +14,11 @@
 		
 
 //DONE 
-// TODO: import jspdf
-// TODO: make shortcut to pageCopy
+	// TODO: pageCopy logic--get it to copy
+	// TODO: pageCopy logic--get it to auto-download
+	// TODO: pageCopy logic testing
+	// TODO: import jspdf
+	// TODO: make shortcut to pageCopy
 	//TODO: Make a setup fn, to be called from auto nav
 	// TODO: Make unloadMx fn
 	// TODO: Add timestamp to "tried it"
@@ -592,7 +593,7 @@
 		// Make page copy container
 		const div = doc.createElement('div');
 		div.id="pgCopyContainer";
-		div.style="visibility:hidden;";
+		div.style="visibility:hidden; display:none;";
 		doc.childNodes[1].appendChild(div).appendChild(copyButton);
 
 		// Add the "take a picture" functionality directly into the iframe's context
