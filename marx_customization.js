@@ -2,6 +2,10 @@
 
 // TODO: 
 
+
+// TODO: pageCopy logic--get it to copy
+// TODO: pageCopy logic--get it to auto-download
+// TODO: pageCopy logic testing
 // TODO: Style v> button
 // TOOD: Add auto-navigator
 	// TODO: logon w/Sel role
@@ -12,6 +16,8 @@
 		
 
 //DONE 
+// TODO: import jspdf
+// TODO: make shortcut to pageCopy
 	//TODO: Make a setup fn, to be called from auto nav
 	// TODO: Make unloadMx fn
 	// TODO: Add timestamp to "tried it"
@@ -86,9 +92,9 @@
 		Adds the passed in CSS text to the document body */
 	function addCssEl(cssText, doc=document) {
 		if (cssText!=null) {
-			const css_el = doc.createElement("style");
-			css_el.textContent = cssText;
-			doc.childNodes[1].appendChild(css_el);
+			const cssEL = doc.createElement("style");
+			cssEL.textContent = cssText;
+			doc.childNodes[1].appendChild(cssEL);
 		}
 	}
 
@@ -96,9 +102,9 @@
 		Adds the passed in script text to the document body */
 	function addJsScript(scriptText, doc=document) {
 		if (scriptText!=null) {
-			const js_el = doc.createElement("script");
-			js_el.textContent = scriptText;
-			doc.childNodes[1].appendChild(js_el);
+			const jsEl = doc.createElement("script");
+			jsEl.textContent = scriptText;
+			doc.childNodes[1].appendChild(jsEl);
 		}
 	}
 
@@ -135,9 +141,11 @@
 			console.warn(">> debug on");
 		}
 
-		if(document.ranSetup) {
-			return;
-		}
+		// commented out for now. Not sure why I needed this before
+		// it prevents things, now
+		// if(document.ranSetup) {
+		// 	return;
+		// }
 
 		var doc = getIframeDoc();
 		doc.addEventListener("keyup", selectCuInfo);
@@ -156,23 +164,39 @@
 
 		/*** Add Button to Hide/Show Search ***/
 		iframe.addEventListener("load", addToggleBtn);
-		addToggleBtn();
 
 		/*** Add Shortcut Functionality ***/
 		iframe.addEventListener("load", setUpKeyboardShortcuts);
 
-		/*** Add jsPDF Functionality ***/
+		/*** Add Libraries ***/
 		iframe.addEventListener("load", addJsPDF);
+		iframe.addEventListener("load", addHtml2Canvas);
+
+		/*** Add Canvas for PageCopy Functionality ***/
+		iframe.addEventListener("load", setUpPgCopy);
 	}
 
 	/*  Function addJsPDF
 		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
-	function addJsPDF(doc=document) {
-		const js_el = doc.createElement("script");
-		doc.childNodes[1].appendChild(js_el);
-		js_el.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
-		js_el.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
-		js_el.crossorigin="anonymous";
+	function addJsPDF() {
+		var doc = getIframeDoc();
+		// doc = document;
+		const jsEl = doc.createElement("script");
+		doc.childNodes[1].appendChild(jsEl);
+		jsEl.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
+		jsEl.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
+		jsEl.crossorigin="anonymous";
+	}
+
+	/*  Function addHtml2Canvas
+		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
+	function addHtml2Canvas() {
+		var doc = getIframeDoc();
+		// doc = document;
+		const jsEl = doc.createElement("script");
+		doc.childNodes[1].appendChild(jsEl);
+		jsEl.src="https://github.com/niklasvh/html2canvas/releases/download/v1.4.1/html2canvas.min.js";
+		jsEl.crossorigin="anonymous";
 	}
 
 	/*  Function unloadMx
@@ -230,7 +254,6 @@
 		if(isDB()) {
 			console.warn(">> debug on");
 		}
-
 		var iframeDoc = getIframeDoc();
 
 		// Early escape if button already exists
@@ -265,7 +288,7 @@
 		Removes the autonav logic when we have arrived, to prevent issues when reloading */
 	function addAutoNavListener() {
 		// add test for autonav listener
-		getIframeDoc().removeEventListener("load", autoNav);
+		getIframeDoc().addEventListener("load", autoNav);
 	}
 
 	/*  Function getIframeJqry
@@ -320,7 +343,7 @@
 	function autoNav(){
 		var iFrameJqry = getIframeJqry(); // so I can use "contains"
 		var iframeDoc = getIframeDoc();
-		debugger;
+		// debugger;
 
 		//TODO: Put in load listeners
 		/*
@@ -468,20 +491,124 @@
 
 
 /*** PAGE COPY ***/
+	/* This section is more than a bit convoluted. Because the
+		the functions usually run in the context of the *main* 
+		document, the CSS inside the iframe won't apply (proably
+		due to XSS stuff). So we create a button inside the 
+		iframe so the fns run from inside the iframe, to 
+		preserve the context.
+	*/
 
-	/*  Function pageCopy
+	/* Function getCopyButton
 		Gets the info HTML table that contains the cu's info */
+	function getCopyButton() {
+		return getIframeJqry()('#copyButton')[0];
+	}
+
+
+	/* Function copyCanvasToClipboard
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues
+		
+		Copies canvas to clipboard */
+	function copyCanvasToClipboard(canvas) {
+		canvas.toBlob(function (blob) {
+			const item = new ClipboardItem({ "image/png": blob });
+			navigator.clipboard.write([item]); 
+		})
+   }
+
+	/* Function saveNewCanvas
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues
+		
+		Removes old canvas, saves the new canvas to the DOM */
+	function saveNewCanvas(canvas) {
+		//delete old canvas
+		var pgCopyContainer = $('#pgCopyContainer')[0];
+		if(pgCopyContainer.children.length > 1) {
+			pgCopyContainer.removeChild(pgCopyContainer.children[1]);
+		}
+
+		//save new canvas into hidden el
+		pgCopyContainer.appendChild(canvas);
+
+		return canvas;
+	}
+
+	/* Function iFramePageCopy
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues.
+
+		Gets the el to copy, calls html2canvas, saves it to the
+		clipboard */
+	function iFramePageCopy() {
+		var marxTBody = $('.eligTable5 > tbody')[0];
+		if(marxTBody == undefined) {
+			console.warn('Could not find the MARx main tbody');
+			return;
+		}
+		html2canvas(marxTBody)
+			.then(saveNewCanvas)
+			.then(copyCanvasToClipboard)
+			.catch(function () {
+				console.warn("Failed to copy MARx main tbody");
+			});
+	}
+
+	/* Function pageCopy
+		Refers the event to the function inside of the iframe */
 	function pageCopy(evt) {
-		// CTRL + SHIFT + X // x b/c it's like copy
+		// CTRL + SHIFT + '/' // '/' b/c it's near enter
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 220) {
 			if(isDB()) {
 				console.warn("debug on");
 			}
-			console.log("copied page");
 
+			getCopyButton().click();
 		}
 
 	}
+
+	/* Function copyBtnOnClickSetUp
+		Adds the onclick to the copy button. Needs to do this 
+		later, as it needs to refer to a fn native to the iframe */
+	function copyBtnOnClickSetUp() {
+		$('#copyButton')[0].onclick = iFramePageCopy;
+	}
+
+	/* Function setUpPgCopy
+		Adds the canvas container div and copy button to the 
+		iframe. Injects the scripts into the iframe as native
+		functions */
+	function setUpPgCopy() {
+		var doc = getIframeDoc();
+
+		// make button to click on
+		const copyButton = doc.createElement('button');
+		copyButton.type='button';
+		copyButton.id='copyButton';
+
+		// Make page copy container
+		const div = doc.createElement('div');
+		div.id="pgCopyContainer";
+		div.style="visibility:hidden;";
+		doc.childNodes[1].appendChild(div).appendChild(copyButton);
+
+		// Add the "take a picture" functionality directly into the iframe's context
+		var scriptText = 
+			" iFramePageCopy = "+iFramePageCopy.toString()+
+			"; saveNewCanvas = "+saveNewCanvas.toString()+
+			"; copyCanvasToClipboard = "+copyCanvasToClipboard.toString()+
+			"; ("+copyBtnOnClickSetUp.toString()+")()";
+		addJsScript(scriptText,doc);
+	}
+
+	/* Leave for future debugging. Simple way to check what's being rendered
+	html2canvas(temp1).then(function (canvas) {
+   	document.body.appendChild(canvas);
+	});
+	*/
 
 
 
@@ -489,14 +616,18 @@
  * LOGIC
  *************/
 // Set up 
-function setup(doc=document) {
+function setup() {
+	var doc = document;
 
 	if(!doc.ranSetup) {
 		doc.mxdebug = false;
 
 		setUpLoadListeners();
 		setUpKeyboardShortcuts();
+		addToggleBtn();
 		addJsPDF();
+		addHtml2Canvas();
+		setUpPgCopy();
 
 		doc.ranSetup = true;
 		doc.unloadMX = unloadMx;
