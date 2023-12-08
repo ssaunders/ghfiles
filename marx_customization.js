@@ -2,18 +2,23 @@
 
 // TODO: 
 
-
+// TODO: Have search table expand if there is content in it
+// TODO: Make Ctrl+shift+E for Enrollment info to copy the top section
+	// TODO: Create a button div, so I can extend the screenshot functionality
+	// TODO: connect shortcut
+	// TODO: write fn to hmtl2canvas the 4 divs I need
 // TODO: figure out why i have to hit the shortcut buttons twice
 // TODO: Style v> button
 // TOOD: Add auto-navigator
-	// TODO: logon w/Sel role
-	// TODO: beneficiaries
-	// TODO: eligibility
+	// TODO: Make it auto-step
 	// TODO: make it so that if the MX button is pushed, it'll still go
-		// TODO: Have it delay the addition of the stuff until the end
 		
 
 //DONE 
+	// TOOD: Add auto-navigator
+	// TODO: Have it delay the addition of the stuff until the end
+		// TODO: beneficiaries
+		// TODO: eligibility
 	// TODO: pageCopy logic--get it to copy
 	// TODO: pageCopy logic--get it to auto-download
 	// TODO: pageCopy logic testing
@@ -148,10 +153,11 @@
 		// 	return;
 		// }
 
-		var doc = getIframeDoc();
+		const doc = getIframeDoc();
 		doc.addEventListener("keyup", selectCuInfo);
 		doc.addEventListener("keyup", selectSearchBox);
 		doc.addEventListener("keyup", pageCopy);
+		doc.addEventListener("keyup", enrollInfoCopy);
 		console.log(">> set up shortcuts "+getCurrentTimestamp());
 	}
 
@@ -170,29 +176,30 @@
 		iframe.addEventListener("load", setUpKeyboardShortcuts);
 
 		/*** Add Libraries ***/
-		iframe.addEventListener("load", addJsPDF);
+		// iframe.addEventListener("load", addJsPDF);
 		iframe.addEventListener("load", addHtml2Canvas);
 
 		/*** Add Canvas for PageCopy Functionality ***/
 		iframe.addEventListener("load", setUpPgCopy);
+		iframe.addEventListener("load", setUpEnrollInfoCopy);
 	}
 
 	/*  Function addJsPDF
 		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
-	function addJsPDF() {
-		var doc = getIframeDoc();
-		// doc = document;
-		const jsEl = doc.createElement("script");
-		doc.childNodes[1].appendChild(jsEl);
-		jsEl.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
-		jsEl.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
-		jsEl.crossorigin="anonymous";
-	}
+	// function addJsPDF() {
+	// 	const doc = getIframeDoc();
+	// 	// doc = document;
+	// 	const jsEl = doc.createElement("script");
+	// 	doc.childNodes[1].appendChild(jsEl);
+	// 	jsEl.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
+	// 	jsEl.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
+	// 	jsEl.crossorigin="anonymous";
+	// }
 
 	/*  Function addHtml2Canvas
 		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
 	function addHtml2Canvas() {
-		var doc = getIframeDoc();
+		const doc = getIframeDoc();
 		// doc = document;
 		const jsEl = doc.createElement("script");
 		doc.childNodes[1].appendChild(jsEl);
@@ -210,16 +217,93 @@
 		iframe.removeEventListener("load", setUpKeyboardShortcuts);
 
 		// remove keyup events
-		var doc = getIframeDoc();
+		const doc = getIframeDoc();
 		doc.removeEventListener("keyup", selectCuInfo);
 		doc.removeEventListener("keyup", selectSearchBox);
 		doc.removeEventListener("keyup", pageCopy);
+		doc.removeEventListener("keyup", enrollInfoCopy);
 
 		console.log("removed shortcuts");
 		document.ranSetup = false;
 	}
 
-	/*** SET UP TOGGLE BUTTON ***/
+
+	/*** CANVAS COPY CONTAINER ****/
+
+	/* Function makeCanvasContainer	
+		Puts the canvasContainer into the DOM. Returns a ref to it. */
+	function makeCanvasContainer() {
+		const doc = getIframeDoc();
+		const div = doc.createElement('div');
+		div.id="canvasContainer";
+		// div.style="visibility:hidden; display:none;";
+
+		//inner btn div
+		const btnDiv = doc.createElement('div');
+
+		doc.childNodes[1].appendChild(div).appendChild(btnDiv);
+		return div;
+	}
+
+	/* Function getCanvasContainer
+		Returns the canvasContainer. Creates it if it doesn't exist */
+	function getCanvasContainer() {
+		var canvasContainer = getIframeJqry()('#canvasContainer')[0];
+		if(canvasContainer == undefined) {
+			canvasContainer = makeCanvasContainer();
+		}
+		return canvasContainer;
+	}
+
+	/* Function addBtnToCanvasContainer
+		Adds a button that can be clicked to the canvas
+		the first div holds the buttons */
+	function addBtnToCanvasContainer(btn) {
+		getCanvasContainer().children[0].appendChild(btn);
+	}
+
+	// /* Function setupCanvasContainer
+	// 	Adds a button that can be clicked to the canvas
+	// 	the first div holds the buttons */
+	// function setupCanvasContainer() {
+	// 	makeCanvasContainer();
+	// }
+
+	/*** IMBEDDED TO IFRAME ****/
+
+	/* Function copyCanvasToClipboard
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues
+		
+		Copies canvas to clipboard */
+	function copyCanvasToClipboard(canvas) {
+		canvas.toBlob(function (blob) {
+			const item = new ClipboardItem({ "image/png": blob });
+			navigator.clipboard.write([item]); 
+		})
+   }
+
+
+	/* Function saveNewCanvas (iframe embedded)
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues
+		
+		Removes old canvas, saves the new canvas to the DOM */
+	function saveNewCanvas(canvas) {
+		//delete old canvas
+		var canvasContainer = getCanvasContainer();
+		if(canvasContainer.children.length > 1) {
+			canvasContainer.removeChild(canvasContainer.children[1]);
+		}
+
+		//save new canvas into hidden el
+		canvasContainer.appendChild(canvas);
+
+		return canvas;
+	}
+
+
+/*** SET UP TOGGLE BUTTON ***/
 
 	/*  Function setUpToggleBtn
 		Creates and adds to the DOM the toggle button and its logic. 
@@ -281,15 +365,18 @@
 	/* Function removeAutoNavListener
 		Removes the autonav logic when we have arrived, to prevent issues when reloading */
 	function removeAutoNavListener() {
-		// add test for autonav listener
-		getIframeDoc().removeEventListener("load", autoNav);
+		console.log(">> removed autonav");
+		getIframe().removeEventListener("load", autoNav);
 	}
 
 	/* Function addAutoNavListener
-		Removes the autonav logic when we have arrived, to prevent issues when reloading */
+		Removes the autonav logic when we have arrived, to prevent issues when reloading.
+		Calling this fn multiple times isn't an issue, 
+		as it won't cause multiple runs, since the signature 
+		is the same. */
 	function addAutoNavListener() {
-		// add test for autonav listener
-		getIframeDoc().addEventListener("load", autoNav);
+		console.log(">> Added autonav")
+		getIframe().addEventListener("load", autoNav);
 	}
 
 	/*  Function getIframeJqry
@@ -311,7 +398,7 @@
 		Searches for specific elements on the DOM to decide the current step the nave is at. */
 	function getCurrStepNum() {
 		var iFrameJqry = getIframeJqry();
-		var doc = getIframeDoc();
+		const doc = getIframeDoc();
 
 		if ($("#cms-marxaws-tile") != null && $("#cms-marxaws-tile").length != 0) { // no iframe on this step
 			console.log("returned 1");
@@ -344,9 +431,9 @@
 	function autoNav(){
 		var iFrameJqry = getIframeJqry(); // so I can use "contains"
 		var iframeDoc = getIframeDoc();
-		// debugger;
 
-		//TODO: Put in load listeners
+		// adding the same listener mult times won't cause it to fire mult times
+		addAutoNavListener();
 		/*
 		 step 1 does something weird. The full page doesn't re-render, 
 		 just the bottom part, replacing it with an iframe. So I need a 
@@ -389,7 +476,9 @@
 					console.log(">> loaded from Autonav, step 5");
 				});
 				removeAutoNavListener();
-				setup();
+				if(!document.ranSetup) {
+					setup();
+				}
 				break;
 		}
 	}
@@ -491,6 +580,96 @@
 	}
 
 
+/*** ENROLLMENT/TOP INFO COPY ***/
+	/* This section is more than a bit convoluted. Because the
+		the functions usually run in the context of the *main* 
+		document, the CSS inside the iframe won't apply (proably
+		due to XSS stuff). So we create a button inside the 
+		iframe so the fns run from inside the iframe, to 
+		preserve the context.
+	*/
+
+	/* Function getEnrollInfoCopyBtn
+		Gets the button we need to click in order to trigger the copy logic */
+	function getEnrollInfoCopyBtn() {
+		return getIframeJqry()('#enrollInfoCopyButton')[0];
+	}
+
+	/* Function enrollInfoCopy_iFrame (iframe embedded)
+		This executes in the context of the iframe, where 
+		document is the iframe doc. Important, b/c styling issues.
+
+		Gets the el to copy, calls html2canvas, saves it to the
+		clipboard */
+	function enrollInfoCopy_iFrame() {
+		console.log(">> doin' stuff ");
+		return;
+
+		var marxTBody = $('.eligTable5 > tbody')[0];
+		if(marxTBody == undefined) {
+			console.warn('Could not find all the MARx enrollment info');
+			return;
+		}
+
+		html2canvas(marxTBody)
+			.then(saveNewCanvas)
+			.then(copyCanvasToClipboard)
+			.catch(function () {
+				console.warn("Failed to copy MARx enrollment info");
+			});
+	}
+
+	/* Function enrollInfoCopy
+		Refers the event to the function inside of the iframe */
+	function enrollInfoCopy(evt) {
+		// CTRL + SHIFT + 'E' // 'E' b/c "enroll"
+		if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
+			if(isDB()) {
+				console.warn("debug on");
+			}
+
+			getEnrollInfoCopyBtn().click();
+		}
+
+	}
+
+	/* Function enrollInfoCopyBtnSetup (embeded in iframe)
+		Adds the onclick to the copy button. Needs to do this 
+		later, as it needs to refer to a fn native to the iframe */
+	function enrollInfoCopyBtnSetup() {
+		$('#enrollInfoCopyButton')[0].onclick = enrollInfoCopy_iFrame;
+		// TODO: Try out just adding this fn, w/o embedding it
+	}
+
+	/* Function setUpEnrollInfoCopy
+		Adds the canvas container div and copy button to the 
+		iframe. Injects the scripts into the iframe as native
+		functions */
+	function setUpEnrollInfoCopy() {
+		const doc = getIframeDoc();
+
+		// make button to click on, add it to canvasContainer
+		const enrollInfoCopyBtn = doc.createElement('button');
+		enrollInfoCopyBtn.type='button';
+		enrollInfoCopyBtn.id='enrollInfoCopyButton';
+		addBtnToCanvasContainer(enrollInfoCopyBtn);
+
+		// Add the "take a picture" functionality directly into the iframe's context
+		// This has to happen this way, as the button must refer to a 
+		// fn already in the iframe, for formatting
+		var scriptText = 
+			"enrollInfoCopy_iFrame = "+enrollInfoCopy_iFrame.toString()+";\n"+
+			"("+enrollInfoCopyBtnSetup.toString()+")();";
+		addJsScript(scriptText,doc);
+	}
+
+	/* Leave for future debugging. Simple way to check what's being rendered
+	html2canvas(temp1).then(function (canvas) {
+   	document.body.appendChild(canvas);
+	});
+	*/
+
+
 /*** PAGE COPY ***/
 	/* This section is more than a bit convoluted. Because the
 		the functions usually run in the context of the *main* 
@@ -500,50 +679,19 @@
 		preserve the context.
 	*/
 
-	/* Function getCopyButton
-		Gets the info HTML table that contains the cu's info */
-	function getCopyButton() {
-		return getIframeJqry()('#copyButton')[0];
+	/* Function getPageCopyButton
+		Gets the button we need to click in order to trigger the copy logic */
+	function getPageCopyButton() {
+		return getIframeJqry()('#pageCopyButton')[0];
 	}
 
-
-	/* Function copyCanvasToClipboard
-		This executes in the context of the iframe, where 
-		document is the iframe doc. Important, b/c styling issues
-		
-		Copies canvas to clipboard */
-	function copyCanvasToClipboard(canvas) {
-		canvas.toBlob(function (blob) {
-			const item = new ClipboardItem({ "image/png": blob });
-			navigator.clipboard.write([item]); 
-		})
-   }
-
-	/* Function saveNewCanvas
-		This executes in the context of the iframe, where 
-		document is the iframe doc. Important, b/c styling issues
-		
-		Removes old canvas, saves the new canvas to the DOM */
-	function saveNewCanvas(canvas) {
-		//delete old canvas
-		var pgCopyContainer = $('#pgCopyContainer')[0];
-		if(pgCopyContainer.children.length > 1) {
-			pgCopyContainer.removeChild(pgCopyContainer.children[1]);
-		}
-
-		//save new canvas into hidden el
-		pgCopyContainer.appendChild(canvas);
-
-		return canvas;
-	}
-
-	/* Function iFramePageCopy
+	/* Function pageCopy_iFrame
 		This executes in the context of the iframe, where 
 		document is the iframe doc. Important, b/c styling issues.
 
 		Gets the el to copy, calls html2canvas, saves it to the
 		clipboard */
-	function iFramePageCopy() {
+	function pageCopy_iFrame() {
 		var marxTBody = $('.eligTable5 > tbody')[0];
 		if(marxTBody == undefined) {
 			console.warn('Could not find the MARx main tbody');
@@ -566,16 +714,16 @@
 				console.warn("debug on");
 			}
 
-			getCopyButton().click();
+			getPageCopyButton().click();
 		}
 
 	}
 
-	/* Function copyBtnOnClickSetUp
+	/* Function pageCopyBtnOnClickSetUp
 		Adds the onclick to the copy button. Needs to do this 
 		later, as it needs to refer to a fn native to the iframe */
-	function copyBtnOnClickSetUp() {
-		$('#copyButton')[0].onclick = iFramePageCopy;
+	function pageCopyBtnOnClickSetUp() {
+		$('#pageCopyButton')[0].onclick = pageCopy_iFrame;
 	}
 
 	/* Function setUpPgCopy
@@ -583,25 +731,21 @@
 		iframe. Injects the scripts into the iframe as native
 		functions */
 	function setUpPgCopy() {
-		var doc = getIframeDoc();
+		const doc = getIframeDoc();
 
 		// make button to click on
-		const copyButton = doc.createElement('button');
-		copyButton.type='button';
-		copyButton.id='copyButton';
-
-		// Make page copy container
-		const div = doc.createElement('div');
-		div.id="pgCopyContainer";
-		div.style="visibility:hidden; display:none;";
-		doc.childNodes[1].appendChild(div).appendChild(copyButton);
+		const pageCopyButton = doc.createElement('button');
+		pageCopyButton.type='button';
+		pageCopyButton.id='pageCopyButton';
+		addBtnToCanvasContainer(pageCopyButton);
 
 		// Add the "take a picture" functionality directly into the iframe's context
+		 		// TODO: Move these two fn's into their own place.
 		var scriptText = 
-			" iFramePageCopy = "+iFramePageCopy.toString()+
-			"; saveNewCanvas = "+saveNewCanvas.toString()+
-			"; copyCanvasToClipboard = "+copyCanvasToClipboard.toString()+
-			"; ("+copyBtnOnClickSetUp.toString()+")()";
+			"pageCopy_iFrame = "+pageCopy_iFrame.toString()+";\n"+
+			"saveNewCanvas = "+saveNewCanvas.toString()+";\n"+
+			"copyCanvasToClipboard = "+copyCanvasToClipboard.toString()+";\n"+
+			"("+pageCopyBtnOnClickSetUp.toString()+")();";
 		addJsScript(scriptText,doc);
 	}
 
@@ -610,7 +754,6 @@
    	document.body.appendChild(canvas);
 	});
 	*/
-
 
 
 /*************
@@ -626,9 +769,11 @@ function setup() {
 		setUpLoadListeners();
 		setUpKeyboardShortcuts();
 		addToggleBtn();
-		addJsPDF();
+		// addJsPDF();
 		addHtml2Canvas();
+		// setupCanvasContainer();
 		setUpPgCopy();
+		setUpEnrollInfoCopy();
 
 		doc.ranSetup = true;
 		doc.unloadMX = unloadMx;
@@ -643,13 +788,13 @@ function setup() {
 /*** Add AutoNav Functionality ***/
 // need to add the listener, so it starts the loop for the navigation until we arrive
 // this is only important if you enter when there is an iframe
-var iframeDoc = getIframeDoc();
-if(iframeDoc != undefined) {
-	iframeDoc.addEventListener("load", autoNav);
+var iframe = getIframe();
+if(iframe != undefined) {
+	iframe.addEventListener("load", autoNav);
 }
 
-
 autoNav();
-document.addEventListener('load',function () {
+document.addEventListener('load',k)
+var k = function () {
 	console.log(">> loaded");
-})
+}
