@@ -39,8 +39,8 @@
 		// TODO: Remove the two things (highlight and +) at top?
 
 /*************
- * FUNCTIONS
- *************/
+** FUNCTIONS
+**************/
 
 /*** LIBRARY ***/
 
@@ -230,6 +230,17 @@
 
 	/*** CANVAS COPY CONTAINER ****/
 
+	// ?? TODO: HOW TO MAKE COPY CONTAINER WORK?
+	// 	CPCTR exists
+	// 	* make object? 
+	// 		- pass ref to parent context? 
+	// 		- can execute in iframe context still?
+	// 	* embed all logic in iframe
+	// 		- ugly
+	// 		- needs parent context ref for addBtnToCanvasContainer > getCanvasContainer (but only this one)
+	// 		- 
+
+
 	/* Function makeCanvasContainer	
 		Puts the canvasContainer into the DOM. Returns a ref to it. */
 	function makeCanvasContainer() {
@@ -246,9 +257,12 @@
 	}
 
 	/* Function getCanvasContainer
-		Returns the canvasContainer. Creates it if it doesn't exist */
+		Returns the canvasContainer. Creates it if it doesn't exist. 
+		Can execute inside iframe context, or main window context */
 	function getCanvasContainer() {
-		var canvasContainer = getIframeJqry()('#canvasContainer')[0];
+		// handle working in two different contexts
+		var jquery = typeof getIframeJqry == 'undefined' ? $ : getIframeJqry();
+		var canvasContainer = jquery('#canvasContainer')[0];
 		if(canvasContainer == undefined) {
 			canvasContainer = makeCanvasContainer();
 		}
@@ -269,7 +283,7 @@
 	// 	makeCanvasContainer();
 	// }
 
-	/*** IMBEDDED TO IFRAME ****/
+		/* IMBEDDED TO IFRAME */
 
 	/* Function copyCanvasToClipboard
 		This executes in the context of the iframe, where 
@@ -304,6 +318,12 @@
 
 
 /*** SET UP TOGGLE BUTTON ***/
+
+	/*  Function searchTableHasContent
+		Returns true if the search table has info used to search in it*/
+	function searchTableHasContent () {
+		return false;
+	}
 
 	/*  Function setUpToggleBtn
 		Creates and adds to the DOM the toggle button and its logic. 
@@ -375,8 +395,12 @@
 		as it won't cause multiple runs, since the signature 
 		is the same. */
 	function addAutoNavListener() {
-		console.log(">> Added autonav")
-		getIframe().addEventListener("load", autoNav);
+		var iframe = getIframe();
+		if(iframe != undefined) {
+			iframe.addEventListener("load", autoNav);
+		} else {
+			console.error("Could not add AutoNav listener. Iframe not defined");
+		}
 	}
 
 	/*  Function getIframeJqry
@@ -401,24 +425,20 @@
 		const doc = getIframeDoc();
 
 		if ($("#cms-marxaws-tile") != null && $("#cms-marxaws-tile").length != 0) { // no iframe on this step
-			console.log("returned 1");
 			return 1;
 		} else if (doc != undefined && doc.querySelector('.pageTitle').children[0].innerHTML == 'User Security Role Selection (M002)') {
-			console.log("returned 2");
 			return 2;
 		} else if(iFrameJqry != undefined) {
 			if (iFrameJqry('.pageTitle').children()[0].innerHTML == 'Welcome (M101)') {
-				console.log("returned 3");
 				return 3;
 			} else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiaries: Find (M201)') {
-				console.log("returned 4");
 				return 4;
 			} else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiary: Eligibility (M232)') {
 				return 5;
 			}
 		}
 
-		console.log("returned 0");
+		console.warn("returned 0");
 		return 0;
 	}
 
@@ -432,8 +452,6 @@
 		var iFrameJqry = getIframeJqry(); // so I can use "contains"
 		var iframeDoc = getIframeDoc();
 
-		// adding the same listener mult times won't cause it to fire mult times
-		addAutoNavListener();
 		/*
 		 step 1 does something weird. The full page doesn't re-render, 
 		 just the bottom part, replacing it with an iframe. So I need a 
@@ -441,6 +459,7 @@
 		 the remaining steps should be fine 
 		*/
 
+		// adding the same listener mult times won't cause it to fire mult times
 		switch(getCurrStepNum()) {
 			default: 
 				console.warn('Failed AutoNav');
@@ -450,32 +469,24 @@
 				$('.cms-myapps-link')[0].click()
 				break;
 			case 2: 
+				addAutoNavListener();
+
 				//for some reason, can't get iframe's jquery here
-				iframeDoc.addEventListener('load',function () {
-					console.log(">> loaded from Autonav, step 2");
-				});
 		 		iframeDoc.querySelector('#userRole').click();
 				break;
 			case 3: 
+				addAutoNavListener();
 
-				iframeDoc.addEventListener('load',function () {
-					console.log(">> loaded from Autonav, step 3");
-				});
 		 		iFrameJqry('a:contains("Beneficiaries")')[0].click();
 				break;
 			case 4: 
+				addAutoNavListener();
 
-				iframeDoc.addEventListener('load',function () {
-					console.log(">> loaded from Autonav, step 4");
-				});
 		 		iFrameJqry('a:contains("Eligibility")')[0].click();
 				break;
-			case 5: //we have arrived, run the usual stuff
-
-				iframeDoc.addEventListener('load',function () {
-					console.log(">> loaded from Autonav, step 5");
-				});
+			case 5: //we have arrived, run the usual stuff, stop auto-nav
 				removeAutoNavListener();
+
 				if(!document.ranSetup) {
 					setup();
 				}
@@ -745,6 +756,7 @@
 			"pageCopy_iFrame = "+pageCopy_iFrame.toString()+";\n"+
 			"saveNewCanvas = "+saveNewCanvas.toString()+";\n"+
 			"copyCanvasToClipboard = "+copyCanvasToClipboard.toString()+";\n"+
+			"getCanvasContainer = "+getCanvasContainer.toString()+";\n"+
 			"("+pageCopyBtnOnClickSetUp.toString()+")();";
 		addJsScript(scriptText,doc);
 	}
