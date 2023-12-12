@@ -184,27 +184,17 @@
 		iframe.addEventListener("load", setUpEnrollInfoCopy);
 	}
 
-	/*  Function addJsPDF
-		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
-	// function addJsPDF() {
-	// 	const doc = getIframeDoc();
-	// 	// doc = document;
-	// 	const jsEl = doc.createElement("script");
-	// 	doc.childNodes[1].appendChild(jsEl);
-	// 	jsEl.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js";
-	// 	jsEl.integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/";
-	// 	jsEl.crossorigin="anonymous";
-	// }
-
 	/*  Function addHtml2Canvas
 		Sets up all the load listeners, so that when site loads new cu, logic is re-added */
 	function addHtml2Canvas() {
 		const doc = getIframeDoc();
 		// doc = document;
 		const jsEl = doc.createElement("script");
-		doc.childNodes[1].appendChild(jsEl);
-		jsEl.src="https://github.com/niklasvh/html2canvas/releases/download/v1.4.1/html2canvas.min.js";
+		// jsEl.src="https://github.com/niklasvh/html2canvas/releases/download/v1.4.1/html2canvas.min.js";
+		jsEl.src="https://html2canvas.hertzen.com/dist/html2canvas.js"
 		jsEl.crossorigin="anonymous";
+
+		doc.childNodes[1].appendChild(jsEl);
 	}
 
 	/*  Function unloadMx
@@ -229,17 +219,6 @@
 
 
 	/*** CANVAS COPY CONTAINER ****/
-
-	// ?? TODO: HOW TO MAKE COPY CONTAINER WORK?
-	// 	CPCTR exists
-	// 	* make object? 
-	// 		- pass ref to parent context? 
-	// 		- can execute in iframe context still?
-	// 	* embed all logic in iframe
-	// 		- ugly
-	// 		- needs parent context ref for addBtnToCanvasContainer > getCanvasContainer (but only this one)
-	// 		- 
-
 
 	/* Function makeCanvasContainer	
 		Puts the canvasContainer into the DOM. Returns a ref to it. */
@@ -276,13 +255,6 @@
 		getCanvasContainer().children[0].appendChild(btn);
 	}
 
-	// /* Function setupCanvasContainer
-	// 	Adds a button that can be clicked to the canvas
-	// 	the first div holds the buttons */
-	// function setupCanvasContainer() {
-	// 	makeCanvasContainer();
-	// }
-
 		/* IMBEDDED TO IFRAME */
 
 	/* Function copyCanvasToClipboard
@@ -296,7 +268,6 @@
 			navigator.clipboard.write([item]); 
 		})
    }
-
 
 	/* Function saveNewCanvas (iframe embedded)
 		This executes in the context of the iframe, where 
@@ -613,16 +584,35 @@
 		Gets the el to copy, calls html2canvas, saves it to the
 		clipboard */
 	function enrollInfoCopy_iFrame() {
-		console.log(">> doin' stuff ");
-		return;
-
 		var marxTBody = $('.eligTable5 > tbody')[0];
 		if(marxTBody == undefined) {
-			console.warn('Could not find all the MARx enrollment info');
+			console.warn('Could not find MARx main tbody');
 			return;
 		}
 
-		html2canvas(marxTBody)
+		var first =  marxTBody.children[1];
+		var second = marxTBody.children[2];
+		var third =  marxTBody.children[3];
+		var fourth =  marxTBody.children[4];
+
+		var config = {
+			ignoreElements: function(el){
+				if(el.contains(marxTBody.children[2]) 
+					|| fourth.contains(el)
+					|| third.contains(el)
+					|| second.contains(el)
+					|| first.contains(el)
+					|| el.nodeName == 'HEAD'
+					|| el.nodeName == 'LINK'
+					|| el.nodeName == 'STYLE') {
+					return false;
+				} else {
+					return true;
+				}
+			}
+		}
+
+		html2canvas(marxTBody,config)
 			.then(saveNewCanvas)
 			.then(copyCanvasToClipboard)
 			.catch(function () {
