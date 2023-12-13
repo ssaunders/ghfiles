@@ -236,11 +236,17 @@
 	}
 
 	/* Function getCanvasContainer
-		Returns the canvasContainer. Creates it if it doesn't exist. 
+		Returns the canvasContainer. Cerates it if it doesn't exist. 
 		Can execute inside iframe context, or main window context */
 	function getCanvasContainer() {
 		// handle working in two different contexts
-		var jquery = typeof getIframeJqry == 'undefined' ? $ : getIframeJqry();
+		var jquery;
+		try {
+			jquery = getIframeJqry;
+		} catch {
+			jquery = $;
+		}
+
 		var canvasContainer = jquery('#canvasContainer')[0];
 		if(canvasContainer == undefined) {
 			canvasContainer = makeCanvasContainer();
