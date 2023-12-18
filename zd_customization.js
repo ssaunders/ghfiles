@@ -65,14 +65,14 @@
 		Copies a string to the computer clipboard */
 	function copyStringToClipboard(string) {
 		if(string == null) {
-			console.warn("Nothing to copy");
+			console.warn(">> Nothing to copy");
 			return;
 		}
 
 		navigator.clipboard.writeText(string).then(() => {
-		  console.log('Content copied to clipboard');
+		  console.log('>> Content copied to clipboard');
 		},() => {
-		  console.error('Failed to copy');
+		  console.error('>> Failed to copy');
 		});
 	}
 
@@ -80,7 +80,7 @@
 		Copies the content of an el to the computer clipboard */
 	function copyElToClipboard(htmlEl) {
 		if(htmlEl == null) {
-			console.warn("Nothing to copy");
+			console.warn(">> Nothing to copy");
 			return;
 		}
 
@@ -141,7 +141,7 @@
 		document.addEventListener("keyup", selectHumEmailInfo);
 		document.addEventListener("keyup", subjectFocus);
 		document.addEventListener("keyup", searchBoxFocus);
-		console.warn("set up shortcuts");
+		console.warn(">> set up shortcuts");
 	}
 
 	/* Function unloadZD
@@ -153,7 +153,7 @@
 		document.removeEventListener("keyup", selectHumEmailInfo);
 		document.removeEventListener("keyup", subjectFocus);
 		document.removeEventListener("keyup", searchBoxFocus);
-		console.log("removed shortcuts");
+		console.log(">> removed shortcuts");
 		document.ranSetup = false;
 	}
 
@@ -186,11 +186,11 @@
 		// CTRL + SHIFT + ?
 		// if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
 		// 	if(isDB()) {
-		// 				console.warn("debug on");
+		// 				console.warn(">> debug on");
 		// 	}
 		// 	var firstInfoEl = getFirstCommentEl(); 
 		// 	if(firstInfoEl == null) {
-		// 		console.log("Could not find an element containing 'Agent Name:'");
+		// 		console.log(">> Could not find an element containing 'Agent Name:'");
 		// 		return;
 		// 	}
 
@@ -225,7 +225,7 @@
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
 			var subjLineEl = getSubjLineEl(); 
 			if(subjLineEl == null) {
-				console.log("Could not find a Subject line");
+				console.log(">> Could not find a subject line");
 				return;
 			}
 
@@ -252,10 +252,18 @@
 	function addStateAbbr() {
 		var subjLineEl = getSubjLineEl(),
 			 ticketInfoEl = getTicketInfoEl(),
-			 ticketInfo = ticketInfoEl.innerHTML,
-			 stringPos = ticketInfo.search(/, ([A-Z]{2}) \d+/),
-			 // extra space so that there is a keystroke that sets the value
-			 stateAbbr = " - "+ticketInfo[stringPos+2]+ticketInfo[stringPos+3]+" ";
+			 ticketInfo, stringPos, stateAbbr;
+
+	   if(subjLineEl === undefined) {
+	   	console.warn(">> Could not add state abbr to subject: subject line not found");
+	   } else if (ticketInfoEl === undefined) {
+	   	console.warn(">> Could not add state abbr to subject: processed ticket info not found");
+	   }
+
+		ticketInfo = ticketInfoEl.innerHTML,
+		stringPos = ticketInfo.search(/, ([A-Z]{2}) \d+/),
+		// extra space so that there is a keystroke that sets the value
+		stateAbbr = " - "+ticketInfo[stringPos+2]+ticketInfo[stringPos+3]+" ";
 
 		// will this work?
 		subjLineEl.value += stateAbbr;
@@ -282,7 +290,7 @@
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
 			var searchBoxEl = getSearchBox(); 
 			if(searchBoxEl == null) {
-				console.log("Could not find an active search box ",searchBoxEl);
+				console.warn(">> Could not find an active search box ",searchBoxEl);
 				return;
 			}
 
@@ -323,7 +331,7 @@
 			return firstInfoEl;
 		}
 
-		console.warn("First comment does not look like for an RFI");
+		console.warn(">> First comment does not look like for an RFI");
 		return null;
 	}
 
@@ -371,7 +379,7 @@
 		// CTRL + SHIFT + F //(f for "first")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
 			if(isDB()) {
-				console.warn("debug on");
+				console.warn(">> debug on");
 			}
 			var firstCommentEl = getFirstCommentEl();
 
@@ -414,7 +422,7 @@
 		// CTRL + SHIFT + E // (e for "engage")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
 			if(isDB()) {
-				console.warn("debug on");
+				console.warn(">> debug on");
 			}
 
 			var finalString = 
@@ -441,7 +449,7 @@
 		// CTRL + SHIFT + H // (h for "Humana")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
 			if(isDB()) {
-				console.warn("debug on: selectHumEmailInfo");
+				console.warn(">> debug on: selectHumEmailInfo");
 			}
 
 			//If not an RFI w/a cu el
@@ -496,7 +504,7 @@
 		if (cuInfoElListLn == 0) {
 			t3FirstComment = $('.fr-focus div.zd-comment:contains("Hi Case Management,")');
 			if(t3FirstComment.length = 0) {
-				console.warn("Could not find an element containing 'Cu/Agent Info' or T3 first comment");
+				console.warn(">> Could not find an element containing 'Cu/Agent Info' or T3 first comment");
 				return null;
 			} else {
 				return t3FirstComment
@@ -512,7 +520,7 @@
 		// CTRL + SHIFT + X  //x b/c convenient
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
 			if(isDB()) {
-						console.warn("debug on");
+						console.warn(">> debug on");
 			}
 
 			copyElToClipboard(getTicketInfoEl());
