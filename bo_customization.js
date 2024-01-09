@@ -2,6 +2,7 @@
 
 // TODO: 
 
+// TODO: BO CT+SH+X PULLING WRONG INFO ON 121679558
 // TODO: Pipe dream--create page that wraps BO in an iframe, so I can keep my shortcuts/apply them auto on refresh
 	//TODO: Make it so the bol search calls that page
 	//TODO: Make it so the Start of Day shortcut works w/it
@@ -28,6 +29,10 @@
 	NOTES_ON_FN */
 
 
+MAKE MACRO FOR FIVE9 TICKET
+MAKE MACRO FOR INTRO TO GH ticket
+(make sure tags are right)
+
 
 /*************
  * FUNCTIONS
@@ -43,14 +48,17 @@
 
 	/* Function DEBUG FUNCTIONS
 		tests for/starts/stops debug */
-	function isDB() {
-		return document.mxdebug;
-	}
-	function startDB() {
-		document.mxdebug = true;
-	}
-	function endDB() {
-		document.mxdebug = false;	
+	debug = {
+		isDB: function () {
+			return document.bodebug;
+		},
+		startDB: function() {
+			document.bodebug = true;
+		}
+		function endDB() {
+			document.bodebug = false;	
+		}
+
 	}
 
 	/* Function copyStringToClipboard
@@ -188,19 +196,24 @@ function getNumPIPs() {
 /* Function getMostRecentSalePip
 	Gets the most recent sales PIP, if there is one to get. */
 function getMostRecentSalePip() {
-/* T2 Agent:	Mitsuko Martindale
+ /* T2 Agent:	Mitsuko Martindale
 	T3 Agent:	LaWanda Wells
 	Plan:	Anthem Dual Advantage (HMO D-SNP) H3447-030-0
 	SEP:	AEP
 	Sub Date:	10/31/2023
 	Eff Date:	01/01/2024
-	Alt Address:	-
+	Alt Address:	- 
+ */
 
 
 	/* Could also use:
 		$$('#appInfoContainer div:contains("Off-Exchange")');
 		I don't remember why I didn't/changed it from this
 	*/
+	if(isDB()) {
+		console.warn("debug on (getMostRecentSalePip)");
+	}
+
 	var salePIP = $$('#appInfoContainer div:contains("Medicare Advantage")');
 	if(salePIP[0] == undefined) {
 		console.warn("Could not find sale PIP");
@@ -214,6 +227,9 @@ function getMostRecentSalePip() {
 	Gets the DTC PIP, if there is one to get. */
 function getMostRecentDtcPip() {
 	// TODO: check for just one page...or a page w/o a DTC
+	if(isDB()) {
+		console.warn("debug on (getMostRecentDtcPip)");
+	}
 
 	var dtcPip = $$('#appInfoContainer div:contains("DTC Transfer")');
 	if(dtcPip[0] == undefined) {
@@ -347,7 +363,7 @@ function getZip() {
 /* Function getAltAddr
 	Gets the alt address */
 function getAltAddr() {
-	if(getCurrAddr() != '') {
+	if(getCurrAddr() == '') {
 		return '-';
 	}
 
@@ -371,8 +387,8 @@ function getAltAddr() {
 function selectAppInfo(evt) {
 	// CTRL + SHIFT + X
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-		if(document.bodebug == true) {
-			console.warn("debug on");
+		if(isDB()) {
+			console.warn("debug on (selectAppInfo)");
 		}
 
 		var finalString = 
@@ -394,18 +410,17 @@ function selectAppInfo(evt) {
 /*************
  * LOGIC
  *************/
-document.bodebug = true; // TODO: Make this survive minif.
 if(document.ranSetup != true) {
 	setUpKeyboardShortcuts();
 
 	document.ranSetup = true;
-	document.unloadBO = unloadBO;
-	document.alreadyPresent = alreadyPresent;
+	window.unloadBO = unloadBO;
+	window.alreadyPresent = alreadyPresent;
 	evt = { // For debugging/testing
 		ctrlKey:true,
 		shiftKey:true,
 		which:70
 	}
 } else {
-	document.alreadyPresent();
+	alreadyPresent();
 }
