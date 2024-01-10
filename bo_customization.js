@@ -49,14 +49,15 @@
 	/* Function DEBUG FUNCTIONS
 		tests for/starts/stops debug */
 	mydebug = {
+		isDebugging: false,
 		isDB: function () {
-			return document.bodebug;
+			return this.isDebugging;
 		},
 		startDB: function() {
-			document.bodebug = true;
+			this.isDebugging = true;
 		},
 		endDB: function() {
-			document.bodebug = false;	
+			this.isDebugging = false;	
 		}
 
 	};
@@ -129,14 +130,14 @@
 /* Function setUpKeyboardShortcuts
 	Sets up the keyboard listeners to the page */
 function setUpKeyboardShortcuts() {
-	document.addEventListener("keyup", selectAppInfo);
+	document.addEventListener("keyup", copyAppInfo);
 	console.log("set up shortcuts");
 }
 
 /* Function unloadBO
 	Removes the keyboard listeners from the page */
 function unloadBO() {
-	document.removeEventListener("keyup", selectAppInfo);
+	document.removeEventListener("keyup", copyAppInfo);
 	console.log("removed shortcuts");
 	document.ranSetup = false;
 }
@@ -210,8 +211,8 @@ function getMostRecentSalePip() {
 		$$('#appInfoContainer div:contains("Off-Exchange")');
 		I don't remember why I didn't/changed it from this
 	*/
-	if(isDB()) {
-		console.warn("debug on (getMostRecentSalePip)");
+	if(bo.mydebug.isDB()) {
+		console.warn(">> debug: at getMostRecentSalePip");
 	}
 
 	var salePIP = $$('#appInfoContainer div:contains("Medicare Advantage")');
@@ -227,8 +228,8 @@ function getMostRecentSalePip() {
 	Gets the DTC PIP, if there is one to get. */
 function getMostRecentDtcPip() {
 	// TODO: check for just one page...or a page w/o a DTC
-	if(isDB()) {
-		console.warn("debug on (getMostRecentDtcPip)");
+	if(bo.mydebug.isDB()) {
+		console.warn(">> debug: at getMostRecentDtcPip");
 	}
 
 	var dtcPip = $$('#appInfoContainer div:contains("DTC Transfer")');
@@ -363,16 +364,12 @@ function getZip() {
 /* Function getAltAddr
 	Gets the alt address */
 function getAltAddr() {
-	if(getCurrAddr() == '') {
-		return '-';
-	}
-
-	return getCity() +", "+getState()+" "+getZip();
+	return getCurrAddr()+", "+getCity()+", "+getState()+" "+getZip();
 }
 
 //// PUT IT TOGETHER ////
 
-/* Function selectAppInfo
+/* Function copyAppInfo
 	Event function that selects and copies the correct node containing the cu's processed and formatted info 
 
 	OUTPUT:
@@ -384,11 +381,11 @@ function getAltAddr() {
 		Eff Date:
 		Alt Address:
 	*/
-function selectAppInfo(evt) {
+function copyAppInfo(evt) {
 	// CTRL + SHIFT + X
 	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-		if(isDB()) {
-			console.warn("debug on (selectAppInfo)");
+		if(bo.mydebug.isDB()) {
+			console.warn(">> debug: at copyAppInfo");
 		}
 
 		var finalString = 
