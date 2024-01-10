@@ -29,9 +29,9 @@
 	NOTES_ON_FN */
 
 
-MAKE MACRO FOR FIVE9 TICKET
-MAKE MACRO FOR INTRO TO GH ticket
-(make sure tags are right)
+// MAKE MACRO FOR FIVE9 TICKET
+// MAKE MACRO FOR INTRO TO GH ticket
+// (make sure tags are right)
 
 
 /*************
@@ -48,18 +48,18 @@ MAKE MACRO FOR INTRO TO GH ticket
 
 	/* Function DEBUG FUNCTIONS
 		tests for/starts/stops debug */
-	debug = {
+	mydebug = {
 		isDB: function () {
 			return document.bodebug;
 		},
 		startDB: function() {
 			document.bodebug = true;
-		}
-		function endDB() {
+		},
+		endDB: function() {
 			document.bodebug = false;	
 		}
 
-	}
+	};
 
 	/* Function copyStringToClipboard
 		Copies a string to the computer clipboard */
@@ -410,17 +410,23 @@ function selectAppInfo(evt) {
 /*************
  * LOGIC
  *************/
-if(document.ranSetup != true) {
+if(typeof bo == "undefined") {
+	window.bo = {
+		ranSetup: false
+	};
+}
+if(bo.ranSetup != true) {
 	setUpKeyboardShortcuts();
 
-	document.ranSetup = true;
-	window.unloadBO = unloadBO;
-	window.alreadyPresent = alreadyPresent;
+	bo.ranSetup = true;
+	bo.unloadBO = unloadBO;
+	bo.alreadyPresent = alreadyPresent;
+	bo.mydebug = mydebug;
 	evt = { // For debugging/testing
 		ctrlKey:true,
 		shiftKey:true,
 		which:70
 	}
 } else {
-	alreadyPresent();
+	bo.alreadyPresent();
 }
