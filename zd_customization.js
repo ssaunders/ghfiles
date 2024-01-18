@@ -2,8 +2,12 @@
 
 // TODO: 
 
+// working on vvv
+// TODO: Finish adding ZD object
+	// TODO: Get it unset ZD
 
-// TODO: Make a " - XX" addition for state for Subj C+S+T
+// TODO: Make the "get first comment" and "process comment" into a library fn
+// TODO: Make a shortcut to scroll to the most recent Cu Info
 // TODO: Fix DNE copy to handle Devoted RFI's
 // TODO: Make Ctrl+Shift+E also work for Dev RFI'S
 // TODO: Make view refresher that sends me a notification if certain views have stuff available.
@@ -13,7 +17,8 @@
 	// (sort groups of things seperately)
 
 /** DONE **/
-// TODO: Make Ctrl+Shift+S also focus search bar
+	// TODO: Make a " - XX" addition for state for Subj C+S+T
+	// TODO: Make Ctrl+Shift+S also focus search bar
 	// TODO: TEST to see if HM email copy fn actually filters out correct plans
 	// TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
 	// TODO: Make Ct+Sh+x get PI header, too
@@ -26,6 +31,7 @@
 	// TODO: Figure out what to do if multiple fit
 	// TODO: Figure out how to get/select/copy the particular element containing the thing
 	// TODO: Make an unload fn
+	// TODO: Make document hold ref's to all these things, so can test/call/replace
 
 /* Function DEFAULT
    NOTES_ON_FN */
@@ -51,15 +57,18 @@
 
 	/* Function DEBUG FUNCTIONS
 		tests for/starts/stops debug */
-	function isDB() {
-		return document.mxdebug;
-	}
-	function startDB() {
-		document.mxdebug = true;
-	}
-	function endDB() {
-		document.mxdebug = false;	
-	}
+	mydebug = {
+		isDebugging: false,
+		isDB: function () {
+			return this.isDebugging;
+		},
+		startDB: function() {
+			this.isDebugging = true;
+		},
+		endDB: function() {
+			this.isDebugging = false;	
+		}
+	};
 
 	/* Function copyStringToClipboard
 		Copies a string to the computer clipboard */
@@ -93,7 +102,7 @@
 		document.execCommand("Copy");
 	}
 
-	/*  Function addCssEl
+	/* Function addCssEl
 		Adds the passed in CSS text to the document body */
 	function addCssEl(cssText, doc) {
 		doc = (doc == null || doc == undefined) ? document : doc;
@@ -105,7 +114,7 @@
 		}
 	}
 
-	/*  Function addJsScript
+	/* Function addJsScript
 		Adds the passed in script text to the document body */
 	function addJsScript(scriptText, doc) {
 		doc = (doc == null || doc == undefined) ? document : doc;
@@ -136,7 +145,7 @@
 	   Sets up the keyboard listeners to the page */
 	function setUpKeyboardShortcuts() {
 		document.addEventListener("keyup", selectTicketInfo);
-		document.addEventListener("keyup", selectComment);
+		document.addEventListener("keyup", selectFirstComment);
 		document.addEventListener("keyup", selectDNEInfo);
 		document.addEventListener("keyup", selectHumEmailInfo);
 		document.addEventListener("keyup", subjectFocus);
@@ -144,25 +153,25 @@
 		console.warn(">> set up shortcuts");
 	}
 
-	/* Function unloadZD
+	/* Function unload
 	   Removes the keyboard listeners from the page */
-	function unloadZD() {
+	function unload() {
 		document.removeEventListener("keyup", selectTicketInfo);
-		document.removeEventListener("keyup", selectComment);
+		document.removeEventListener("keyup", selectFirstComment);
 		document.removeEventListener("keyup", selectDNEInfo);
 		document.removeEventListener("keyup", selectHumEmailInfo);
 		document.removeEventListener("keyup", subjectFocus);
 		document.removeEventListener("keyup", searchBoxFocus);
 		console.log(">> removed shortcuts");
-		document.ranSetup = false;
+		zd.ranSetup = false;
 	}
 
 	/* Function isCarrierPlan
 	   Copies "Not a HM Plan" to the clipboard */
-	function isCarrierPlan(cuInfo,carrierName) {
+	function isCarrierPlan(cuInfoEl,carrierName) {
 		if(carrierName == undefined || carrierName == null) return false;
 		var regExp = new RegExp("Plan Name:\\s+"+carrierName);
-		return cuInfo.innerHTML.replaceAll("&nbsp;"," ").search(regExp) != -1;
+		return cuInfoEl.innerHTML.replaceAll("&nbsp;"," ").search(regExp) != -1;
 	}
 
 
@@ -185,7 +194,7 @@
 	function setFocusToNoteEl(evt) {
 		// CTRL + SHIFT + ?
 		// if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
-		// 	if(isDB()) {
+		// 	if(zd.mydebug.isDB()) {
 		// 				console.warn(">> debug on");
 		// 	}
 		// 	var firstInfoEl = getFirstCommentEl(); 
@@ -252,7 +261,7 @@
 	function addStateAbbr() {
 		var subjLineEl = getSubjLineEl(),
 			 ticketInfoEl = getTicketInfoEl(),
-			 ticketInfo, stringPos, stateAbbr;
+			 stateAbbr;
 
 	   if(subjLineEl === undefined) {
 	   	console.warn(">> Could not add state abbr to subject: subject line not found");
@@ -260,9 +269,11 @@
 	   	console.warn(">> Could not add state abbr to subject: processed ticket info not found");
 	   }
 
-		ticketInfo = ticketInfoEl.innerHTML,
-		stringPos = ticketInfo.search(/, ([A-Z]{2}) \d+/),
-		// extra space so that there is a keystroke that sets the value
+	   //have to declare variables here, b/c minifier madness
+		var ticketInfo = ticketInfoEl.innerHTML.replaceAll("&nbsp;","");
+		var stringPos = ticketInfo.search(/, ([A-Z]{2}) \d{5}/);
+		// extra space to give something to backspace, so there 
+		// is a keystroke that triggers the logic to set the value
 		stateAbbr = " - "+ticketInfo[stringPos+2]+ticketInfo[stringPos+3]+" ";
 
 		// will this work?
@@ -340,15 +351,15 @@
 	function processDevotedRFIComment(el) {
 		var rfiParts= el.innerHTML.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
 
-		var returnVal = "Agent Name: "+rfiParts[1]+
-		" Agent NPN/Party ID: "+rfiParts[2]+
-		" Agent Writing Number/SAN :"+
-		" Medicare ID: "+rfiParts[8]+
-		" Sub Date: "+rfiParts[5]+
-		" Due Date:"+
-		" Case Worker (Cigna*)/Broker Phone (Aetna/United*):"+
-		" Case Number (Cigna*)/Broker Email (Aetna/United*):"+
-		" Policy ID/Application ID:"+
+		var returnVal = "Agent Name: "+rfiParts[1]+"\n"+
+		" Agent NPN/Party ID: "+rfiParts[2]+"\n"+
+		" Agent Writing Number/SAN :"+"\n"+
+		" Medicare ID: "+rfiParts[8]+"\n"+
+		" Sub Date: "+rfiParts[5]+"\n"+
+		" Due Date:"+"\n"+
+		" Case Worker (Cigna*)/Broker Phone (Aetna/United*):"+"\n"+
+		" Case Number (Cigna*)/Broker Email (Aetna/United*):"+"\n"+
+		" Policy ID/Application ID:"+"\n"+
 		" Reason: "+rfiParts[10];
 
 		return returnVal;
@@ -373,17 +384,18 @@
 		return returnVal;
 	}
 
-	/* Function selectComment
+	/* Function selectFirstComment
 	   Event function that selects and copies the initial comment containing the RFI's info */
-	function selectComment(evt) {
+	function selectFirstComment(evt) {
 		// CTRL + SHIFT + F //(f for "first")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
-			if(isDB()) {
+			if(zd.mydebug.isDB()) {
 				console.warn(">> debug on");
 			}
 			var firstCommentEl = getFirstCommentEl();
 
 			if(firstCommentEl == null) {
+				console.warn("First comment not recognized");
 				return;
 			} else if(isRegularRFI(firstCommentEl)) {
 				copyElToClipboard(getFirstCommentEl());
@@ -421,7 +433,7 @@
 	function selectDNEInfo(evt) {
 		// CTRL + SHIFT + E // (e for "engage")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
-			if(isDB()) {
+			if(zd.mydebug.isDB()) {
 				console.warn(">> debug on");
 			}
 
@@ -448,7 +460,7 @@
 	function selectHumEmailInfo(evt) {
 		// CTRL + SHIFT + H // (h for "Humana")
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
-			if(isDB()) {
+			if(zd.mydebug.isDB()) {
 				console.warn(">> debug on: selectHumEmailInfo");
 			}
 
@@ -519,7 +531,7 @@
 	function selectTicketInfo(evt) {
 		// CTRL + SHIFT + X  //x b/c convenient
 		if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-			if(isDB()) {
+			if(zd.mydebug.isDB()) {
 						console.warn(">> debug on");
 			}
 
@@ -531,21 +543,23 @@
 /*************
  * LOGIC
  *************/
-if(document.ranSetup != true) {
-
+if(typeof zd == "undefined") {
+	window.zd = {
+		ranSetup: false
+	};
+}
+if(zd.ranSetup != true) {
 	setUpKeyboardShortcuts();
 
-	document.ranSetup = true;
-	window.unloadZD = unloadZD;
-	window.alreadyPresent = alreadyPresent;
+	zd.ranSetup = true;
+	zd.unload = unload;
+	zd.alreadyPresent = alreadyPresent;
 	evt = { // For debugging/testing
 	    ctrlKey:true,
 	    shiftKey:true,
 	    which:70
 	}
+	zd.mydebug = mydebug;
 } else {
-	alreadyPresent();
+	zd.alreadyPresent();
 }
-
-// TODO: Make document hold ref's to all these things, so can test/call/replace
-//document.zd.THING
