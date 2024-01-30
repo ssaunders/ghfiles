@@ -176,6 +176,13 @@
 		return cuInfoEl.innerHTML.replaceAll("&nbsp;"," ").search(regExp) != -1;
 	}
 
+	/* Function parseCuInfo
+	   Parses the cu info el text into an array */
+	function parseCuInfo(cuInfo) {
+		return cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
+	}
+
+
 /*** FOCUS INTERNAL NOTE ***/
 
 	/* Function getNoteEl
@@ -478,7 +485,7 @@
 				return;
 			}
 
-			parsedCuInfo = cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
+			parsedCuInfo = parseCuInfo(cuInfo.innerHTML); 
 
 			var leadID = parsedCuInfo[1].replace(/Lead ID: */,""),
 				cuName = parsedCuInfo[2].replace(/Cu Name: */,""),
