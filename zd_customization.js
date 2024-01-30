@@ -3,17 +3,19 @@
 // TODO: 
 
 // working on vvv
-// TODO: Finish adding ZD object
-	// TODO: Get it unset ZD
+
+// priority vvv
+// TODO: Fix DNE copy to handle Devoted RFI's
+// TODO: Make Ctrl+Shift+E also work for Dev RFI'S
 
 // TODO: Make the "get first comment" and "process comment" into a library fn
 // TODO: Make a shortcut to scroll to the most recent Cu Info
-// TODO: Fix DNE copy to handle Devoted RFI's
-// TODO: Make Ctrl+Shift+E also work for Dev RFI'S
 // TODO: Make view refresher that sends me a notification if certain views have stuff available.
 // TODO: make shortcut to focus on internal note 
 // TODO: Make a subject sorter...for just the page.
 	// (needs to ignore !)
+	// TODO: Finish adding ZD object
+		// TODO: Get it unset ZD
 	// (sort groups of things seperately)
 
 /** DONE **/
@@ -173,7 +175,6 @@
 		var regExp = new RegExp("Plan Name:\\s+"+carrierName);
 		return cuInfoEl.innerHTML.replaceAll("&nbsp;"," ").search(regExp) != -1;
 	}
-
 
 /*** FOCUS INTERNAL NOTE ***/
 
@@ -351,15 +352,15 @@
 	function processDevotedRFIComment(el) {
 		var rfiParts= el.innerHTML.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
 
-		var returnVal = "Agent Name: "+rfiParts[1]+"\n"+
-		" Agent NPN/Party ID: "+rfiParts[2]+"\n"+
-		" Agent Writing Number/SAN :"+"\n"+
-		" Medicare ID: "+rfiParts[8]+"\n"+
-		" Sub Date: "+rfiParts[5]+"\n"+
-		" Due Date:"+"\n"+
-		" Case Worker (Cigna*)/Broker Phone (Aetna/United*):"+"\n"+
-		" Case Number (Cigna*)/Broker Email (Aetna/United*):"+"\n"+
-		" Policy ID/Application ID:"+"\n"+
+		var returnVal = "Agent Name: "+rfiParts[1]+" "+
+		" Agent NPN/Party ID: "+rfiParts[2]+" "+
+		" Agent Writing Number/SAN :" +
+		" Medicare ID: "+rfiParts[8]+" "+
+		" Sub Date: "+rfiParts[5]+" "+
+		" Due Date: "+
+		" Case Worker (Cigna*)/Broker Phone (Aetna/United*): "+
+		" Case Number (Cigna*)/Broker Email (Aetna/United*): "+
+		" Policy ID/Application ID: "+
 		" Reason: "+rfiParts[10];
 
 		return returnVal;
@@ -442,6 +443,9 @@
 				getLeadID()+"\t"+
 				getFirstCommentEl().children[0].innerHTML;
 
+		   // TODO: get inner HTML, and if Dev, get agent Name
+
+
 			copyStringToClipboard(finalString);
 
 			return;
@@ -477,7 +481,7 @@
 			parsedCuInfo = cuInfo.innerHTML.replace(/ ?\&nbsp\;/g,"").split("<br>");
 
 			var leadID = parsedCuInfo[1].replace(/Lead ID: */,""),
-				cuName = parsedCuInfo[2].replace(/Customer Name: */,""),
+				cuName = parsedCuInfo[2].replace(/Cu Name: */,""),
 				cuDOB  = parsedCuInfo[3].replace(/DOB: */,""),
 				cuZip  = parsedCuInfo[4].slice(-5),
 				cuMBI  = parsedCuInfo[5].slice(-11),
