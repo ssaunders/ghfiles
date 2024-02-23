@@ -1,10 +1,18 @@
+   // TODO: 
+
 // program
-	// TODO: Given a list of numbers, pull a number n out, and 0 out the nth item in the array
+   // TODO: Generate the guess
+   // TODO: Make tests for getLargestGa
+   // TODO: Make tests for generateGues
+
 // input
 	// TODO: pull elements from the comment into a list of numbers
 	// TODO: export the list in CSV, to do analysis
 
 // DONE:
+   // TODO: Make tests for makeEmptyList
+   // TODO: Make tests for markGuesses
+	// TODO: Given a list of numbers, pull a number n out, and 0 out the nth item in the array
 	// TODO: Generate list of 500 filled w/ 1's
 
 
@@ -122,6 +130,15 @@ verboseThisSection = false;
         a.every((val, index) => val === b[index]);
    }
 
+   /* Function objectEquals
+      Checks if two arrays have an equal # of elemnts,
+      and that each of their elements is equal */
+   function objectEquals(a, b) {
+    return Object.isObject(a) &&
+        Object.isObject(b) &&
+        a.every((val, index) => val === b[index]);
+   }
+
    /* Function getHighestNum
       Checks if two arrays have an equal # of elemnts,
       and that each of their elements is equal */
@@ -154,12 +171,14 @@ function tests() {
 
    verboseThisSection = false;
 
+
   /***** makeEmptyList *****/
    verboseThisSection = false;
    console.log(">> Assertions for: makeEmptyList")
 	console.assert(makeEmptyList().length == HIGHEST_NUMBER,"Test Fail: Did not make a size 500 list");
 	console.assert(makeEmptyList()[HIGHEST_NUMBER-1]==1,"Test Fail: Did not make a list of 1's");
    console.assert(makeEmptyList(4).length == 4,"Test Fail: Did not make list of custom size");
+
 
   /***** markGuesses *****/
    verboseThisSection = false;
@@ -232,8 +251,137 @@ function tests() {
    console.assert(arrayEquals(markGuesses(guessAry,makeEmptyList(11)),ansAry),
       "Test Fail: Guess array contains more all #'s");
 
+
+  /***** getLargestGap *****/ 
+   console.log(">> Assertions for: getLargestGap")
+   verboseThisSection = false;
+
+   // ansAry = [0,0,1,1,1,1,0,1,0,0,0];
+
+   // Empty guess array
+   guessAry = [];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 1,
+      bottom: 11
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Empty guess array");
+
+   // Guess array contains #'s in order
+   guessAry = [2,8,9,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains #'s in order");
+
+   // Guess array contains #'s in random order
+   guessAry = [9,10,2,8];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains #'s in random order");
+
+   // Guess array contains duplicate #'s
+   guessAry = [2,2,8,9,10,2,2,2,8,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains duplicate #'s");
+
+   // Guess array contains highest #
+   guessAry = [2,8,9,11];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains highest #");
+
+   // Guess array contains lowest #
+   guessAry = [1,8,9,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 1
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains lowest #");
+
+   // Guess array contains negative #
+   guessAry = [2,-8,8,9,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains negative #");
+
+   // Guess array contains # higher than HIGHEST_NUMBER
+   guessAry = [2,8,9,10,12];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains # higher than HIGHEST_NUMBER");
+
+   // Guess array contains 0
+   guessAry = [0,2,8,9,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Guess array contains 0");
+
+   // Guess array's bottom contains 0
+   guessAry = [0,8,9,10];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 1
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Guess array contains 0");
+
+   // Guess array contains more #'s than are guessable
+   guessAry = [2,8,9,10,2,8,9,10,2,8,9,10,0,1,12,16,-1,30,2,8,9,10,11];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains more #'s than are guessable");
+
+   // Guess array contains all #'s
+   guessAry = [1,2,3,4,5,6,7,8,9,10,11];
+   numAry = markGuesses(guessAry,makeEmptyList(11));
+   ansObj = {
+      top: 8,
+      bottom: 2
+   };
+   console.assert(objectEquals(getLargestGap(numAry), ansObj),
+      "Test Fail: Guess array contains all #'s");
+
   /***** generateGuess *****/
-   verboseThisSection = true;
+   console.log(">> Assertions for: generateGuess")
+   verboseThisSection = false;
+
    // Empty guess array
    guessAry = [];
    numAry = markGuesses(guessAry,makeEmptyList(11));
@@ -241,8 +389,35 @@ function tests() {
    console.assert(generateGuess(numAry)===targetGuess,
       "Test Fail: Empty guess array");
 
-	// TESTS TO WRITE:
-	// guess numbers that 
+   // Guess array contains #'s in order
+   guessAry = [2,7,9,10];
+
+   // Guess array contains #'s in random order
+   guessAry = [9,10,2,7];
+
+   // Guess array contains duplicate #'s
+   guessAry = [2,2,7,9,10,2,2,2,7,10];
+
+   // Guess array contains highest #
+   guessAry = [2,7,9,11];
+
+   // Guess array contains lowest #
+   guessAry = [1,7,9,10];
+
+   // Guess array contains negative #
+   guessAry = [2,-7,7,9,10];
+
+   // Guess array contains # higher than HIGHEST_NUMBER
+   guessAry = [2,7,9,10,12];
+
+   // Guess array contains 0
+   guessAry = [0,2,7,9,10];
+
+   // Guess array contains more #'s than are guessable
+   guessAry = [2,7,9,10,2,7,9,10,2,7,9,10,0,1,12,16,-1,30,2,7,9,10,11];
+
+   // Guess array contains all #'s
+   guessAry = [1,2,3,4,5,6,7,8,9,10,11];
 
 }
 tests();
