@@ -2,21 +2,26 @@
 
 // TODO: 
 
+// working on vvv
+
+// priority vvv
 // TODO: Have search table expand if there is content in it
-// TODO: Make Ctrl+shift+E for Enrollment info to copy the top section
-	// TODO: Create a button div, so I can extend the screenshot functionality
-	// TODO: connect shortcut
-	// TODO: write fn to hmtl2canvas the 4 divs I need
+// TODO: Get auto-nav to work with the first part of MARx
+// TODO: Fix MARx refresher
+
 // TODO: figure out why i have to hit the shortcut buttons twice
 // TODO: Style v> button
-// TOOD: Add auto-navigator
-	// TODO: Make it auto-step
-	// TODO: make it so that if the MX button is pushed, it'll still go
 		
 
 //DONE 
+	// TODO: Make Ctrl+shift+E for Enrollment info to copy the top section
+		// TODO: Create a button div, so I can extend the screenshot functionality
+		// TODO: connect shortcut
+		// TODO: write fn to hmtl2canvas the 4 divs I need
 	// TOOD: Add auto-navigator
-	// TODO: Have it delay the addition of the stuff until the end
+		// TODO: Make it auto-step
+		// TODO: make it so that if the MX button is pushed, it'll still go
+		// TODO: Have it delay the addition of the stuff until the end
 		// TODO: beneficiaries
 		// TODO: eligibility
 	// TODO: pageCopy logic--get it to copy
@@ -24,7 +29,7 @@
 	// TODO: pageCopy logic testing
 	// TODO: import jspdf
 	// TODO: make shortcut to pageCopy
-	//TODO: Make a setup fn, to be called from auto nav
+	// TODO: Make a setup fn, to be called from auto nav
 	// TODO: Make unloadMx fn
 	// TODO: Add timestamp to "tried it"
 	// TODO: Rework hideShowFn > name better
@@ -39,7 +44,7 @@
 		// TODO: Remove the two things (highlight and +) at top?
 
 /*************
-** FUNCTIONS
+* FUNCTIONS
 **************/
 
 /*** LIBRARY ***/
@@ -226,7 +231,7 @@
 		const doc = getIframeDoc();
 		const div = doc.createElement('div');
 		div.id="canvasContainer";
-		// div.style="visibility:hidden; display:none;";
+		div.style="visibility:hidden; display:none;";
 
 		//inner btn div
 		const btnDiv = doc.createElement('div');
@@ -765,8 +770,8 @@
 
 
 /*************
- * LOGIC
- *************/
+* LOGIC
+**************/
 // Set up 
 function setup() {
 	var doc = document;
@@ -790,8 +795,6 @@ function setup() {
 		doc.alreadyPresent();
 	}
 }
-
-/*** Run auto-nav ***/
 
 /*** Add AutoNav Functionality ***/
 // need to add the listener, so it starts the loop for the navigation until we arrive
