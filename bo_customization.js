@@ -2,7 +2,13 @@
 
 // TODO: 
 
+// working on vvv
+// TODO: Shortcut to add new PIP
+	// TODO: Have it add default values
+
+// priority vvv
 // TODO: BO CT+SH+X PULLING WRONG INFO ON 121679558
+
 // TODO: Pipe dream--create page that wraps BO in an iframe, so I can keep my shortcuts/apply them auto on refresh
 	//TODO: Make it so the bol search calls that page
 	//TODO: Make it so the Start of Day shortcut works w/it
@@ -35,8 +41,8 @@
 
 
 /*************
- * FUNCTIONS
- *************/
+* FUNCTIONS
+**************/
 
 /*** LIBRARY ***/
 
@@ -333,80 +339,90 @@ function getEffDate() {
 
 //// ADDR STUFF ////
 
-/* Function getCuInfoPg
-	Gets the cu's info page */
-function getCuInfoPg() {
-	return $$('#contact-info-2')[0];
-}
+	/* Function getCuInfoPg
+		Gets the cu's info page */
+	function getCuInfoPg() {
+		return $$('#contact-info-2')[0];
+	}
 
-/* Function getCurrAddr
-	Gets the cu's address or '' */
-function getCurrAddr() {
-	return $$('#address_1_street1')[0].innerHTML;
-} 
+	/* Function getCurrAddr
+		Gets the cu's address or '' */
+	function getCurrAddr() {
+		var addr = $$('#address_1_street1')[0].innerHTML.replaceAll("&nbsp;","");
+		if(addr.slice(0,6).toUpperCase() == "PO BOX") {
+			reutrn "";
+		}
+		return addr;
+	} 
 
-/* Function getCity
-	Gets the city */
-function getCity() {
-	return $$('#address_1_city')[0].innerHTML;
-}
-/* Function getState
-	Gets the state */
-function getState() {
-	return $$('#address_1_state')[0].innerHTML;
-}
-/* Function getZip
-	Gets the zip */
-function getZip() {
-	return $$('#address_1_zip')[0].innerHTML;
-}
+	/* Function getCity
+		Gets the city */
+	function getCity() {
+		return $$('#address_1_city')[0].innerHTML;
+	}
+	/* Function getState
+		Gets the state */
+	function getState() {
+		return $$('#address_1_state')[0].innerHTML;
+	}
+	/* Function getZip
+		Gets the zip */
+	function getZip() {
+		return $$('#address_1_zip')[0].innerHTML;
+	}
 
-/* Function getAltAddr
-	Gets the alt address */
-function getAltAddr() {
-	return getCurrAddr()+", "+getCity()+", "+getState()+" "+getZip();
-}
+	/* Function getAltAddr
+		Gets the alt address */
+	function getAltAddr() {
+		var addr = getCurrAddr();
+		if(addr == "") {
+			return getCity()+", "+getState()+" "+getZip();
+		} else {
+			return addr+", "+getCity()+", "+getState()+" "+getZip();
+		}
+
+	}
 
 //// PUT IT TOGETHER ////
 
-/* Function copyAppInfo
-	Event function that selects and copies the correct node containing the cu's processed and formatted info 
+	/*  Function copyAppInfo
+		Event function that selects and copies the correct node containing the cu's processed and formatted info 
 
-	OUTPUT:
-		T2 Agent:
-		T3 Agent:
-		Plan:
-		SEP:
-		Sub Date:
-		Eff Date:
-		Alt Address:
-	*/
-function copyAppInfo(evt) {
-	// CTRL + SHIFT + X
-	if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-		if(bo.mydebug.isDB()) {
-			console.warn(">> debug: at copyAppInfo");
+		OUTPUT:
+			T2 Agent:
+			T3 Agent:
+			Plan:
+			SEP:
+			Sub Date:
+			Eff Date:
+			Alt Address:
+		*/
+	function copyAppInfo(evt) {
+		// CTRL + SHIFT + X
+		if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
+			if(bo.mydebug.isDB()) {
+				console.warn(">> debug: at copyAppInfo");
+			}
+
+			var finalString = 
+				"T2 Agent:\t"+getT2AgentName()+"\n"+
+				"T3 Agent:\t"+getT3AgentName()+"\n"+
+				"Plan:\t"+getPlanData()+"\n"+
+				"SEP:\t"+getSep()+"\n"+
+				"Sub Date:\t"+getSubDate()+"\n"+
+				"Eff Date:\t"+getEffDate()+"\n"+
+				"Alt Address:\t"+getAltAddr();
+
+			copyStringToClipboard(finalString);
+
+			return;
 		}
-
-		var finalString = 
-			"T2 Agent:\t"+getT2AgentName()+
-			"\nT3 Agent:\t"+getT3AgentName()+
-			"\nPlan:\t"+getPlanData()+
-			"\nSEP:\t"+getSep()+
-			"\nSub Date:\t"+getSubDate()+
-			"\nEff Date:\t"+getEffDate()+
-			"\nAlt Address:\t"+getAltAddr();
-
-		copyStringToClipboard(finalString);
-
-		return;
 	}
-}
 
 
 /*************
- * LOGIC
- *************/
+* LOGIC
+**************/
 if(typeof bo == "undefined") {
 	window.bo = {
 		ranSetup: false
