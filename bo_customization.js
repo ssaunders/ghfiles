@@ -5,6 +5,7 @@
 // working on vvv
 	// priority vvv
 	// TODO: BO CT+SH+X PULLING WRONG INFO ON 121679558
+	// TODO: BO CT+SH+X PULLING WRONG INFO ON 126980663
 
 	// TODO: Shortcut to add new PIP
 		// TODO: Have it add default values
@@ -225,7 +226,7 @@ function loadPlanInfoTab() {
 		Eff Date:	01/01/2024
 		Alt Address:	- 
 	 */
-		
+
 
 		/* Could also use:
 			$$('#appInfoContainer div:contains("Off-Exchange")');
@@ -270,11 +271,11 @@ function loadPlanInfoTab() {
 			return this.result;
 		}
 
-		var planPIP = getMostRecentDtcPip();
+		var dtcPIP = getMostRecentDtcPip();
 
 		loadCommHistTab();
 
-		if(planPIP != undefined) {
+		if(dtcPIP != undefined) {
 			this.result = true;
 		} else if(getT2UsernameFromCommHistory() != "-") {
 			this.result = true;
@@ -301,11 +302,20 @@ function loadPlanInfoTab() {
 	}
 
 
+	/* Function getAORsNameFromPIP
+		Gets the T2 agent's name from the DTC PIP or the sales PIP */
+	function getAORsNameFromPIP(pip) {
+		if (pip == undefined) return "-";
+
+		var agentName = pip.querySelector('div[data-testid="agent-of-record"]').innerHTML;
+
+		return agentName.replace(/(.*) \(\d+\)/,"$1");
+	}
 
 	/* Function getT2AgentName
 		Gets the T2 agent's name from the DTC PIP or the sales PIP */
 	function getT2AgentName() {
-		var planPIP, t2AgentData;
+		var planPIP;
 
 		if(isSubmittingAgentT3()) {
 			planPIP = getMostRecentDtcPip();
@@ -314,9 +324,7 @@ function loadPlanInfoTab() {
 		}
 
 		if(planPIP != undefined) {
-			t2AgentData = planPIP.querySelector('div[data-testid="agent-of-record"]').innerHTML;
-
-			return t2AgentData.replace(/(.*) \(\d+\)/,"$1");
+			return getAORsNameFromPIP(planPIP);
 		} else {
 			return getT2UsernameFromCommHistory();
 		}
@@ -325,17 +333,15 @@ function loadPlanInfoTab() {
 	/* Function getT3AgentName
 		Gets the T3 agent's name from the sale PIP */
 	function getT3AgentName() {
-		var salePIP, t2AgentData;
+		var salePIP;
 
 		if (isSubmittingAgentT3()) {
 			salePIP = getMostRecentSalePip();
+			return getAORsNameFromPIP(salePIP);
 		} else {
 			return "-";
 		}
 
-		t2AgentData = salePIP.querySelector('div[data-testid="agent-of-record"]').innerHTML;
-
-		return t2AgentData.replace(/(.*) \(\d+\)/,"$1");
 	}
 
 	/* Function getPlanData
@@ -421,23 +427,29 @@ function loadPlanInfoTab() {
 				so the app is done on a later date than the T2 agent
 				talks to the cu
 			2. Sometimes the T2 person puts "App Submitted"
-			3. We can usually find the UserID for the T3 agent by
+			x 3. We can usually find the UserID for the T3 agent by
 				manipulating their name
 			4. What if the T2 person from the call log...is 
 				the sales person. Then you'd have a dup.
 
+			note: T1 shows their transfer as "Transfer - Tier 2",
+			which means I may be able to differentiate from a
+			VConnect transfer/know it's a T2 person
 
 			planInfoTab/contactInfoTab << tab names
 		*/
+		var t3Name, subDate;
 
 		loadCommHistTab();
 
 		// find every entry matching the sub date, filter out unimportant
-		var subDate = getSubDatePadded();
+		subDate = getSubDatePadded();
 		callRecordAry = $$('#lead-communication tr:contains('+subDate+')');
 		callRecordAry = callRecordAry.filter((el) => {
 			console.log(el.children[5]);
-			return el.children[5].innerHTML == "Application Submitted" || el.children[5].innerHTML == "DTC Transfer" 
+			return el.children[5].innerHTML == "Application Submitted" 
+			    || el.children[5].innerHTML == "DTC Transfer";
+			    //|| el.children[5].innerHTML == "Transfer - Tier 2" 
 		});
 
 		if(callRecordAry.length == 1) {
@@ -445,7 +457,31 @@ function loadPlanInfoTab() {
 			alert("Check comm history. Only one record");
 			return "-";
 		} else if(callRecordAry.length == 2) {
-			return callRecordAry[1].children[3].innerHTML;
+			// Most likely a T2/T3 pair
+			if(callRecordAry[1].children[5].innerHTML == "DTC Transfer") {
+				return callRecordAry[1].children[3].innerHTML;
+
+			} else if(callRecordAry[0].children[5].innerHTML == "DTC Transfer") {
+				return callRecordAry[0].children[3].innerHTML;
+
+			} else if(callRecordAry[0].children[5].innerHTML == "Application Submitted"
+					 && callRecordAry[1].children[5].innerHTML == "Application Submitted") {
+				//if you're getting the T2 username from the comm history,
+				//the Sale PIP is from the T3 agent
+				t3Name = getAORsNameFromPIP(getMostRecentSalePip());
+				t3UserNameIsh = t3Name.toLowerCase().replace(/([a-z])([a-z]+ )([a-z]+)/,"$1$3");
+
+				if(callRecordAry[0].children[3].innerHTML.search(t3UserNameIsh) == 0){
+					return callRecordAry[1].children[3].innerHTML;
+				} else {
+					return callRecordAry[0].children[3].innerHTML;
+				}
+
+			} else {
+				alert("Something went wrong");
+				console.warn("Something went wrong");
+				return "-";
+			}
 		} else if(callRecordAry.length > 2) {
 			// 3+- uh...not sure
 			alert("Check comm history. More than two records");
@@ -457,11 +493,11 @@ function loadPlanInfoTab() {
 
 	//// ADDR STUFF ////
 
-		/* Function getCuInfoPg
-			Gets the cu's info page */
-		function getCuInfoPg() {
-			return $$('#contact-info-2')[0];
-		}
+		// /* Function getCuInfoPg
+		// 	Gets the cu's info page */
+		// function getCuInfoPg() {
+		// 	return $$('#contact-info-2')[0];
+		// }
 
 		/* Function getCurrAddr
 			Gets the cu's address or '' */
@@ -561,7 +597,7 @@ if(bo.ranSetup != true) {
 		shiftKey:true,
 		which:70
 	}
-	
+
 } else {
 	bo.alreadyPresent();
 }
