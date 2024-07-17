@@ -1,0 +1,174 @@
+//~~~~ SITE_NAME CUSTOMIZATION ~~~~//
+
+// TODO: 
+
+	// 1  working on
+
+	// 2 priority
+
+	// 3 backlog
+
+	/** DONE **/
+
+/* Function function_name
+   NOTES_ON_FN */
+function function_name(argument) {
+	// body...
+}
+
+
+/*************
+* FUNCTIONS
+**************/
+
+/*** LIBRARY ***/
+
+	/* Function alreadyPresent
+		alerts that the code already exists */
+	function alreadyPresent() {
+		console.warn(">> ABBREVIATION Code already present");
+	}
+
+	/* Function DEBUG FUNCTIONS
+		tests for/starts/stops debug */
+	mydebug = {
+		isDebugging: false,
+		isDB: function () {
+			return this.isDebugging;
+		},
+		startDB: function() {
+			this.isDebugging = true;
+		},
+		endDB: function() {
+			this.isDebugging = false;	
+		}
+	};
+
+	/* Function copyStringToClipboard
+		Copies a string to the computer clipboard */
+	function copyStringToClipboard(string) {
+		if(string == null) {
+			console.warn(">> Nothing to copy");
+			return;
+		}
+
+		navigator.clipboard.writeText(string).then(() => {
+		  console.log('>> Content copied to clipboard');
+		},() => {
+		  console.error('>> Failed to copy');
+		});
+	}
+
+	/* Function copyElToClipboard
+		Copies the content of an el to the computer clipboard */
+	function copyElToClipboard(htmlEl) {
+		if(htmlEl == null) {
+			console.warn(">> Nothing to copy");
+			return;
+		}
+
+	    var range = document.createRange();
+	    var sel = document.getSelection();
+
+	    sel.removeAllRanges();
+	    range.selectNodeContents(htmlEl);
+		sel.addRange(range);
+		document.execCommand("Copy");
+	}
+
+	/* Function addCssEl
+		Adds the passed in CSS text to the document body */
+	function addCssEl(cssText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (cssText!=null) {
+			const css_el = doc.createElement("style");
+			css_el.textContent = cssText;
+			doc.childNodes[1].appendChild(css_el);
+		}
+	}
+
+	/* Function addJsScript
+		Adds the passed in script text to the document body */
+	function addJsScript(scriptText, doc) {
+		doc = (doc == null || doc == undefined) ? document : doc;
+
+		if (scriptText!=null) {
+			const js_el = doc.createElement("script");
+			js_el.textContent = scriptText;
+			doc.childNodes[1].appendChild(js_el);
+		}
+	}
+
+	/* Function getCurrentTimestamp
+		Returns a string of the current timestamp */
+	function getCurrentTimestamp() {
+		return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+	}
+
+	evt = { // For debugging/testing
+		ctrlKey:true,
+		shiftKey:true,
+		which:70
+	}
+
+
+/*** UTILITY ***/
+
+	/* Function setUpKeyboardShortcuts
+	   Sets up the keyboard listeners to the page */
+	function setUpKeyboardShortcuts() {
+		document.addEventListener("keyup", exampleFn);
+		console.warn(">> set up shortcuts");
+	}
+
+	/* Function unload
+	   Removes the keyboard listeners from the page */
+	function unload() {
+		document.removeEventListener("keyup", exampleFn);
+		console.log(">> removed shortcuts");
+		ABBREVIATION.ranSetup = false;
+	}
+
+
+/*** FEATURE NAME ***/
+
+	/* Function exampleFn
+	   DESCRIPTION */
+	function exampleFn() {
+		// var firstInfoElList = $('div.ABBREVIATION-comment:contains("Agent Name:")');
+		// var firstInfoElListLn = firstInfoElList.length;
+		// if (firstInfoElListLn == 0) {
+		// 	return null;
+		// } else {
+		// 	return firstInfoElList[firstInfoElListLn-1];
+		// }
+	}
+
+	/**** SUB FEATURE ****/
+
+	/* Function subfeatureFn
+	   DESCRIPTION */
+	function subfeatureFn() {
+
+	}
+
+
+/*************
+* LOGIC
+**************/
+if(typeof ABBREVIATION == "undefined") {
+	window.ABBREVIATION = {
+		ranSetup: false
+	};
+}
+if(ABBREVIATION.ranSetup != true) {
+	setUpKeyboardShortcuts();
+
+	ABBREVIATION.ranSetup = true;
+	ABBREVIATION.unload = unload;
+	ABBREVIATION.alreadyPresent = alreadyPresent;
+	ABBREVIATION.mydebug = mydebug;
+} else {
+	ABBREVIATION.alreadyPresent();
+}
