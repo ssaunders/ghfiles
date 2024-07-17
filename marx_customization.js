@@ -3,11 +3,14 @@
 // TODO: 
 
 // working on vvv
+	// TODO: Fix the div that's supposed to be hidden showing up
+
 
 // priority vvv
 // TODO: Have search table expand if there is content in it
 // TODO: Get auto-nav to work with the first part of MARx
-// TODO: Fix MARx refresher
+// TODO: Fix MARx refresher -- have it pick up the "stay" button
+// TODO: Have Ctrl+Enter work in SSN lookup
 
 // TODO: figure out why i have to hit the shortcut buttons twice
 // TODO: Style v> button
@@ -142,7 +145,7 @@
 		Gets the document belonging to the cu lookup iframe */
 	function getIframeDoc() {
 		var iframe = getIframe();
-		return iframe == undefined ? undefined : getIframe().contentDocument;   
+		return iframe == undefined ? undefined : iframe.contentDocument;   
 	}
 
 	/*  Function setUpKeyboardShortcuts
@@ -503,6 +506,10 @@
 	/*  Function autoRefresh
 		Auto-refreshes the interation w/MARx by re-submitting search*/
 	function setUpAutoRefresher(){
+		$('#cms-myprofile-session-xtend');
+		// let it pass after 4 hours, use counter, check ever 1:45
+	
+
 		var iframeDoc = getIframeDoc();
 
 		if(iframeDoc.refresherActive) {
