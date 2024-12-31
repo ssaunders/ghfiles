@@ -1,32 +1,71 @@
 //~~~~ CHC CUSTOMIZATION ~~~~//
 
+/* TODO: 
+   // TODO: Make Library fn's an inserting JS script
+   // TODO: Make the Tester script work as an inserting JS script
+   // TODO: Make all the files an inserting script
+   // TODO: Make a "master" script that detects the page, and then pulls in the right script.
+   // TODO: Check out Ctrl+X in Results page
 
-// working on vvv
-   // RESULTS
-   // TODO: Double check the + levels for states I'm unsure of: TN, WA, GA, WI, FL
-   // TODO: Fix the detect state to handle states that don't have a ST abbr at the beginning, w/o relying on addr
+   // TODO: MAKE A SCRIPT THAT WILL DO THE REPLACEMENTS/RENAMING FOR ME to add in a new test info
+    https://gohealth.zendesk.com/agent/tickets/17804937 >> Couldn't pick up when no-select CSX
 
-   // SEARCH
-   // TODO: create a preference list, so that can change Search Option to whatever needs be
-   // TODO: CTL+Enter doesn't always send?
-   // TODO: figure out what happens if I save it as a webpage that loads things
-   // TODO: ctrl + shift + v => Figures out if DOB or name, insert into appropriate field
-         // TODO: Have it auto-select the Search Option when pasting, for a format that works
+      ~~ SEARCH PAGE ~~
+   /**  1  WORKING ON **
+   // TODO: Have an indicator for what info the cu object has stored. Top right
+   // TODO: Make a "persistant search" > I.E, it searches until it gets a response. 
+      // TODO: Make the toggle btn
+      // TODO: Have it make a sound when it actually lands
+      // TODO: Search twice, b/c it doesn't pop up a window when that happens
 
-         // TODO: Have it focus on Gender, when the field is active and not filled out
-         // TODO: Have it immediately search, if it fits all criteria
-         // TODO: if a MARx copy/paste, make sure the state/address state match
-   // TODO: Fix Search section not doing Ctrl+enter
+   /**  2  PRIORITY   **
+   // TODO: Make customer object that persists until state changes, overwrite new data
+      // TODO: Make the object
+      // TODO: Connect it up to change of Search Option
+      // TODO: Make it clear when new Name comes in?
+      // TODO: When state changes, clear it
+      // TODO: Make a "pasted" indicator
+
+   /**  3  BACKLOG    **
+   // TODO: Make a "Get current states list" that runs through the Site dd and adds the state names into an array
+   // TODO: Create a message div
+      // TODO: Message if the Mcd # stored in the cu's info matches the state's regex
+   // TODO: Color the Search Option, so that it shows in green the parts that are searchable, given the curr cu info obj
    // TODO: Change the file to have a CHC object that is put on the top, always
-   // TODO: Make it so that when you change the Search Option, it preserves your data
-      // TODO: make an object that keeps the data when selectOption changes
+   // TODO: Make it so the Ctrl + Enter doesn't open page after clicking link
+   // TODO: Make it so that Ctrl + V doesn't happen
+   // TODO: figure out what happens if I save it as a webpage that loads things
+   // TODO: create a preference list, so that can change Search Option to whatever needs be
+   // TODO: Make Ctrl + S change between the filters > Site > Payer > search option > forms on Tier 2
+   // TODO: TOAST message Search page
+   // TODO: Mark somewhere that the "look for" isn't for every level
+   // TODO: css for increasing input size of things
 
- /* RESULTS PAGE */ 
-   
+      ~~ RESULTS PAGE ~~
+   /**  1  WORKING ON **
+   // TODO: this one didn't scroll down: https://gohealth.zendesk.com/agent/tickets/17853320
+   // TODO: Make sure the highlighter works for the new states: 
+         /* Need to check: DE, IA, KS, LA, MI, NV, PA, SC
+            CHECKED: 
+               MI - MA-M, but it was the second Plan covg
+               OK - Missed S.L.M.B. Should that be a keyword?
+               IA - tricky. no real consistency?
+         */
+   // TODO: Double check the + levels for states I'm unsure of: TN, WA, GA, WI, FL
+   // TODO: Figuring out LTC recognition for FL in https://gohealth.zendesk.com/agent/tickets/17820081
+   // TODO: Improve state detection for AR and NC. Address isn't reliable
+   // TODO: Put in a "check for LTC" marker in top right under state
+
+
+   /**  2  PRIORITY   **
    // TODO: TOAST message Results page
       // TODO: make toast that shows state detected
       // TODO: make toast that shows how many highlights detected
-      // should include a little note if it didn't find anything to highlight
+      // TODO: should include a little note if it didn't find anything to highlight
+      // TODO: Should show if state is an LTC state AZ, FL, NJ, TN, VA
+
+   /**  3  BACKLOG    **
+   // TODO: Have the copy/paste add to the cu's info as long as 1. it's empty, and 2. it matches the data
    // TODO: allow for jumping between highlights
    // TODO: shortcut to gather info into a single copy/pastable
    // TODO: try to figure out a way to have it persist through refreshes (if added to main CHC);
@@ -34,16 +73,26 @@
    
    // TODO: Problem states: TN? AZ-4 digit code, but no clear flag on where it is, no label
    // FL QMB+/FBDE - IN SLMB/+, QMB+, FBDE - GA QMB+/FBDE - AR FBDE/QMB+/slmb - GA QMB+
-   // which states have LTC?
-
- /* SEARCH PAGE */
-   // TODO: Make Ctrl + S change between the filters > Site > Payer > search option > forms on Tier 2
-   // TODO: TOAST message Search page
-   // TODO: Mark somewhere that the "look for" isn't for every level
-   // TODO: css for increasing input size of things
+   // TODO: Highlight what Search Options are usable by the data copied
 
 /** DONE **/
+   // TODO: Make an auto-nav
+   // Fixed issue where state wouldn't apply if it was lowercase
+   // TODO: Highlight the MBI
+   // TODO: Highlight the LTC indicator, sometimes
+   // TODO: Fix "focusEl" having a length, now that highlighted els is just els
 
+   /**** Post Version Release ****/
+
+   // Fixed an issue w/DOB pasting w/incorrect format
+   // Adjusted the IL, TN position in the site drop down
+   // TODO: Add the new states to Change: DE, IA, KS, LA, MI, NV, OK, PA, SC
+   // TODO: Make it so when you paste into SSN field, it pulls out stuff
+   // TODO: Make it so when you paste into DOB field, it pulls out stuff
+   // TODO: Put in a "check for LTC" marker in top right of the tier 1 portion
+    // TODO: Make the "interpret JSON failed" be less monstrous when I accidentally past the whole body o/code
+   // Fixed an issue w/detecting AZ in Results Page
+   // TODO: Fix Search section not doing Ctrl+enter
    // TODO: Make AR and "home" multi-state ones work (use Name: ? )
    // TODO: Have the Ctrl+Enter include a number on top of the spinner
    // TODO: Figure out how to make SearchOption work (can't just have it select on load, needs to respond to payer...mutation obs?)
@@ -57,6 +106,8 @@
    // TODO: siteField / don't change it if it's already on the right state
    // TODO: Finish getAbbr
    // TODO: ctrl + shift + v => Figures out if DOB or name, insert into appropriate field
+      // TODO: Have it auto-select the Search Option when pasting, for a format that works
+      // TODO: Have it focus on Gender, when the field is active and not filled out
       // TODO: Add shortcut
       // TODO: Add "set" fn's
       // TODO: Make & test interpreter for : fields *only*
@@ -102,9 +153,11 @@
 
    /*** ALLOWED STATES DB ***/
    allowedStatesDB = {
-      _DB: {
-         allowedStates: ["AL", "AR", "AZ", "CA", "CT", "FL", "GA", "IL", "IN", "KY", 
-                         "MO", "MS", "NC", "NJ", "NY", "OH", "SC", "TN", "TX", "WA", "WI"]
+      _DB: {   // OR, ME, NE, RI, HI not functional yet
+         allowedStates: ["AL", "AR", "AZ", "CA", "CT", "DE", "FL", "GA", "IA", 
+                         "IL", "IN", "KS", "KY", "LA", "MI", "MO", "MS", "NC", 
+                         "NJ", "NV", "NY", "OH", "OK", "PA", "SC", "TN", "TX", 
+                         "WA", "WI"]
       },
       isStateAllowed: function(state) {
          state = stateNameToAbbrDB.getAbbr(state);
@@ -132,23 +185,31 @@
    /*** PREFERRED SEARCH OPTION DB ***/
    preferredSearchOptionDB = {
       _DB: {
-         searchOptionValue: {
+         searchOptionValue: { //ADD STATE HERE
             "AL":SEARCH_OPT_NAME_DOB,
             "AR":SEARCH_OPT_NAME_DOB,
             "AZ":SEARCH_OPT_NAME_DOB,
             "CA":-1,
             "CT":SEARCH_OPT_SSN_NAME_DOB,
+            "DE":SEARCH_OPT_NAME_DOB, 
             "FL":SEARCH_OPT_NAME_DOB_GENDER,
             "GA":SEARCH_OPT_NAME_DOB_GENDER,
+            "IA":SEARCH_OPT_NAME_DOB,
             "IL":SEARCH_OPT_NAME_DOB,
             "IN":SEARCH_OPT_NAME_DOB,
+            "KS":SEARCH_OPT_NAME_DOB, 
             "KY":SEARCH_OPT_NAME_DOB_GENDER,
+            "LA":SEARCH_OPT_NAME_DOB, 
+            "MI":SEARCH_OPT_NAME_DOB, 
             "MO":SEARCH_OPT_NAME_DOB,
             "MS":SEARCH_OPT_NAME_DOB,
             "NC":SEARCH_OPT_NAME_DOB,
             "NJ":SEARCH_OPT_NAME_DOB,
+            "NV":SEARCH_OPT_NAME_DOB, 
             "NY":SEARCH_OPT_MEM_ID,
             "OH":SEARCH_OPT_NAME_DOB,
+            "OK":SEARCH_OPT_NAME_DOB,
+            "PA":SEARCH_OPT_NAME_DOB, 
             "SC":SEARCH_OPT_NAME_DOB,
             "TN":SEARCH_OPT_NAME_DOB,
             "TX":SEARCH_OPT_NAME_DOB,
@@ -162,26 +223,35 @@
       _getDB: function() {return this._DB.searchOptionValue}
    }
 
-   /*** PREFERRED SEARCH OPTION DB ***/
+   /*** SITE SELECT VALUE DB ***/
    siteFieldValueDB = {
       _DB: {
-         stateValue: {
+         stateValue: {  //ADD STATE HERE
             "AL": "BP00286802",
             "AR": "BP00277137",
             "AZ": "BP00243685",
             "CA": "BP00285700",
             "CT": "BP00277123",
+            "DE": "BP00314119",
             "FL": "BP00277121",
             "GA": "BP00246036",
+            "IA": "BP00321512",
             "IL": "BP00277137",
             "IN": "BP00246185",
+            "KS": "BP00248330",
             "KY": "BP00280354",
+            "LA": "BP00249413",
+            "MI": "BP00311701",
             "MO": "BP00246038",
             "MS": "BP00246211",
             "NC": "BP00277123",
             "NJ": "BP00277120",
+            "NV": "BP00249431",
             "NY": "BP00277119",
             "OH": "BP00245655",
+            "OK": "BP00306248",
+            "PA": "BP00245494",
+            "SC": "BP00278102",
             "TN": "BP00277137",
             "TX": "BP00248831",
             "WA": "BP00312367",
@@ -193,7 +263,6 @@
       }, 
       _getDB: function() {return this._DB.stateValue}
    }
-
 
    /*** STATE NAME TO ABBR DB ***/
    stateNameToAbbrDB = {
@@ -272,18 +341,18 @@
          return typeof abbr == "string" && this._stateAbbrListRegex.test(abbr);
       },
       _getDB: function() {return this._DB.nameToAbbr},
-      _stateAbbrListRegex: /AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY/i
+      _stateAbbrListRegex: /^(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/i
    }
 
    /*** STATE DB ***/
-   stateDB = {
+   stateDB = { // ADD STATE HERE: NEED TO DOUBLE CHECK THE RESULTS SEARCH KEYS
       _DB: {
-         stateInfo:{
+         stateInfo: {
             AK: {
                stateCode:'AK',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -294,7 +363,7 @@
                stateCode:'AL',
                mcdIdFormat:'13 characters, #\'s only',
                mcdIdExample:'1234567890123',
-               format: '/\\d{13}/',
+               format: '\\d{13}',
                ltcWaiver: '',
                usesInactive: 'x',
                fbdeRaises: '',
@@ -305,7 +374,7 @@
                stateCode:'AR',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -316,29 +385,29 @@
                stateCode:'AZ',
                mcdIdFormat:'9 characters, letters and #\'s. Starts with A',
                mcdIdExample:'A23456789',
-               format: '/A\\d{8}/',
+               format: 'A\\d{8}',
                ltcWaiver: 'x',
                usesInactive: '',
                fbdeRaises: '',
-               keyWords: '- SLMB / - QMB / - SSI / - TANF / - AHC / - ADULT / - NEWLY / - SOBRA / - QI1 / - MN/MI / - KIDS / LTC',
+               keyWords: '- SLMB / - QMB / - SSI / - TANF / - AHC / - ADULT / - NEWLY / - SOBRA / - QI1 / - MN/MI / - KIDS / LTC / Long Term Care',
                npi: '1679759989'
             },
             CA: {
                stateCode:'CA',
                mcdIdFormat:'9 or 14 characters, letters and #\'s. 9th character a letter',
                mcdIdExample:'12345678A01234 OR 12345678A',
-               format: '/\\d{8}[A-Z](\\d{5})?/',
+               format: '\\d{8}[A-Z](\\d{5})?',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: 'Primary Aid Code / 2nd Special Aid Code / 80 / 8C / Remaining',
+               keyWords: 'Primary Aid Code / 2nd Special Aid Code / 8C / Remaining',
                npi: ''
             },
             CO: {
                stateCode:'CO',
                mcdIdFormat:'7 characters, letters and #\'s. 1st character is letter.',
                mcdIdExample:'A234567',
-               format: '/[A-Z]\\d{6}/',
+               format: '[A-Z]\\d{6}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -349,7 +418,7 @@
                stateCode:'CT',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -360,7 +429,7 @@
                stateCode:'DC',
                mcdIdFormat:'8 characters, #\'s only',
                mcdIdExample:'12345678',
-               format: '/\\d{8}/',
+               format: '\\d{8}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -371,29 +440,29 @@
                stateCode:'DE',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Plan Coverage Description:  ',
                npi: ''
             },
             FL: {
                stateCode:'FL',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: 'x',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: 'Plan Coverage Description: / SLMB / QMB / Long-Term Care',
+               keyWords: 'Plan Coverage Description: / SLMB / QMB / Long-Term Care / Medicaid:',
                npi: ''
             },
             GA: {
                stateCode:'GA',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -404,7 +473,7 @@
                stateCode:'HI',
                mcdIdFormat:'10 characters, letters and #\'s. 2nd character is letter.',
                mcdIdExample:'1A34567890',
-               format: '/\\d[A-Z]\\d{7}/',
+               format: '\\d[A-Z]\\d{7}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -415,18 +484,18 @@
                stateCode:'IA',
                mcdIdFormat:'8 characters, letters and #\'s. 1st character is letter.',
                mcdIdExample:'A2345678',
-               format: '/[A-Z]\\d{7}/',
+               format: '[A-Z]\\d{7}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Plan Coverage Description:  ',
                npi: ''
             },
             ID: {
                stateCode:'ID',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -437,62 +506,62 @@
                stateCode:'IL',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
-               keyWords: ' Plan Coverage Description: ',
+               keyWords: ' Plan Coverage Description: / QMB only / QMB ONLY',
                npi: '1417114836'
             },
             IN: {
                stateCode:'IN',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: ' Plan Coverage Description: / Medicaid: / Qualified Medicare Beneficiary / Full Medicaid / Specified Low Income Medicare Beneficiary',
-               npi: ''
-            },
-            KY: {
-               stateCode:'KY',
-               mcdIdFormat:'11 characters, #\'s only',
-               mcdIdExample:'12345678901',
-               format: '/\\d{10}/',
-               ltcWaiver: '',
-               usesInactive: '',
-               fbdeRaises: '',
-               keyWords: 'memberProgramCode / memberStatusCode',
+               keyWords: ' Plan Coverage Description: / Medicaid: / Qualified Medicare Beneficiary / Full Medicaid / Specified Low Income Medicare Beneficiary / PARTIAL',
                npi: ''
             },
             KS: {
                stateCode:'KS',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{11}/',
+               format: '\\d{11}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Plan Coverage Description: / TITLE XIX (MEDICAID)',
+               npi: ''
+            },
+            KY: {
+               stateCode:'KY',
+               mcdIdFormat:'11 characters, #\'s only',
+               mcdIdExample:'12345678901',
+               format: '\\d{10}',
+               ltcWaiver: '',
+               usesInactive: '',
+               fbdeRaises: '',
+               keyWords: 'memberProgramCode / memberStatusCode',
                npi: ''
             },
             LA: {
                stateCode:'LA',
                mcdIdFormat:'13 characters, #\'s only',
                mcdIdExample:'1234567890123',
-               format: '/\\d{13}/',
+               format: '\\d{13}',
                ltcWaiver: '',
                usesInactive: 'x',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Special Low Income Medicare Beneficiary / Qualified Medicare Beneficiary',
                npi: ''
             },
             MA: {
                stateCode:'MA',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -503,7 +572,7 @@
                stateCode:'MD',
                mcdIdFormat:'11 characters, #\'s only',
                mcdIdExample:'12345678901',
-               format: '/\\d{11}/',
+               format: '\\d{11}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -525,18 +594,18 @@
                stateCode:'MI',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Plan Coverage Description:',
                npi: ''
             },
             MN: {
                stateCode:'MN',
                mcdIdFormat:'8 characters, #\'s only',
                mcdIdExample:'12345678',
-               format: '/\\d{8}/',
+               format: '\\d{8}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -547,7 +616,7 @@
                stateCode:'MO',
                mcdIdFormat:'8 characters, #\'s only',
                mcdIdExample:'12345678',
-               format: '/\\d{8}/',
+               format: '\\d{8}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -558,7 +627,7 @@
                stateCode:'MS',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -569,7 +638,7 @@
                stateCode:'MT',
                mcdIdFormat:'7 characters, #\'s only',
                mcdIdExample:'1234567',
-               format: '/\\d{7}/',
+               format: '\\d{7}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -580,7 +649,7 @@
                stateCode:'NC',
                mcdIdFormat:'10 characters, letters and #\'s. Ends with a letter',
                mcdIdExample:'123456789A',
-               format: '/\\d{9}[A-Z]/',
+               format: '\\d{9}[A-Z]',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -591,7 +660,7 @@
                stateCode:'ND',
                mcdIdFormat:'9 characters, letters and #\'s. Starts with ND',
                mcdIdExample:'ND3456789',
-               format: '/ND\\d{7}/',
+               format: 'ND\\d{7}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -602,7 +671,7 @@
                stateCode:'NE',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -613,7 +682,7 @@
                stateCode:'NH',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -624,18 +693,18 @@
                stateCode:'NJ',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: 'x',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: 'PROGRAM / QMB PLUS',
+               keyWords: 'PROGRAM / QMB PLUS / Long Term Care / MSP / Qualified Medicare Beneficiary / MLTSS',
                npi: ''
             },
             NM: {
                stateCode:'NM',
                mcdIdFormat:'14 characters, #\'s only',
                mcdIdExample:'12345678901234',
-               format: '/\\d{14}/',
+               format: '\\d{14}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -646,7 +715,7 @@
                stateCode:'NV',
                mcdIdFormat:'11 characters, #\'s only',
                mcdIdExample:'12345678901',
-               format: '/\\d{11}/',
+               format: '\\d{11}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -657,7 +726,7 @@
                stateCode:'NY',
                mcdIdFormat:'8 characters, letters and #\'s. 1st, 2nd & 8th characters are letters.',
                mcdIdExample:'AB34567C',
-               format: '/[A-Z]{2}\\d{5}[A-Z]/',
+               format: '[A-Z]{2}\\d{5}[A-Z]',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -668,29 +737,29 @@
                stateCode:'OH',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: '',
                usesInactive: '',
-               fbdeRaises: 'x',
-               keyWords: 'Plan Coverage Description: / Medicaid FFS| / MCE | / | SLMB',
+               fbdeRaises: '',
+               keyWords: 'Plan Coverage Description: / Medicaid FFS| /  MCE | / | SLMB',
                npi: ''
             },
             OK: {
                stateCode:'OK',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
-               keyWords: '',
+               keyWords: 'Plan Coverage Description:',
                npi: ''
             },
             OR: {
                stateCode:'OR',
                mcdIdFormat:'8 characters, letters and #\'s. 1st, 2nd, 6th & 8th characters are letters.',
                mcdIdExample:'AB345C7D',
-               format: '/[A-Z]{2}\\d{4}[A-Z]{3}/',
+               format: '[A-Z]{2}\\d{4}[A-Z]{3}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -701,7 +770,7 @@
                stateCode:'PA',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -723,7 +792,7 @@
                stateCode:'SC',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -734,7 +803,7 @@
                stateCode:'SD',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -745,7 +814,7 @@
                stateCode:'TN',
                mcdIdFormat:'11 characters, letters and #\'s. Starts with TD',
                mcdIdExample:'TD345678901',
-               format: '/TD\\d{9}/',
+               format: 'TD\\d{9}',
                ltcWaiver: 'x',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -756,9 +825,9 @@
                stateCode:'TX',
                mcdIdFormat:'9 characters, #\'s only',
                mcdIdExample:'123456789',
-               format: '/\\d{9}/',
+               format: '\\d{9}',
                ltcWaiver: '',
-               usesInactive: 'x',
+               usesInactive: '',
                fbdeRaises: '',
                keyWords: 'Plan Coverage Description: / MAO, / SSI, / Medical Assistance / TANF / 41 Pregnant Women',
                npi: ''
@@ -767,7 +836,7 @@
                stateCode:'UT',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -778,18 +847,18 @@
                stateCode:'VA',
                mcdIdFormat:'12 characters, #\'s only',
                mcdIdExample:'123456789012',
-               format: '/\\d{12}/',
+               format: '\\d{12}',
                ltcWaiver: 'x',
                usesInactive: '',
                fbdeRaises: '',
-               keyWords: '',
+               keyWords: 'Long Term Care',
                npi: ''
             },
             VT: {
                stateCode:'VT',
                mcdIdFormat:'7 characters, #\'s only',
                mcdIdExample:'1234567',
-               format: '/\\d{7}/',
+               format: '\\d{7}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -800,7 +869,7 @@
                stateCode:'WA',
                mcdIdFormat:'11 characters, letters and #\'s. Ends with WA',
                mcdIdExample:'123456789WA',
-               format: '/\\d{9}WA/',
+               format: '\\d{9}WA',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -811,7 +880,7 @@
                stateCode:'WI',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -822,7 +891,7 @@
                stateCode:'WV',
                mcdIdFormat:'11 characters, #\'s only',
                mcdIdExample:'12345678901',
-               format: '/\\d{11}/',
+               format: '\\d{11}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: 'x',
@@ -833,7 +902,7 @@
                stateCode:'WY',
                mcdIdFormat:'10 characters, #\'s only',
                mcdIdExample:'1234567890',
-               format: '/\\d{10}/',
+               format: '\\d{10}',
                ltcWaiver: '',
                usesInactive: '',
                fbdeRaises: '',
@@ -850,7 +919,7 @@
          if(state != undefined) {
             tester = new RegExp(state.format);
          } else {
-            throw "Input give is not a state: "+stateAbbr;
+            throw "Input given is not a valid state: "+stateAbbr;
          }
 
          return tester.test(mcdNum);
@@ -862,11 +931,11 @@
          if(state != undefined) {
             return state.npi;
          } else {
-            throw "Input give is not a state: "+stateAbbr;
+            throw "Input given is not a valid state: "+stateAbbr;
          }
       },
       getStateInfo: function(stateAbbr) {
-         var verifiedAbbr = stateNameToAbbrDB.getAbbr(stateAbbr)
+         var verifiedAbbr = stateNameToAbbrDB.getAbbr(stateAbbr);
          return this._getDB()[verifiedAbbr];
       }, 
       _getDB: function() {return this._DB.stateInfo}
@@ -881,7 +950,7 @@
 
    /* Function alreadyPresent
       alerts that the code already exists */
-   alreadyPresent = function () {
+   function alreadyPresent() {
       console.warn(">> CHC Code already present");
    }
 
@@ -902,16 +971,17 @@
 
    /* Function copyStringToClipboard
       Copies a string to the computer clipboard */
-   copyStringToClipboard = function (string) {
+   function copyStringToClipboard(string) {
       if(string == null) {
          console.warn(">> Nothing to copy");
          return;
       }
 
-      navigator.clipboard.writeText(string)
+      return navigator.clipboard.writeText(string)
          .then(() => {
            console.log(">> Content copied to clipboard");
-         },() => {
+         },(a,b,c,d) => {
+            //TODO: handle if a.message.contains "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
            console.error(">> Failed to copy");
          });
    }
@@ -920,30 +990,52 @@
       Copies the content of an el to the computer clipboard */
    function copyElToClipboard(htmlEl) {
       if(htmlEl == null) {
-         console.warn(">> Nothing to copy");
+         console.warn("Nothing to copy");
          return;
+      }
+
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
       }
 
       var range = document.createRange();
       var sel = document.getSelection();
-      
+
       sel.removeAllRanges();
       range.selectNodeContents(htmlEl);
       sel.addRange(range);
       document.execCommand("Copy");
    }
 
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+
+   //TODO: Decide what to do here. Should I throw an error if not added?
+   // have a return val? Need to indicate if it wasn't added
+
    /* Function addCssEl
       Adds the passed in CSS text to the document body */
-   function addCssEl(cssText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
 
       if (cssText!=null) {
-         var css_el = doc.createElement("style");
          css_el.textContent = cssText;
          doc.head.appendChild(css_el);
       }
-
+      
       return css_el;
    }
 
@@ -951,9 +1043,10 @@
       Adds the passed in script text to the document body */
    function addJsScript(scriptText, doc) {
       doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
 
       if (scriptText!=null) {
-         var js_el = doc.createElement("script");
          js_el.textContent = scriptText;
          doc.head.appendChild(js_el);
       }
@@ -966,8 +1059,9 @@
    function addJsFromURL(url, doc) {
       doc = (doc == null || doc == undefined) ? document : doc;
 
+      const js_el = doc.createElement("script");
+
       if (url!=null) {
-         var js_el = doc.createElement("script");
          js_el.src = url;
          doc.head.appendChild(js_el);
       }
@@ -981,23 +1075,9 @@
       return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
    }
 
-   /* Function listenToAllEvents
-      Listens to all the events on an el. For debugging. Doesn't currently work*/
-   function listenToAllEvents(el) { // limitScroll/Mouse/Key, userFn
-      var eventFilter;
-      // eventFilter = /^on(key|mouse)/     // just for onkey* or onmouse*
-      eventFilter = /^on/                // gets all events
-      Object.keys(el).forEach(key => {
-          if (eventFilter.test(key)) {
-              el.addEventListener(key.slice(2), event => {
-                  console.log(event);
-              });
-          }
-      });
-   }
-
    /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer. */
+      Adds a mutation observer to targetEl. Returns the observer. 
+      The fn passed in will receive these arguments: */
    function addMutationObs(targetEl, fn, options) {
       if(typeof fn != "function") {
          fn = () => console.log("ran mutationObserver for ",targetEl);
@@ -1015,6 +1095,73 @@
       return mutationObs;
    }
 
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. Doesn't currently work*/
+   function listenToAllEvents(el) { // limitScroll/Mouse/Key, userFn
+      var eventFilter;
+      // Options: animation*, on*, mouse*, pointer*, transistion*, click, blur, dblclick, scroll*
+      // eventFilter = /^on(key|mouse)/     // just for onkey* or onmouse*
+      eventFilter = /^on/                // gets all events
+      Object.keys(el).forEach(key => {
+          if (eventFilter.test(key)) {
+              el.addEventListener(key.slice(2), event => {
+                  console.log(event);
+              });
+          }
+      });
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. 
+      eventFilter is ....
+      { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
+      "mouse"
+      // Options: animation*, on*, mouse*, pointer*, transition*, click, blur, dblclick, scroll*
+      */
+   function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
+      var eventTypes, regexString, filterToUse;
+         
+         eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
+      // Figure out if it's a string event name, a regex, or an obj
+      if(typeof eventFilter == "string") {
+         filterToUse = eventFilter;
+      } else if(typeof eventFilter == "object") {
+         if(eventFilter.test == undefined) {
+            eventTypes =
+               eventFilter.mouse      ? "|mouse" : "" +
+               eventFilter.click      ? "|click" : "" +
+               eventFilter.pointer    ? "|pointer" : "" +
+               eventFilter.animation  ? "|animation" : "" +
+               eventFilter.transition ? "|transition" : "" +
+               eventFilter.key        ? "|key" : "";
+            regexString = eventFilter.exclude ? "^on(?!.*("+eventTypes.slice(1)+").*$" : "^on.*("+eventTypes.slice(1)+").*$"
+            filterToUse = new RegExp(regexString);
+         } else { // eventFilter is a regex
+            filterToUse = eventFilter
+         }
+      } else {
+         console.warn("Failed to listen to events. Could not recognize filter");
+      }
+
+      for (var key in el) {
+         if (key.search(filterToUse) === 0) {
+            console.log("added to ",key)
+            el.addEventListener(key.slice(2), fn)
+         }
+      }
+
+      return {
+         removeListeners: () => {
+            for (var key in el) {
+               if (key.search(filterToUse) === 0) {
+                  console.log("removed from",key)
+                  el.removeEventListener(key.slice(2), fn)
+               }
+            }
+         }
+      }
+   }
+
    String.prototype.toProper = function (txt) {
       var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
       return properized;
@@ -1024,6 +1171,207 @@
       ctrlKey:true,
       shiftKey:true,
       which:70
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log(a,b,c);
+   }
+
+   /* Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+   /* Possible formats: */
+      tstAry = [
+    /* std:            */  "01/01/1954" , "01.01.1954" , "01-01-1954" , "01 1 1954" , "01011954" ,  
+    /* No 0-pad day    */  "01/1/1954"  , "01.1.1954"  , "01-1-1954"  , "01 1 1954" , "0111954"  ,  
+    /* No 0-pad mon    */  "1/01/1954"  , "1.01.1954"  , "1-01-1954"  , "1 01 1954" , "1011954"  ,
+    /* No 0-pad day/Mon*/  "1/1/1954"   , "1.1.1954"   , "1-1-1954"   , "1 1 1954"  , "111954"   ,
+
+    // 2-char year
+    /* std:            */  "01/01/54"   ,  "01.01.54"  ,  "01-01-54"  ,  "01 1 54"  ,  "010154" ,       
+    /* No 0-pad day    */  "01/1/54"    ,  "01.1.54"   ,  "01-1-54"   ,  "01 1 54"  ,  "01154"  , 
+    /* No 0-pad mon    */  "1/01/54"    ,  "1.01.54"   ,  "1-01-54"   ,  "1 01 54"  ,  "10154"  , 
+    /* No 0-pad day/Mon*/  "1/1/54"     ,  "1.1.54"    ,  "1-1-54"    ,  "1 1 54"   ,  "1154"   ,
+               
+    // Messy
+      "1/11954" ,     "11/1954" ,    "11/54" ,      "1/154" ,
+      "1.11954" ,     "11.1954" ,    "11.54" ,      "1.154" ,
+      "1-11954" ,     "11-1954" ,    "11-54" ,      "1-154" ,
+      "1 11954" ,     "11 1954" ,    "11 54" ,      "1 154" ,
+      ];
+
+      // Cases:
+         // missing first /
+         // missing second /
+         // has both /'s
+         // missing first 0
+         // missing second 0
+         // has both 0's
+         // two digit year
+         // four digit year
+
+      // Assumptions:
+         // 4 yr vs 2 yr date
+         // month vs day is full
+
+      // 
+      tstAry.forEach((a) => {b = standardizeFullDateString(a); if(b!="01/01/1954"){console.log(b=="01/01/1954",a," > ",b,)}});
+
+   function randDate() {
+      var delimters = [" ","/",".","-",""],
+          pads = ["0",""],
+          yearPrefixes = ["19","20",""],
+
+          month = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2), 
+          day = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2), 
+          delimiterOne = delimters[Math.floor(Math.random()*delimters.length)],
+          delimiterTwo = delimters[Math.floor(Math.random()*delimters.length)],
+          yearPrefix = yearPrefixes[Math.floor(Math.random()*yearPrefixes.length)]
+          yearPostfix = ("0"+Math.floor(Math.random()*100)).slice(-2);
+
+      return month + delimiterOne + day + delimiterTwo + yearPrefix + yearPostfix;
+   }
+   for (var i = 10; i >= 0; i--) {
+      randDt = randDate();
+      console.log(">> randDt: ",randDt," -> ",standardizeFullDateString(randDt));
+   }
+
+   function standardizeFullDateString(fullDate) {
+      if(typeof fullDate != "string") {
+         return fullDate;
+      }
+
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry;
+
+      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, not preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+         // If it has a 2-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } 
+
+      // Split it into parts, so that you can 0 pad
+      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+      if(partsAry == null ) {
+         console.warn("~~ full date", fullDate);
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it 
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   function convertColonListToJsonObj(colonList, hasHeader=false) {
+      var logStuff = false;
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Skip the header
+      if(hasHeader === true || /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+         // if(infoAry[iter] == "DOB" || infoAry[iter] == "Date of Birth" || infoAry[iter] == "Birth Date"){
+         //    returnObj.dob =infoAry[iter+1];
+         // } else if(infoAry[iter] == "MBI" || infoAry[iter] == "MBI Number"){
+         //    returnObj.mbi =infoAry[iter+1];
+         // } else {
+            returnObj[infoAry[iter]]=infoAry[iter+1];
+         // }
+         if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+         }
+      }
+      return returnObj;
+   }
+
+   /* Function firstCommentPreProcessing
+      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
+      */
+   function firstCommentPreProcessing(copiedText="") {
+      var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
+          dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
+      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
+   }
+
+   /* Function getObjFromCopiedText
+      Also calls standardizeCuInfo, which is specific to cu info, 
+      but I'm including it b/c it's simpler than knowing you have 
+      to always pair the two fn's.
+      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+      */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+      var data;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+      }
+
+      return standardizeCuInfo(data);
+   }
+
+   /* Function standardizeCuInfo
+      Takes cu input from wherever I have copied it, in whatever format,
+      and standardizes the data names.
+      */
+   function standardizeCuInfo(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, namePartsFirst, namePartsSecond;
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      } 
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+      
+      nameParts = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "").match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+     return newCuInfoObj;
    }
 
 
@@ -1078,6 +1426,8 @@
    function setUpSearchPageMutators() {
       mutatorArray.push(searchOptionAutoSelect());
       mutatorArray.push(npiAutoSelect());
+
+      console.warn(">> set up mutators");
    }
 
    /* Function addShortcutToSearchPage
@@ -1132,7 +1482,7 @@
       Sets up the keyboard listeners to the page */
    function setUpSearchPageListeners() {
       getFieldSite().on('change',onSiteChange);
-      // getFieldPayer().on('change',onPayerChange);
+      // getFieldPayer().on('change',onPayerChange); << done w/mutator instead
 
       //iframe re-intiating CHC fn's
       getAppFrame().addEventListener("load",addChcRefToAppFrame);
@@ -1140,9 +1490,11 @@
       getTier2Frame().addEventListener("load",addChcRefToTier2Frame);
       getRequestReviewFrame().addEventListener("load",addChcRefToRequestReviewFrame);
       //functionality listeners
+      // getTier2Frame().addEventListener("load",addPersistentSearchBtn);
       getTier2Frame().addEventListener("load",addSearchSpinner);
       getTier2Frame().addEventListener("load",addSpinnerRevealOnSubmit);
       getRequestReviewFrame().addEventListener("load",hideSearchSpinner);
+      getTier2Frame().addEventListener('load',setUpFixItFns);
       //shortcut re-establishers. B/c these frames reload
       getTier2Frame().addEventListener("load",addShortcutsOnTier2Load);
       getRequestReviewFrame().addEventListener("load",addShortcutsOnRequestReviewLoad);
@@ -1175,14 +1527,16 @@
    /* Function unloadSearchPageMutators
       Removes the keyboard listeners from the page and undoes everything in runSetup */
    function unloadSearchPageMutators() {
-      for (var iter = mutatorArray.length - 1; iter >= 0; iter--) {
-         mutatorArray[iter].disconnect();
-      }
+      mutatorArray.map((muta) => {
+         muta.disconnect();
+      });
+      mutatorArray = [];
    }
 
    /* Function unloadSearchPageShortcuts
       Removes the keyboard listeners from the page and undoes everything in runSetup */
    function unloadSearchPageShortcuts() {
+         // todo: Make this functional? W/map
       var debouncedFn;
       for (var iter = shortcutFnArray.length - 1; iter >= 0; iter--) {
          debouncedFn = shortcutFnArray[iter].fn;
@@ -1207,6 +1561,7 @@
       getRequestReviewFrame().removeEventListener("load",addChcRefToRequestReviewFrame);     
       //functionality listeners
       getTier1Frame().removeEventListener("load",npiAutoSelect);
+      // getTier2Frame().removeEventListener("load",addPersistentSearchBtn);
       getTier2Frame().removeEventListener("load",addSearchSpinner);
       getTier2Frame().removeEventListener("load",addSpinnerRevealOnSubmit);
       getRequestReviewFrame().removeEventListener("load",hideSearchSpinner);
@@ -1223,8 +1578,9 @@
       unloadSearchPageListeners();
       unloadSearchPageMutators();
 
-      //pull off the listeners on Site and payer
-      console.log(">> removed Search Page shortcuts & listeners");
+      removePersistentSearchBtn();
+      removeSearchSpinner();
+      // TODO: pull off the listeners on Site and payer
    }
 
   //~~~ RESULTS PAGE SETUP ~~~//
@@ -1259,14 +1615,20 @@
    function insertHighlightCSS() {
       console.log('ran insertHighlightCSS');
       var cssEl,
-          cssContent = "\
-            .secondary > *, .secondary {\
-               background-color: #FFFDD0 !important;\
-               color: black !important;\
-            }\
-            .primary > *, .primary {\
-               background-color: #9FE2BF !important;\
-            }";
+          cssContent = `
+            .secondary > *, .secondary {
+               background-color: #FFFDD0 !important;
+               color: black !important;
+            }
+            .primary > *, .primary {
+               background-color: #9FE2BF !important;
+            }
+            .mbi-highlight > *, .mbi-highlight {
+               background-color: #D0DAFF !important;
+            }
+            .ltc-highlight > *, .ltc-highlight {
+               background-color: #ffd0f5 !important;
+            }`;
 
       cssEl = addCssEl(cssContent);
       cssEl.id = 'highlight_css';
@@ -1318,8 +1680,8 @@
           ctOption = jQ('<option value="BP00277123" title="Name: CT - WELLCARE HEALTH PLAN, INC.">CT - WELLCARE HE...</option>');
 
       // insert in reverse alphabetical so that inserting won't cause the insert positions to change
-      siteField[0].add(tnOption[0],17);
-      siteField[0].add(ilOption[0],8);
+      siteField[0].add(tnOption[0],29);
+      siteField[0].add(ilOption[0],10);
       siteField[0].add(ctOption[0],4);
    }
 
@@ -1331,6 +1693,8 @@
                iframe iframe_tier2 -- search
       This means that every interaction with parts of the page has to navigate these iframes. The getters/setters are 
    */
+
+
 /*** FIELD & IFRAME GETTERS/SETTERS ***/
   // IFRAME GETTERS
    /* Function getMainPageDoc
@@ -1428,7 +1792,7 @@
    }
    /* Function setFieldFirstName
       Sets the first name field */
-   function setFieldFirstName(firstName) {
+   function setFieldFirstName(firstName=null) {
       var firstNameField = getTier1Window().$(getFieldFirstName());
 
       if(typeof firstName != 'string' ) {
@@ -1448,7 +1812,7 @@
    }
    /* Function setFieldLastName
       Sets the last name field */
-   function setFieldLastName(lastName) {
+   function setFieldLastName(lastName=null) {
       var lastNameField = getTier1Window().$(getFieldLastName());
 
       if(typeof lastName != 'string' || lastNameField == null) {
@@ -1468,19 +1832,19 @@
    }
    /* Function setFieldDOB
       Sets the DOB field */
-   function setFieldDOB(dob) {
-      var dobField = getTier1Window().$(getFieldDOB());
-
-      //TODO: Make this handle the 1914 vs 14
+   function setFieldDOB(dob=null) {
+      var moddedDOB, dobField = getTier1Window().$(getFieldDOB());
 
       if(dobField == null) {
          console.warn("Failed to set DOB _"+dob+"_");
          return false;
       }
 
-      dobField.val(dob);
+      moddedDOB = standardizeFullDateString(dob);
 
-      return dobField.val() == dob;
+      dobField.val(moddedDOB);
+
+      return dobField.val() == moddedDOB;
    }
 
    /* Function getFieldSSN
@@ -1490,7 +1854,7 @@
    }
    /* Function setFieldSSN
       Sets the SSN field */
-   function setFieldSSN(ssn) {
+   function setFieldSSN(ssn=null) {
       var selectedStateAbbr = getFieldPayer().getSelected(),
           ssnField = ( selectedStateAbbr == "CA" ? getTier1Window().$(getFieldMcdId()) : getTier1Window().$(getFieldSSN()) );
 
@@ -1498,7 +1862,7 @@
          return false;
       }
 
-      if(typeof ssn == "string" && !/^\d{3}-?\d{2}-?\d{4}$/.test(ssn)){
+      if(typeof ssn == "string" && !/^\d{3}(-| )?\d{2}(-| )?\d{4}$/.test(ssn)){
          console.warn("Failed to set SSN (string) _"+ssn+"_");
          return false;
       } else if(typeof ssn != "string") {
@@ -1506,7 +1870,7 @@
          return false;
       }
 
-      ssnField.val(ssn);
+      ssnField.val(ssn.replaceAll(/( |-)/g,""));
 
       return ssnField.val() == ssn;
    }
@@ -1538,7 +1902,7 @@
    }
    /* Function setFieldGender
       Sets the gender field */
-   function setFieldGender(gender) {
+   function setFieldGender(gender=null) {
       var genderField = getTier1Window().$(getFieldGender());
 
       if (genderField == null) {
@@ -1568,7 +1932,7 @@
    }
    /* Function setFieldCardIssueDate
       Sets the card issue date field */
-   function setFieldCardIssueDate(date) {
+   function setFieldCardIssueDate(date=null) {
       var cardIssueDateField = getTier1Window().$(getFieldCardIssueDate());
 
       if(cardIssueDateField == null) {
@@ -1605,7 +1969,7 @@
    }
    /* Function setFieldSite
       Sets the Site field. */
-   function setFieldSite(stateAbbr) {
+   function setFieldSite(stateAbbr=null) {
       if(typeof stateAbbr != "string" || !allowedStatesDB.isStateAllowed(stateAbbr)) {
          console.warn("Failed to set Site  _"+stateAbbr+"_");
          return false;
@@ -1650,11 +2014,19 @@
       // console.log("stateAbbr",stateAbbr);
       // console.log("stateInfo",stateInfo);
 
+      if(stateInfo.ltcWaiver == "x") {
+         addLtcWarningEl();
+         showLtcWarning();
+      } else {
+         hideLtcWarning();
+      }
+
       /* we don't have to set the NPI, b/c npiAutoSelect handles it 
          through an observer. The NPI select is recreated each time */
 
       console.log("ran setFieldPayer w ", stateAbbr);
       setFieldPayer(stateAbbr);
+      // if(stateInfo.usesLtcWaiver) {showLtcEL()} else { hideLtcEl() }
       console.warn("-------- onSiteChange end -------- ");
    }
 
@@ -1743,7 +2115,7 @@
       if(searchOption.length == 0 ) {
          delay = 800;
       }
-      changeSearchOptionToNameDOB(delay);
+      changeSearchOptionToPreferredOption(delay);
    }
 
    /// SEARCH OPTION ///
@@ -1777,16 +2149,16 @@
       }
    }
 
-   /* Function changeSearchOptionToNameDOB
+   /* Function changeSearchOptionToPreferredOption
       Gets the Search Option field--determines info used in search: SSN, DOB, Name, etc */
-   function changeSearchOptionToNameDOB(delay) {
-      console.log("changeSearchOptionToNameDOB fired w/delay of ", delay);
+   function changeSearchOptionToPreferredOption(delay) {
+      console.log("changeSearchOptionToPreferredOption fired w/delay of ", delay);
       if(delay == undefined || delay == 0) {
          // Setter returns false if not set. This will cut off the 
          // first time there is a successful setting.
          setFieldSearchOption(SEARCH_OPT_NAME_DOB) || setFieldSearchOption(SEARCH_OPT_NAME_DOB_GENDER);
       } else {
-         setTimeout(changeSearchOptionToNameDOB(0),delay);
+         setTimeout(changeSearchOptionToPreferredOption(0),delay);
       }
    }
 
@@ -1898,6 +2270,7 @@
    
 /*** TOAST MESSAGE ***/
 
+
 /*** NPI/SEARCH OPTION AUTOSELECT ***/
       // Callback function to execute when mutations are observed
       callback = (mutationList, observer) => {
@@ -1943,11 +2316,14 @@
    /* Function searchOptionAutoSelect
       Attached to the tier1 load, this gets the NPI from the state info and selects it */
    function searchOptionAutoSelect() {
+      // TODO: have this grab the data object, and determine which option is best given the data
+      // TODO: change the preferredSearchOptionDB to have an *array*, in preferred order
       var searchOptionParentObserver = new MutationObserver(setSearchOptionFromStateInfo),
-          config = {childList:true},
-          searchOptionSelectParent = getTier1El("#td_searchOption");
+                                           config = {childList:true},
+                                           searchOptionSelectParent = getTier1El("#td_searchOption");
 
       searchOptionParentObserver.observe(searchOptionSelectParent[0], config);
+      // console.log("searchOptionAutoSelect", searchOptionSelectParent[0], config);
 
       return searchOptionParentObserver;
    }
@@ -2002,22 +2378,6 @@
          siteField.focus();
          siteField[0].showPicker();
       }
-
-      // var siteField = getFieldSite(),
-      //       searchOptionField = getFieldSearchOption(), 
-      //       payerField = getFieldPayer(),
-      //       elToFocus;
-      //   if(siteField.is(":focus")) {
-      //      searchOption[0].showPicker();
-      //      elToFocus = searchOptionField;
-      //   // } else if(searchOptionField:is(":focus")) {
-      //      // TODO: Make it so that it highlights the field, but doesn't change it. Need to store the state and put it back if skip over
-      //   //    elToFocus = payerField;
-      //   } else {
-      //      siteField[0].showPicker();
-      //      elToFocus = siteField;
-      //   }
-      //   elToFocus.focus();
    }
 
    /*** PASTE SEARCH INFO ***/
@@ -2031,17 +2391,10 @@
          navigator.clipboard
             .readText()
             .then((clipText) => {
-               var cuInfoObj;
-               try {
-                  cuInfoObj = JSON.parse(clipText);
-               } catch(exception) {
-                  console.warn("Failed to parse clipText: ", clipText);
-                  return;
-               }
+               var cuInfoObj = getObjFromCopiedText(clipText,"Cu/Agent Info ");
 
-               if(cuInfoObj.state != "" && allowedStatesDB.isStateAllowed(cuInfoObj.state)) {
-                  // set it up to be a promise?
-
+               if(cuInfoObj.state != "" && cuInfoObj.state != undefined 
+                  && allowedStatesDB.isStateAllowed(cuInfoObj.state)) {
                   // If the state is the same as the site, just paste in the info
                   if(getFieldSite().getSelected().attr('title').substr(6,2) == cuInfoObj.state) {
                         fillFields(cuInfoObj);
@@ -2059,6 +2412,9 @@
                   fillFields(cuInfoObj);
                   submitIfComplete();
                }
+
+               // TODO: make this smart
+               // customer.load(cuInfoObj);
             });
       }
 
@@ -2072,41 +2428,37 @@
          return false;
       }
 
-      var currState, modifiedDOB;
+      var currState;
 
       currState = getFieldPayer().getSelected();
 
-      if(data.firstName != "") {
+      if(data.firstName != "" && data.firstName != undefined) {
          setFieldFirstName(data.firstName);
       }
       
-      if(data.lastName != "") {
+      if(data.lastName != "" && data.lastName != undefined) {
          setFieldLastName(data.lastName);
       }
       
-      if(data.dob != "") {
-         if(!/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(data.dob)){
-            modifiedDOB = data.dob.replaceAll(/\.\-/g,"/");
-            modifiedDOB = modifiedDOB.replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
-         }
-         setFieldDOB(modifiedDOB != undefined ? modifiedDOB : data.dob);
+      if(data.dob != "" && data.dob != undefined) {
+         setFieldDOB(data.dob);
          if(currState == "CA") {
             setFieldCardIssueDate(data.dob);
          }
       }
       
-      if(data.ssn != "") {
+      if(data.ssn != "" && data.ssn != undefined) {
          setFieldSSN(data.ssn.replaceAll(/\-/g,""));
          if(currState == "CA") {
             setFieldMcdId(data.ssn.replaceAll(/\-/g,""));
          }
       }
       
-      if(data.mcdId != "") {
+      if(data.mcdId != "" && data.mcdId != undefined) {
          setFieldMcdId(data.mcdId);
       }
       
-      if(data.sex != "") {
+      if(data.sex != "" && data.sex != undefined) {
          setFieldGender(data.sex);
       }
 
@@ -2142,17 +2494,94 @@
    
 
 /*** CUSTOMER INFO OBJECT ***/
-   // .load(pasteInfo)
-   // .clear()
-   // .get('fieldName');
-   // .fill()
+   customer = {
+      _data: {
+         "fullName": "",
+         "firstName": "",
+         "lastName": "",
+         "dob": "",
+         "ssn": "",
+         "sex": "",
+         "mcdId": ""
+      },
+
+      /* Function load
+         Takes in a data object and fills the fields out */
+      load: function(data) {
+         this._data.fullName  = (data.fullName  != "" ? data.fullName : "");
+         this._data.firstName = (data.firstName != "" ? data.firstName : "");
+         this._data.lastName  = (data.lastName  != "" ? data.lastName : "");
+         this._data.dob       = (data.dob       != "" ? data.dob : "");
+         this._data.ssn       = (data.ssn       != "" ? data.ssn : "");
+         this._data.sex       = (data.sex       != "" ? data.sex : "");
+         this._data.mcdId     = (data.mcdId     != "" ? data.mcdId : "");
+      },
+
+      /* Function load
+         Takes in a data object and fills the fields out.
+         Adds to things, if the name, etc matches */
+      smartLoad: function(data) {
+         // state is ""
+         // state matches
+         // state *doesn't* match
+         // full name matches
+
+         // if the state matches, and the name matches, or if the name and state don't exist
+         if((data.state == this._data.state && data.fullName == this._data.fullName)
+            || (data.state == "" && data.fullName == ""))
+
+
+         this._data.dob       = (data.dob       != "" ? data.dob : "");
+         this._data.sex       = (data.sex       != "" ? data.sex : "");
+         this._data.mcdId     = (data.mcdId     != "" ? data.mcdId : "");
+         this._data.ssn       = (data.ssn       != "" ? data.ssn : "");
+         this._data.fullName  = (data.fullName  != "" ? data.fullName : "");
+         this._data.firstName = (data.firstName != "" ? data.firstName : "");
+         this._data.lastName  = (data.lastName  != "" ? data.lastName : "");
+      },
+   
+      /* Function clear
+         Erases all data in the object */
+      clear: function() {
+         this._data = {
+            "fullName": "",
+            "firstName": "",
+            "lastName": "",
+            "dob": "",
+            "ssn": "",
+            "sex": "",
+            "mcdId": ""
+         }
+      },
+   
+      /* Function get
+         Returns the value of the given key*/
+      get: function(key) {
+         if(typeof key != "string") {
+            return undefined;
+         }
+
+         return this._data[key];
+      },
+      
+      /* Function fill
+         Fills out the available form elements */
+      fillFields: function() {
+         if(this._data.dob       != "") {setFieldDOB(this._data.dob)}
+         if(this._data.sex       != "") {setFieldGender(this._data.sex)}
+         if(this._data.mcdId     != "") {setFieldMcdId(this._data.mcdId)}
+         if(this._data.ssn       != "") {setFieldSSN(this._data.ssn)}
+         if(this._data.firstName != "") {setField(this._data.firstName)}
+         if(this._data.lastName  != "") {setField(this._data.lastName)}
+      }
+   }
 
 
 /*** SEARCH SPINNER ***/
    searchCounter = 0;
 
    /* Function getSearchCounter
-      Returns the search spinner img el*/
+      Returns the search counter el*/
    function getSearchCounter() {
       return getTier2Doc().getElementsByClassName('search-counter')[0];
    }
@@ -2164,7 +2593,7 @@
    }
 
    /* Function getSubmitButton
-      Returns the search spinner img el*/
+      Returns the submit button */
    function getSubmitButton() {
       return getTier2Doc().getElementById("submit-button");
    }
@@ -2253,6 +2682,16 @@
       searchCounter = 0;
    }
 
+   /* Function removeSearchSpinner
+      Hides the search spinner */
+   function removeSearchSpinner() {
+      var spinner = getSearchSpinner(),
+          counter = getSearchCounter();
+
+      spinner != undefined ? spinner.remove() : "";
+      counter != undefined ? counter.remove() : "";
+   }
+
 
 /*** CHC CONTEXT ***/
    // The HTML Selectors don't have logic behind them, so I have to add this in
@@ -2300,8 +2739,238 @@
    }
 
 
-//// RESULTS PAGE ////
+/*** PERSISTENT SEARCH ***/
 
+   var numSearches = 0;
+   var persistentSearchIsOn = false;
+
+   // TODO: Make a "Persistent Search" button
+      // TODO: Make a red/green stying, with # of searches showing
+      // TODO: It searches, then adds a load listener to the results section
+      // TODO: once it loads, it checks if there is a not "rejected" entry
+         // if no, re-click search
+         // if yes, stop. 
+            // if active, click the link
+      // TODO: ADD A counter that zeros out whenever it is turned off (find something, new search/state
+      // TODO: have it auto click the link that works? >> only if it is active
+      // TODO: have it make a sound
+      // TODO: have it cut off after 20
+
+   // DONE
+
+   /* Function getPersistentSearchBtn
+      Returns the persistent search button el*/
+   function getPersistentSearchBtn() {
+      return getTier2Doc().getElementsByClassName("persistent-search-btn")[0];
+   }
+   
+   /* Function addPersistentSearchBtn
+      Adds the persistent search el 
+      Has 3 states: 
+         Off     - the logic does not run 
+         Active  - the logic will run when a search happens, but no current search
+         Running - the logic is being used, as there is a current search running */
+   function addPersistentSearchBtn() {
+
+      var tier2Doc = getTier2Doc(),
+          persistentSearchBtn = tier2Doc.createElement("button"),
+          submitButton = getSubmitButton(),
+          cssEl, cssContent;
+
+      // May need to do this as an input....
+
+      if(getPersistentSearchBtn() == undefined) {   
+         persistentSearchBtn.classList.add("persistent-search-btn","secondary_btn","flip");
+         persistentSearchBtn.innerHTML = "⭮";
+         persistentSearchBtn.onclick = togglePersistentSearch;
+         persistentSearchBtn.type = "button";
+         submitButton.after(persistentSearchBtn); // TODO: Set it up *after* the Submit button
+      }  
+
+      if(tier2Doc.getElementById('persistent_search_styling') == null) {
+         cssContent = `
+            .persistent-search-btn.flip {
+               transform: rotate(-180deg);
+            }
+            .persistent-search-btn {
+               font-size: large;
+               color: white;
+               background: #c72121; /* red */
+               border: #c72121;
+
+               /* Since this is rotated, the padding, etc is flipped*/
+               margin-left: 21.5px;
+               margin-right: 8.5px;
+               padding: 0 10px 3px 10px;
+               width: 42px;
+            }
+
+            .persistent-search-btn.active.secondary_btn:hover {
+               background: #24b530;
+               color: white;
+               border: #2e8d16;
+            }
+            .persistent-search-btn.active {
+               font-size: medium;
+            }
+
+            .persistent-search-btn.running {
+               background: #2e8d16;
+               border: #2e8d16;
+            }`;
+            
+         cssEl = addCssEl(cssContent, tier2Doc);
+         cssEl.id = 'persistent_search_styling';
+      }
+
+   }
+
+   /* Function removePersistentSearchBtn
+      Removes the persistent search el and functionality*/
+   function removePersistentSearchBtn() {
+      var persistentSearchBtn = getPersistentSearchBtn();
+      
+      if(persistentSearchBtn != undefined) {
+         persistentSearchBtn.remove();
+      }
+   }
+
+   /* Function togglePersistentSearch
+      Turns the function on or off */
+   function togglePersistentSearch(e) {
+      var persistBtn = getPersistentSearchBtn();
+
+      persistentSearchIsOn = !persistentSearchIsOn;
+      if(persistentSearchIsOn) {
+         numSearches = 0;
+         changePersistentSearchBtnText(numSearches);
+         persistBtn.classList.add("active");
+         persistBtn.classList.remove("flip", );
+         // set up listener on Tier 2 for thingy
+      } else {
+         numSearches = 0;
+         changePersistentSearchBtnText("⭮");
+         persistBtn.classList.add("flip");
+         persistBtn.classList.remove("active");
+      }
+   }
+
+   /* Function changePersistentSearchBtnText
+      Changes the text shown on the search button*/
+   function changePersistentSearchBtnText(val) {
+      var persistentSearchBtn = getPersistentSearchBtn();
+      
+      if(persistentSearchBtn != undefined) {
+         persistentSearchBtn.innerHTML = val;
+      }
+   }
+
+   /* Function setUpPersistentSearch
+      Sets up the listener */
+   function setUpPersistentSearch(windowObj) {
+      
+   }
+
+   /* Function removePersistentSearch
+      Sets up the listener */
+   function removePersistentSearch(windowObj) {
+      
+   }
+
+
+/*** LTC WARNING ***/
+
+   /* Function getLtcWarningEl
+      Returns the el containing the LTC warning */
+   function getLtcWarningEl() {
+      var el = getTier1El("#ltc_warning")
+      return el.length > 0 ? el[0] : undefined;
+   }
+
+   /* Function addLtcWarningEl
+      Adds the search spinner el, which starts hidden */
+   function addLtcWarningEl() {
+      var tier1Doc = getTier1Doc(),
+          warning = tier1Doc.createElement("span"),
+          // parentEl = tier1Doc.getElementById("td_provider_npi"), << gets reset?
+          parentEl = tier1Doc.getElementsByClassName("billingProviderRow")[0],
+          cssEl, cssContent;
+
+      if(getLtcWarningEl() == undefined) {   
+         warning.classList.add("ltc-warning","hidden");
+         warning.innerHTML = "State uses LTC waiver";
+         warning.id = "ltc_warning";
+         parentEl.append(warning);
+      }  
+
+      if(tier1Doc.getElementById('warning_css') == null) {
+         cssContent = `
+            .ltc-warning {
+               color: red;
+               display: block;
+               width: 140px;
+               padding: 3px;
+               font-weight:bold;
+            }
+
+            .hidden {
+               display: none;
+            }`;
+            
+         cssEl = addCssEl(cssContent, tier1Doc);
+         cssEl.id = 'warning_css';
+      }
+
+   }
+
+   /* Function hideLtcWarning 
+      Removes the LTC warning el */
+   function hideLtcWarning () {
+      var warning = getLtcWarningEl()
+      warning != undefined ? warning.classList.add("hidden") : "";
+   }
+
+   /* Function showLtcWarning 
+      Removes the LTC warning el */
+   function showLtcWarning () {
+      var warning = getLtcWarningEl()
+      warning != undefined ? warning.classList.remove("hidden") : "";
+   }
+
+   /* Function removeLtcWarningEl 
+      Removes the LTC warning el */
+   function removeLtcWarningEl () {
+      var warning = getLtcWarningEl()
+      warning != undefined ? warning.remove() : "";
+   }
+
+
+/*** FIXIT FUNCTIONS: SSN, DOB ***/
+
+   /* Function setUpFixItFns
+      Adds the fix-it fn's to the frame*/
+   function setUpFixItFns(evt) {
+      var ssnField = getFieldSSN(),
+          dobField = getFieldDOB();
+
+      $(ssnField).on("focusout",fixSSN);
+      $(dobField).on("focusout",fixDOB);
+   }
+
+   /* Function fixSSN
+      Triggers when the SSN input loses focus. Fixes the formatting for it */
+   function fixSSN(evt) {
+      setFieldSSN(evt.target.value);
+   }
+
+   /* Function fixDOB
+      Triggers when the SSN input loses focus. Fixes the formatting for it */
+   function fixDOB(evt) {
+      setFieldDOB(evt.target.value);
+   }
+   
+
+//// RESULTS PAGE ////
 
 /*** TOAST ***/
    //TODO: Add toast els
@@ -2338,33 +3007,43 @@
       var addressTxt, apparentState, matches, addressEl,
           submitterEl = $('#submitter-info caption')[0];
           
+      // See if we can get the state from the "Submitter" Section title
       if(submitterEl!=undefined) {
          submitterTxt = submitterEl.innerHTML;
-         matches = submitterTxt.match(/:\s+([A-Z]{2})\s/);
+         matches = submitterTxt.match(/:\s+([A-Z]{2})(\s|-)/);
          if(matches != null && matches.length >= 2) {
             apparentState=matches[1]
          }
       }
 
-      // Some "submitter" options have multiple state names in them. 
-      // Use the address to verify the location...which is still incorrect.
-      // Plan sponsor?
+      // TODO: Use the blue thing on top to figure out our state
       if(apparentState == undefined || apparentState == "NC" || apparentState == "AR") {
+         // AR, TN, IL, NC, CT
          addressEl = $('#patient-info tr:contains("Address")');
 
-         if(addressEl.length != 0) {
+         if($('div:contains("MEDI-CAL")').length > 0){
+            apparentState = "CA";
+         } else if($('div:contains("AHCCCS")').length > 0){
+            apparentState = "AZ";
+         } else if($('div:contains("TENNESSEE MEDICAID")').length > 0){
+            apparentState = "TN";
+         } else if($('div:contains("ILLINOIS MEDICAID")').length > 0){
+            apparentState = "IL";
+         } else if($('div:contains("HP/CTMAP")').length > 0){
+            apparentState = "CT";
+         } else if($('div:contains("NCTRACKS")').length > 0){
+            apparentState = "NC";
+         } else if($('div:contains("ARKANSAS MEDICAID")').length > 0){
+            apparentState = "AR";
+         } else if(addressEl.length != 0) {
             addressTxt = addressEl[0].nextSibling.childNodes[1].innerHTML;
             apparentState=addressTxt.match(/,\s+([A-Z]{2})/)[1];
-         } else if($('div:contains("MEDI-CAL")').length > 0){
-            apparentState = "CA";
          } else {
             console.warn("Could not find state");
          }
 
-         //TODO: what if the address state doesn't match? Do warning
       } 
 
-      // alert("Detected "&apparentState);
       console.log("Got "+apparentState+" for state");
 
       return apparentState;
@@ -2376,14 +3055,65 @@
       //TODO: create span w/primary or secondary info class
       //TODO: refill element w/data, but added span
    }
+   
+   /* Function getMbiEl
+      Gets the MBI el to highlight. Returns an element  */
+   function getMbiEl() {
+      // HIC Number#:
+      // Other Number:
+      // Group/Policy Number:  
+      var selectedEls=[], mbi;
+      var mbiRegex =/[0-9][AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y]{2}[0-9]{2}/gi;
+
+      mbiSearchResult = mbiRegex.exec(document.body.innerText);
+      if(mbiSearchResult != null) {
+         mbi = mbiSearchResult[0];
+         selectedEls = $(".generalSection td:contains('"+mbi+"')");
+         if(selectedEls.length==0) {
+            selectedEls = $(".general-info-column td:contains('"+mbi+"')");
+            if(selectedEls.length==0) {
+               selectedEls = $$("tr:contains('"+mbi+"')");
+               if(selectedEls.length==0) {
+                  selectedEls = $$("tr:contains('"+mbi+"')");
+               }
+            }
+         }
+      }
+      
+      console.log(">>", selectedEls);
+      return selectedEls[0];
+   }
+   
+   /* Function getLtcEl
+      Gets the LTC el to highlight. Returns an element  */
+   function getLtcEl() {
+      var selectedEls;
+      
+      selectedEls = $(".coverage-grid td:contains('Long-Term Care')");
+      // if(selectedEls.length==0) {
+      //    selectedEls = $("th:contains('')");
+      //    if(selectedEls.length==0) {
+      //       selectedEls = $("th:contains('')");
+      //       if(selectedEls.length==0) {
+      //          selectedEls = $("th:contains('')");
+      //       }
+      //    }
+      // }
+      console.log(">>", selectedEls);
+      return selectedEls[0];
+   }
 
    /* Function highlightImportantEls
-      Gets all the els to highlight */
+      Gets all the els to highlight. Returns an array of the highlighted els */
    function highlightImportantEls() {
       console.log('ran highlightImportantEls');
       const primaryClassName = "primary",
-            secondaryClassName = "secondary";
-      var elAry =[], keyWord, tempEl, classToAdd, focusEl = null,
+            secondaryClassName = "secondary",
+            mbiClassName = "mbi-highlight",
+            ltcClassName = "ltc-highlight";
+      var elAry =[], keyWord, selectedEls, tempEl, classToAdd, mbiEl,
+          focusEl = null, highlightedEls = [],
+          highlightParentEl = true;
           state = getState(),
           stateInfo = stateDB.getStateInfo(state),
           keyWords = stateInfo.keyWords.split("/");
@@ -2399,11 +3129,16 @@
       keyWords.push("Inactive");
       keyWords.push("Spenddown");
       keyWords.push("Spend Down");
+      if(state == "LA") {
+         keyWords.push("Active");
+      }
 
       // search for each key word
       for (var pos = 0; pos < keyWords.length; pos++) {
+         selectedEls = "";
          keyWord = keyWords[pos].trim();
          classToAdd = pos == 0 ? primaryClassName : secondaryClassName;
+         highlightParentEl = true;
 
          switch(keyWord){
             // This group is keywords that show up as values, but should always be marked primary
@@ -2419,21 +3154,29 @@
             case "- MN/MI":
             case "- KIDS":
             case "Special Low Income Medicare Beneficiary":
-               tempEl = $('#general-eli-info td:contains("'+keyWord+'")');
-               if(tempEl.length!=0) {
-                  tempEl[0].parentNode.classList.add(primaryClassName);
+            case "Specified Low Income Medicare Beneficiary":
+               selectedEls = $('#general-eli-info td:contains("'+keyWord+'")');
+               if(selectedEls.length==0) {
+                  selectedEls = $('.coverage-grid td:contains("'+keyWord+'")');
+               }
+
+               if(selectedEls.length!=0) {
+                  tempEl = selectedEls[0];
+                  tempEl.parentNode.classList.add(primaryClassName);
+                  highlightedEls.push(tempEl);
                } 
 
-               if(focusEl == undefined) {
+               if(focusEl != null) {
                   focusEl = tempEl;
                }
+
                break; 
 
             // This group is for keywords that show up as values
             case "-Medicaid":
             case "-TITLE 19 MEDICAID":
+            case "TITLE XIX (MEDICAID)":
             case "41 Pregnant Wome":
-            case "80":
             case "8C":
             case "ABD":
             case "ABDQMB":
@@ -2451,38 +3194,43 @@
             case "Medical Assistance":
             case "Medicare Covered Services Only":
             case "memberProgramCode":
+            case "MSP":
+            case "PARTIAL":
             case "PROGRAM":
             case "QMB":
             case "Qualified Medicare Beneficiary":
             case "Remaining":
             case "SLMB":
             case "Spec. Low Income Mcre Benefic":
-            case "Spend Down":
+            case "Specified Low Income Medicare Beneficiary":
+            case "Spend Down":  // TODO: These are sometimes not highlighting-MI
             case "Spenddown":
             case "SSI,":
             case "TANF":
             case "| SLMB":
-               tempEl = $('#general-eli-info td:contains("'+keyWord+'")');
-               if(tempEl.length!=0) {
-                  tempEl[0].parentNode.classList.add(classToAdd);
-               } else {
-                  tempEl = $('span:contains("'+keyWord+'")');
-                  if(tempEl.length!=0) {
-                     tempEl[0].parentNode.classList.add(classToAdd);
-                  } else {
-                     tempEl = $('.generalSection td:contains("'+keyWord+'")');
-                     if(tempEl.length!=0) {
-                        tempEl[0].parentNode.classList.add(classToAdd);
-                     } else {
-                        tempEl = $('.coverage-grid td:contains("'+keyWord+'")');
-                        if(tempEl.length!=0) {
-                           tempEl[0].classList.add(classToAdd);
-                        }
+               selectedEls = $('#general-eli-info td:contains("'+keyWord+'")');
+               if(selectedEls.length==0) {
+                  selectedEls = $('span:contains("'+keyWord+'")');
+                  if(selectedEls.length==0) {
+                     selectedEls = $('.generalSection td:contains("'+keyWord+'")');
+                     if(selectedEls.length==0) {
+                        selectedEls = $('.coverage-grid td:contains("'+keyWord+'")');
+                        highlightParentEl = false;
                      }
                   }
                }
 
-               if(focusEl == undefined) {
+               if(selectedEls.length!=0) {
+                  tempEl = selectedEls[0]
+                  if(highlightParentEl) {
+                     tempEl.parentNode.classList.add(classToAdd);
+                  } else {
+                     tempEl.classList.add(classToAdd);
+                  }
+                  highlightedEls.push(tempEl);
+               }
+
+               if(focusEl != null) {
                   focusEl = tempEl;
                }
                break;
@@ -2490,25 +3238,42 @@
             case "Medicaid:":
             case "Medical Assist. Cat.:":
             case "PCAT":
+            case "QMB only":
             case "Insurance Type:":
             case "Plan Coverage Description:":
-               tempEl = $('th:contains("'+keyWord+'")');
-               if(tempEl.length!=0) {
-                  tempEl[0].parentNode.classList.add(classToAdd);
+               selectedEls = $('th:contains("'+keyWord+'")');
+               if(selectedEls.length!=0) {
+                  if(state == "MI" && selectedEls.length != 1) {
+                     // MI only uses Plan Coverage Description, but sometimes 
+                     // needs it to be the second entry, not the first
+                     selectedEls[0].parentNode.classList.add(primaryClassName);
+                     highlightedEls.push(tempEl);
+                     
+                     tempEl = selectedEls[1];
+                  } else {
+                     tempEl = selectedEls[0];
+                  }
+                  tempEl.parentNode.classList.add(classToAdd);
+                  highlightedEls.push(tempEl);
                }
 
-               if(focusEl == undefined) {
+               if(focusEl != null) {
                   focusEl = tempEl;
                }
                break;
             // This group is down in the bottom section
             case "Primary Aid Code":
-               tempEl = $('.coverage-grid td:contains("PRIMARY AID CODE")');
-               if(tempEl.length!=0) {
-                  tempEl[0].classList.add(classToAdd);
+            case "PRIMARY AID CODE":
+            case "QMB ONLY":
+               selectedEls = $('.coverage-grid td:contains("'+keyWord.toUpperCase()+'")');
+
+               if(selectedEls.length!=0) {
+                  tempEl = selectedEls[0];
+                  tempEl.classList.add(classToAdd);
+                  highlightedEls.push(tempEl);
                }
 
-               if(focusEl == undefined) {
+               if(focusEl != null) {
                   focusEl = tempEl;
                }
                break;
@@ -2526,10 +3291,14 @@
                // this one is weird. It sometimes has a | in the first "Plan", and sometimes doesn't, 
                // so the highlight jumps to the third one
             case "MCE |": 
-               tempEl = $('#general-eli-info td:contains("'+keyWord+'")');
-               if(tempEl.length>1) {
-                  tempEl[1].parentNode.classList.add(classToAdd);
+               selectedEls = $('#general-eli-info td:contains("'+keyWord+'")');
+
+               if(selectedEls.length>1) {
+                  tempEl = selectedEls[1];
+                  tempEl.parentNode.classList.add(classToAdd);
+                  highlightedEls.push(tempEl);
                }
+
                break;
             default:
                break;
@@ -2537,11 +3306,23 @@
 
       }
 
-      if(focusEl.length != 0){
-         focusEl[0].scrollIntoViewIfNeeded({block: "center"});
+      if(focusEl != null){
+         focusEl.scrollIntoViewIfNeeded({block: "center"});
       }
 
-      return stateInfo;
+      mbiEl = getMbiEl();
+      if (mbiEl != undefined) {
+         mbiEl.parentNode.classList.add(mbiClassName);
+         highlightedEls.push(mbiEl);
+      }
+
+      ltcEl = getLtcEl();
+      if (ltcEl != undefined) {
+         ltcEl.parentNode.classList.add(ltcClassName);
+         highlightedEls.push(ltcEl);
+      }
+
+      return highlightedEls;
 
       //TODO: Alert how many things found
       //TODO: make it so that it alerts when it didn't find any of the el's
@@ -2551,9 +3332,11 @@
    /* Function unHighlightEls
       Gets all the els to highlight */
    function unHighlightEls() {
-      $('.primary,.secondary').each((iter, el) => {
+      $('.primary,.secondary,.mbi-highlight,.ltc-highlight').each((iter, el) => {
          el.classList.remove('primary');
          el.classList.remove('secondary');
+         el.classList.remove('mbi-highlight');
+         el.classList.remove('ltc-highlight');
       });
    }
    
@@ -2563,28 +3346,46 @@
    //TODO: background red?
    //TODO: have it contain the important info in stateDB
 
+
 /*** KEYBOARD SHORTCUTS ***/
 
+  /** COPY MCD ID **/
+
+   /* Function copyMcdId
+      Copies the medicaid id from the page */
+   function getMcdIdFromPage() {
+      var el = $('#patient-info tr:contains("Medicaid Recipient ID")');
+      
+      if(el.length == 0) {
+         el = $('#patient-info tr:contains("Member ID")');
+      }
+      
+      if(el.length > 0) {
+         copyStringToClipboard(el.children()[1].innerHTML);
+      } else {
+         copyStringToClipboard("none");
+      }
+   }
    /* Function copyMcdId
       Copies the medicaid id from the page */
    function copyMcdId(evt) {
       // CTRL + SHIFT + X // x b/c it's like copy
       if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-         console.log("hey");
-         var el = $('#patient-info tr:contains("Medicaid Recipient ID")');
-         
-         if(el.length == 0) {
-            el = $('#patient-info tr:contains("Member ID")');
-         }
-         
-         copyStringToClipboard(el.children()[1].innerHTML);
+         getMcdIdFromPage();
       }
    }
 
 /*************
 * LOGIC
 **************/
-   if(isSearchPage()) {
+   var firstStepLink = (typeof $ != "undefined") ? firstStepLink = $(".ohid") : firstStepLink = null;
+   var secondStepBtn = document.getElementById('btnLogin');
+
+   if(firstStepLink != null && firstStepLink.length != 0) {
+      firstStepLink[0].click();
+   } else if(secondStepBtn != null && secondStepBtn.length != 0) {
+      secondStepBtn.click();
+   } else if(isSearchPage()) {
       // debugger;
       console.log(">> Search Page Detected", window);
       var topWindow = window.top;
@@ -2656,11 +3457,7 @@
          insertHighlightCSS();
          highlightImportantEls();
          setUpResultsPageKeyboardShortcuts();
-         copyMcdId({
-            ctrlKey: true,
-            shiftKey: true,
-            which: 88
-         });
+         getMcdIdFromPage();
 
          chc.allowedStatesDB = allowedStatesDB;
          chc.getStateInfo = getStateInfo;
@@ -2672,6 +3469,7 @@
          chc.mydebug = mydebug;
          chc.ranSetup = true;
 
+         console.log(">> Inserted CHC logic");
       } else {
          chc.alreadyPresent();
       }
