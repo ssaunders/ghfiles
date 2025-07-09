@@ -1,5 +1,5 @@
 //~~~~ BO CUSTOMIZATION ~~~~//
-https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=118181466#
+// https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=118181466#
 
 /* TODO: 
 
@@ -10,6 +10,11 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
    // TODO: Consider "Transfer to Tier 2" followed by "App submitted"
    // TODO: Picked up the people wrong: https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id=130907103#plans1
    // TODO: How to handle AEP apps. Mult Ctrl X, w/a toast that shows which one's being copied?
+   // TODO: Row stripe comm history
+   // TODO: Highlight sub date calls in comm history
+            // https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id=100921491#plans0
+   // TODO: Fix this one pulling agent name as T2 and T3
+            // https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id=100921491#plans0
 
    /**  2  PRIORITY   **
    // TODO: Highlight the dates called on the PIP in the Com Hist on insert
@@ -18,6 +23,9 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       // - Gradient in blue? Or green? Or Orange? Transfer - Tier 2 > DTC > Application Submitted
       // - Highlight the ones that have the same date as the app date?
    // TODO: Paste into BO > Sets only blanks: address (PO box is second), birth date, sex, zip, city, state, 
+   // TODO: Create a "Dr." highlighter for notes (light green) (C + S + H)
+   // TODO: C + S + E = start note, Ctrl/Enter submits, Esc closes
+   // TODO: Make it so that the Plan name is taken from the Title and put as the innerHTML
 
    /**  3  BACKLOG    **
    // TODO: Pipe dream--create page that wraps BO in an iframe, so I can keep my shortcuts/apply them auto on refresh
@@ -172,6 +180,39 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       which:70
    }
 
+   /* Function debounce
+      Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+   
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log(a,b,c);
+   }
+
    /* Function standardizeFullDateString
       Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
       Returns xx/xx/xxxx
@@ -208,7 +249,7 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       and converts it to a JSON obj. Pass in the list, and true if it 
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
-   function convertColonListToJsonObj(colonList, hasHeader=false) {
+   function convertColonListToJsonObj(colonList, hasHeader) {
       var logStuff = false;
           emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
           tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
@@ -225,21 +266,15 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       }
 
       // Skip the header
-      if(hasHeader === true || /\r?\n/.test(listDividers[0])){
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
          iter++;
       }
 
       for (iter; iter < infoAry.length; iter+=2) {
-         // if(infoAry[iter] == "DOB" || infoAry[iter] == "Date of Birth" || infoAry[iter] == "Birth Date"){
-         //    returnObj.dob =infoAry[iter+1];
-         // } else if(infoAry[iter] == "MBI" || infoAry[iter] == "MBI Number"){
-         //    returnObj.mbi =infoAry[iter+1];
-         // } else {
-            returnObj[infoAry[iter]]=infoAry[iter+1];
-         // }
-         if(logStuff) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
             console.log(">>",infoAry[iter],infoAry[iter+1]);
-         }
+        }
       }
       return returnObj;
    }
@@ -259,14 +294,14 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
-   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
       var data;
       try {
          data = JSON.parse(copiedText);
       } catch(error) {
          if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
             data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
-         } else if(typeof hasHeaderOrHeaderString == "boolean") {
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
             data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
          } else {
             data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
@@ -340,6 +375,14 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
          activeTab.click();
          console.log(">> Loaded PIP");
       }
+   }
+
+   /* Function scrollPlanInfoIntoView
+      Scrolls the cu's info page into view */
+   function scrollPlanInfoIntoView() {
+      var messagesDiv = $$(".lead-guidance-message-wrapper")[0],
+          planInfoParentDiv = $$("#form1")[0];
+      (messagesDiv || planInfoParentDiv).scrollIntoView(true);
    }
 
 
@@ -467,6 +510,9 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
             // get sales PIP
             // check for date
          Two PIP's, same date, both have App Sub'd
+
+         TODO:Look at these examples-
+         https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id=113797963#plans0
       */
 
       var dtcPIP = getMostRecentDtcPip(),
@@ -552,6 +598,13 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       Gets the T3 agent's name from the sale PIP */
    function getT3AgentName() {
       var salePIP;
+
+      /* The case of Charlie
+         "Transferred to Charlie" needs more investigation. This one (135098891) was 
+         only w/T3 for only a few minutes, as was this one 135371180. In both cases, 
+         the T2 put "DTC transfer" as the status. So that might mean DTC Trasf has 
+         multiple statuses.
+      */
 
       if (isSubmittingAgentT3()) {
          salePIP = getMostRecentSalePip();
@@ -688,13 +741,16 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
          // 0 - Not sure
          alert("No call record found for sub date");
          t2Name = "-";
+
       } else if(callRecordAry.length == 1) {
          // 1 - If only 1 record, probably "App Sub", which means T3 only? Trans from VConnect, etc
          alert("Check comm history. Only one record");
          t2Name = "-";
+
       } else if(callRecordAry.length <= 3) {
-         // 2 Most likely a T2/T3 pair
+         // 2 - Most likely a T2/T3 pair
          if(callRecordAry[1].children[5].innerHTML == "DTC Transfer") {
+            // 2.1 - DTC transfer is a dead give-away that it's the T2
             t2Name = callRecordAry[1].children[3].innerHTML;
 
          } else if(callRecordAry[0].children[5].innerHTML == "DTC Transfer") {
@@ -724,6 +780,7 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
             console.warn("Something went wrong");
             t2Name = "-";
          }
+
       } else if(callRecordAry.length > 3) {
          // 4+- uh...not sure
          alert("Check comm history. More than two records for sub date");
@@ -798,7 +855,18 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
             console.warn(">> debug: at copyAppInfo");
          }
 
-         var finalString = 
+         copyStringToClipboard(getAppInfo());
+
+         return;
+      }
+   }
+
+   /* Function getAppInfo
+      Gets the app info into a string that is easily copyable */
+   function getAppInfo(){
+      var returnStr = 
+            "Lead Id:\t"+getLeadIdField().val()+"\n"+
+            "Cu Name:\t"+getFirstNameField().val()+" "+getLastNameField().val()+"\n"+
             "T2 Agent:\t"+getT2AgentName()+"\n"+
             "T3 Agent:\t"+getT3AgentName()+"\n"+
             "Plan:\t"+getPlanData()+"\n"+
@@ -807,10 +875,7 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
             "Eff Date:\t"+getEffDate()+"\n"+
             "Alt Address:\t"+getAltAddr();
 
-         copyStringToClipboard(finalString);
-
-         return;
-      }
+      return returnStr;
    }
 
 
@@ -832,6 +897,23 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       }
    }
 
+   /* NOTES:
+      leadViewEditEIP.js > saveChanges
+
+
+      TODo: this does not work vvvv
+   */
+
+   // saveChanges = new Function(["obj"],saveChanges.toString().slice(27,saveChanges.toString().length-1)+"console.log('I inserted!');");
+
+   function insertOverOtherFn(fnName, message, paramsAry=[]) {
+      var stringified = eval(fnName).toString(), 
+          firstCurly = stringified.toString().search("{")+1,
+          newFnBody = stringified.slice(firstCurly,stringified.length-1);
+          console.log("new fn body", newFnBody+"; console.log('"+message.replaceAll("'","\\'")+"');");
+      return new Function(paramsAry,newFnBody+"; console.log('"+message.replaceAll("'","\\'")+"');");
+   }
+
    /* Function fillFields
       Adds info from data object provided to every field */
    function fillFields(data) {
@@ -839,41 +921,87 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
          console.warn(">> Could not fill fields. Data is not an object");
          return false;
       }
+      console.log("filling fields");
+
+      var counter = 0;
+
 
       // new Promise((resolve, reject) => { console.log(">> filling fields: ", data); resolve(); })
             // .then(() => {
+               if(data.lastName != "" && data.lastName != undefined) {
+                  setTimeout((data) => {
+                     setLastNameField(data.lastName);
+                     console.log("filling lastName")
+                  }, initial + counter++ * delta, data);
+
+                  console.log("filling lastName", initial + counter * delta);
+               }
                if(data.firstName != "" && data.firstName != undefined) {
-                  setFirstNameField(data.firstName);
+                  setTimeout((data) => {
+                     setFirstNameField(data.firstName);
+                     console.log("filling firstName")
+                  }, initial + counter++ * delta, data);
+                  console.log("filling firstName", initial + counter * delta);
                }
             // })      
             // .then(() => {
-               if(data.lastName != "" && data.lastName != undefined) {
-                  setLastNameField(data.lastName);
-               }
             // })
             // .then(() => {
                if(data.fullName != "" && data.fullName != undefined) {
-                  setNameFieldInPISection(data.fullName);
+                  setTimeout((data) => {
+                     setNameFieldInPISection(data.fullName);
+                     console.log("filling PI Name")
+                  }, initial + counter++ * delta, data);
+                  console.log("filling PI Name", initial + counter * delta);
                } else {
-                  setNameFieldInPISection(data.firstName + " " + data.lastName);
+                  setTimeout((data) => {
+                     setNameFieldInPISection(data.firstName + " " + data.lastName);
+                     console.log("filling PI Name")
+                  }, initial + counter++ * delta, data);
+                  console.log("filling PI Name", initial + counter * delta);
                }
             // })
             // .then(() => {
                if(data.sex != "" && data.sex != undefined) {
-                  setGenderField(data.sex);
+                  setTimeout((data) => {
+                     setGenderField(data.sex);
+                     console.log("filling sex")
+                  }, initial + counter++ * delta, data);
+                  console.log("filling Gender", initial + counter * delta);
                }
             // })
             // .then(() => {
                if(data.dob != "" && data.dob != undefined) { 
-                  setDOBField(data.dob);
+                  setTimeout((data) => {
+                     setDOBField(data.dob);
+                     console.log("filling dob")
+                  }, initial + counter++ * delta, data);
+                  console.log("filling DOB", initial + counter * delta);
                }
             // })
             // .then(() => {
                if(data["Cust Addr"] != "" && data["Cust Addr"] != undefined) {
-                  setAddressField(data["Cust Addr"]);
+                  setTimeout((data) => {
+                     setAddressField(data["Cust Addr"]);
+                     console.log("filling Addr");
+                  }, initial + counter++ * delta, data);
+                  console.log("filling Addr", initial + counter * delta);
                }
             // });
    }
+
+   /* Function clearFields
+      For debugging. Sets everything to "" */
+   function clearFields() {
+      console.log("setFirstNameField", setFirstNameField(""));
+      console.log("setLastNameField", setLastNameField(""));
+      console.log("setDOBField", setDOBField(""));
+      console.log("setGenderField", setGenderField(""));
+      console.log("setStateField", setStateField(""));
+      console.log("getCityField", setCityField(""));
+      console.log("getZipField", setZipField(""));
+   }
+
 
 /*** GETTERS & SETTERS ***/
 
@@ -907,6 +1035,14 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       input.val(val);
       saveChanges(el[0] || el); // THIS IS A NATIVE BO FN
    }   
+
+   // LEAD ID //
+   /* Function getLeadIdField */
+   function getLeadIdField() {
+      var el = jq("td.label:contains('Lead ID')").next();
+      el.val = () => {return el.html();}
+      return el;
+   }
 
    // FIRST NAME //
    /* Function getFirstNameField */
@@ -1128,6 +1264,7 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
       console.log("getStateField", getStateField());
       console.log("getCityField", getCityField());
       console.log("getZipField", getZipField());
+      console.log("getLeadId", getLeadId());
    }
 
    function checkSetters() {
@@ -1141,35 +1278,50 @@ https://www.brokeroffice.com/leads/leadViewEdit.jsp?subscriber_id=55432&lead_id=
    }
 
 
+
+/*** SEARCH PAGE STUFF ***/
+
+   function openAllLeadLinks() {
+      jq("td>a").each((a,b)=> {b.target="_blank"; b.click()});
+   }
+
+
 /*************
 * LOGIC
 **************/
-if(typeof bo == "undefined") {
-   bo = {
-      ranSetup: false
-   };
-}
-if(bo.ranSetup != true) {
-   setUpKeyboardShortcuts();
-   loadCommHistTab();
-   loadPlanInfoTab();
-
-   bo.ranSetup = true;
-   bo.unload = unload;
-   bo.alreadyPresent = alreadyPresent;
-   bo.mydebug = mydebug;
-
+// if on BO search page
+if(/advancedSearch/.test(window.location.href)) {
+   openAllLeadLinks()
 } else {
-   bo.alreadyPresent();
-}
 
-//*
-function isPipTabLoaded() {
-   return $$('.tbl-form.applicantsTable').length != 0;
+   if(typeof bo == "undefined") {
+      bo = {
+         ranSetup: false
+      };
+   }
+   if(bo.ranSetup != true) {
+      setUpKeyboardShortcuts();
+      loadCommHistTab();
+      loadPlanInfoTab();
+      scrollPlanInfoIntoView();
+
+      bo.ranSetup = true;
+      bo.unload = unload;
+      bo.alreadyPresent = alreadyPresent;
+      bo.mydebug = mydebug;
+
+   } else {
+      bo.alreadyPresent();
+   }
+
+   // on regular page
+   function isPipTabLoaded() {
+      return $$('.tbl-form.applicantsTable').length != 0;
+   }
+   function isCommTabLoaded() {
+      return  $$('#communicationHistoryTable table').length != 0; 
+   }
+   console.log("PIP: ",isPipTabLoaded());
+   console.log("Comm: ",isCommTabLoaded());
+   /**/
 }
-function isCommTabLoaded() {
-   return  $$('#communicationHistoryTable table').length != 0; 
-}
-console.log("PIP: ",isPipTabLoaded());
-console.log("Comm: ",isCommTabLoaded());
-/**/
