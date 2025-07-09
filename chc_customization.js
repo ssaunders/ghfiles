@@ -1173,6 +1173,33 @@
       which:70
    }
 
+   /* Function debounce
+      Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
    /* Function fnLogger
       Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
    function fnLogger(a,b,c) {
@@ -1275,7 +1302,7 @@
       and converts it to a JSON obj. Pass in the list, and true if it 
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
-   function convertColonListToJsonObj(colonList, hasHeader=false) {
+   function convertColonListToJsonObj(colonList, hasHeader) {
       var logStuff = false;
           emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
           tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
@@ -1292,21 +1319,15 @@
       }
 
       // Skip the header
-      if(hasHeader === true || /\r?\n/.test(listDividers[0])){
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
          iter++;
       }
 
       for (iter; iter < infoAry.length; iter+=2) {
-         // if(infoAry[iter] == "DOB" || infoAry[iter] == "Date of Birth" || infoAry[iter] == "Birth Date"){
-         //    returnObj.dob =infoAry[iter+1];
-         // } else if(infoAry[iter] == "MBI" || infoAry[iter] == "MBI Number"){
-         //    returnObj.mbi =infoAry[iter+1];
-         // } else {
-            returnObj[infoAry[iter]]=infoAry[iter+1];
-         // }
-         if(logStuff) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
             console.log(">>",infoAry[iter],infoAry[iter+1]);
-         }
+        }
       }
       return returnObj;
    }
@@ -1326,14 +1347,14 @@
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
-   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
       var data;
       try {
          data = JSON.parse(copiedText);
       } catch(error) {
          if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
             data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
-         } else if(typeof hasHeaderOrHeaderString == "boolean") {
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
             data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
          } else {
             data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
@@ -1377,31 +1398,6 @@
 
 /*** UTILITY ***/
   //~~~ GENERAL UTILTY ~~~//
-   /* Function debounceFn
-      Debounces a fn */
-   function debounce(func, delay=0, timing={'leading': false,'trailing': true}) {
-      console.log("debounce called with delay ", delay, " for ",func.name);
-      let debounceTimer;
-
-      if(timing.trailing) {
-         return function () {
-             const context = this
-             const args = arguments
-             clearTimeout(debounceTimer)
-             debounceTimer = setTimeout(() => func.apply(context, args), delay)
-         }
-      } else {
-        return function debouncedFn() {
-          const context = this
-          const args = arguments
-          if (Date.now() - debounceTimer > delay) {
-            func.apply(context, args);
-          }
-          debounceTimer = Date.now();
-        };
-      }
-   }
-
    /* Function unload
       Removes the keyboard listeners from the page and undoes everything in runSetup */
    function unload() {
