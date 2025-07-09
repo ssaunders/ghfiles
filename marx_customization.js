@@ -1,67 +1,43 @@
-//~~~~ MARX CUSTOMIZATION ~~~~//
+//~~~~ MARKETPLACE CUSTOMIZATION ~~~~//
 
-/* TODO: 
+// TODO: 
+   /**  1  WORKING ON **
+   // TODO: make data-testid="universal-navigation-view-profile" be aria-disabled=false
+   // TODO: make it so that "MBI DATA" is automatically clicked after Ctrl + V'ing things
+   // TODO: make it so that a space is not able to be input into the MBI field
+   // TODO: BUG Make it so that this lead gets the Medicaid info right: 140449595
+   // TODO: Make a "jump to plan" link in "current plan" option
+   // TODO: Make a "add to comparison" link in "current plan" option
 
-    /**  1  WORKING ON **
-    // TODO: Have the "keyup" on SSN & MBI remove the "-", fix it in Ctrl+V
-    // TODO: Have Ctrl+Enter work in SSN lookup
-    // TODO: Have the Ctrl + V just drop out the -, format DOB
-    // TODO: Make changeMaxLengthOnInputs (make them a lot larger)
+   /**  2  PRIORITY   **
+   // TODO: Make stepper for part 2 of marketplace. Or....can I manipulate the URL to jump to the end?
+      https://www.gomedicarequotes.com/repeat-caller/guide/CALLBACK_PERMISSION?sid=703201d77b6a11efb6c3631f102d09b4&applicant_id=self
+      https://www.gomedicarequotes.com/repeat-caller/guide/SCOPE_OF_APPOINTMENT?sid=703201d77b6a11efb6c3631f102d09b4&applicant_id=self
+      https://www.gomedicarequotes.com/guided-sales/guide/INTRODUCTION/COLLECT_EMAIL?applicant_id=self&sid=703201d77b6a11efb6c3631f102d09b4
+      https://www.gomedicarequotes.com/quotes?applicant_id=self&filter_visible=false&origin=guidedsales&selected_product=MEDICARE_ADVANTAGE&sid=703201d77b6a11efb6c3631f102d09b4&user_filter_interaction=false
 
-    /**  2  PRIORITY   **
-    // TODO: Add in the MX object
-        // TODO: Change all ref's for doc vars to be MX vars (ranSetup, etc)
-        // TODO: Add the listener to put the mx object into the iframe
-        // TODO: Change Setup fn to standardized format
-    // TODO: Get auto-nav to work with the first part of MARx
-    
-    /**  3  BACKLOG    **
-    // TODO: Session-Refresher
-        // TODO: Fix MARx refresher -- have it pick up the "stay" button
-        // TODO: set up Session-Refresher to auto-click button every 5 minutes. Does it have to be in an active tab?
-        // TODO: Set it up so that searching updates the 4 hour log out timer back to 4 hours
-    // TODO: figure out why i have to hit the shortcut buttons twice
-    // TODO: Style v> button
-    // TODO: Make the autonav insert do a settimeout if it doesn't find what it's looking for
+   /**  3  BACKLOG    **
+   // TODO: Had a third line in the address...? https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id=131860900#0
+   // TODO: Handle the "Lookup" option for opening MARx sidebar
 
- //DONE 
+/** DONE **/
 
-    /**** Post Version Release ****
+   /**** Post Version Release ****/
+   // TODO: Make the copy refresh the MBI data
+   // TODO: Incorporate if(today == getLastMARxRefreshDate()) skip; so it doesn't try to get it every time it's added to the page
+   // TODO: Copy MARx data
+   // TODO: Open/close/test MARx tab
+   // TODO: Open/close/test Personal Info tab
+   // TODO: Make autonav for Mkplc
+   // TODO: If inserted in BO, then open MP
 
-    // TODO: Have the Ctrl + Shift + V show cu table if hidden
-    // TODO: Have the Ctrl + Shift + V paste info into the search section/s
-    // TODO: Make the "interpret JSON failed" be less monstrous when I accidentally past the whole body o/code
-    // TODO: Fix the div that's supposed to be hidden showing up
-    // TODO: Make Ctrl+shift+E for Enrollment info to copy the top section
-        // TODO: Create a button div, so I can extend the screenshot functionality
-        // TODO: connect shortcut
-        // TODO: write fn to hmtl2canvas the 4 divs I need
-    // TOOD: Add auto-navigator
-        // TODO: Make it auto-step
-        // TODO: make it so that if the MX button is pushed, it'll still go
-        // TODO: Have it delay the addition of the stuff until the end
-        // TODO: beneficiaries
-        // TODO: eligibility
-    // TODO: pageCopy logic--get it to copy
-    // TODO: pageCopy logic--get it to auto-download
-    // TODO: pageCopy logic testing
-    // TODO: import jspdf
-    // TODO: make shortcut to pageCopy
-    // TODO: Make a setup fn, to be called from auto nav
-    // TODO: Make unloadMx fn
-    // TODO: Add timestamp to "tried it"
-    // TODO: Rework hideShowFn > name better
-    // TODO: Fix setUpKeyboardShortcuts to use addEventListener
-    // TODO: Rework addscript > break into two, doc is optional
-    // TODO: Fix it so it doesn't run if it sees the button already there.
-    // TODO: actually use getIframe in code ?
-    // TODO: Add shortcuts? 
-        // TODO: Add MARx refresher
-        // TODO: Add focus to top el?
-        // > Focus to Ben ID search (Ctrl+Shift+S)
-        // TODO: Remove the two things (highlight and +) at top?
 
-*/
+/* Function function_name
+   NOTES_ON_FN */
+function function_name(argument) {
+   // body...
+}
+
 
 /*************
 * FUNCTIONS
@@ -69,84 +45,135 @@
 
 /*** LIBRARY ***/
 
-    /*  Function alreadyPresent
-        alerts that the code already exists */
-    function alreadyPresent() {
-        console.warn(">> MARx Code already present");
-    }
+   /* Function alreadyPresent
+      alerts that the code already exists */
+   function alreadyPresent() {
+      console.warn(">> MP Code already present");
+   }
 
-    /*  Function DEBUG FUNCTIONS
-        tests for/starts/stops debug */
-    function isDB() {
-        return document.mxdebug;
-    }
-    function startDB() {
-        document.mxdebug = true;
-    }
-    function endDB() {
-        document.mxdebug = false;   
-    }
+   /* Function DEBUG FUNCTIONS
+      tests for/starts/stops debug */
+   mydebug = {
+      isDebugging: false,
+      isDB: function () {
+         return this.isDebugging;
+      },
+      startDB: function() {
+         this.isDebugging = true;
+      },
+      endDB: function() {
+         this.isDebugging = false;
+      }
+   };
 
-    /*  Function copyStringToClipboard
-        Copies a string to the computer clipboard */
-    function copyStringToClipboard(string) {
-        if(string == null) {
-            console.warn("Nothing to copy");
-            return;
-        }
+   /* Function copyStringToClipboard
+      Copies a string to the computer clipboard */
+   function copyStringToClipboard(string, printResult) {
+      if(string == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
 
-        navigator.clipboard.writeText(string).then(() => {
-          console.log('Content copied to clipboard');
-        },() => {
-          console.error('Failed to copy');
-        });
-    }
+      return navigator.clipboard.writeText(string)
+         .then((data) => {
+            console.log('>> Content copied to clipboard');
+            if(printResult) {
+               console.log("Copied: ", data)
+            }
+         },() => {
+           console.error('>> Failed to copy');
+         });
+   }
 
-    /*  Function copyElToClipboard
-        Copies the content of an el to the computer clipboard */
-    function copyElToClipboard(htmlEl, doc=document) {
-        if(htmlEl == null) {
-            console.warn("Nothing to copy");
-            return;
-        }
+   /* Function copyElToClipboard
+      Copies the content of an el to the computer clipboard */
+   function copyElToClipboard(htmlEl) {
+      if(htmlEl == null) {
+         console.warn("Nothing to copy");
+         return;
+      }
 
-        var range = doc.createRange();
-        var sel = doc.getSelection();
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
+      }
 
-        sel.removeAllRanges();
-        range.selectNodeContents(htmlEl);
-        sel.addRange(range);
-        doc.execCommand("Copy");
-    }
+      var range = document.createRange();
+      var sel = document.getSelection();
 
-    /*  Function addCssEl
-        Adds the passed in CSS text to the document body */
-    function addCssEl(cssText, doc=document) {
-        if (cssText!=null) {
-            const cssEL = doc.createElement("style");
-            cssEL.textContent = cssText;
-            doc.childNodes[1].appendChild(cssEL);
-        }
-    }
+      sel.removeAllRanges();
+      range.selectNodeContents(htmlEl);
+      sel.addRange(range);
+      document.execCommand("Copy");
+   }
 
-    /*  Function addJsScript
-        Adds the passed in script text to the document body */
-    function addJsScript(scriptText, doc=document) {
-        if (scriptText!=null) {
-            const jsEl = doc.createElement("script");
-            jsEl.textContent = scriptText;
-            doc.childNodes[1].appendChild(jsEl);
-        }
-    }
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
 
-    /*  Function getCurrentTimestamp
-        Returns a string of the current timestamp */
-    function getCurrentTimestamp() {
-        return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
-    }
+      return promise;
+   }
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+      
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   function getCurrentTimestamp() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+   }
 
    /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer. */
+      Adds a mutation observer to targetEl. Returns the observer.
+      The fn passed in will receive these arguments: */
    function addMutationObs(targetEl, fn, options) {
       if(typeof fn != "function") {
          fn = () => console.log("ran mutationObserver for ",targetEl);
@@ -175,29 +202,37 @@
       which:70
    }
 
-   /* Function debounceFn
+   /* Function debounce
       Debounces a fn */
-   function debounce(func, delay=0, timing={'leading': false,'trailing': true}) {
-      console.log("debounce called with delay ", delay, " for ",func.name);
-      let debounceTimer;
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
 
       if(timing.trailing) {
-         return function () {
-             const context = this
-             const args = arguments
-             clearTimeout(debounceTimer)
-             debounceTimer = setTimeout(() => func.apply(context, args), delay)
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
          }
-      } else {
-        return function debouncedFn() {
-          const context = this
-          const args = arguments
-          if (Date.now() - debounceTimer > delay) {
-            func.apply(context, args);
-          }
-          debounceTimer = Date.now();
-        };
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
       }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log(a,b,c);
    }
 
    /* Function standardizeFullDateString
@@ -236,7 +271,7 @@
       and converts it to a JSON obj. Pass in the list, and true if it 
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
-   function convertColonListToJsonObj(colonList, hasHeader=false) {
+   function convertColonListToJsonObj(colonList, hasHeader) {
       var logStuff = false;
           emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
           tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
@@ -253,21 +288,15 @@
       }
 
       // Skip the header
-      if(hasHeader === true || /\r?\n/.test(listDividers[0])){
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
          iter++;
       }
 
       for (iter; iter < infoAry.length; iter+=2) {
-         // if(infoAry[iter] == "DOB" || infoAry[iter] == "Date of Birth" || infoAry[iter] == "Birth Date"){
-         //    returnObj.dob =infoAry[iter+1];
-         // } else if(infoAry[iter] == "MBI" || infoAry[iter] == "MBI Number"){
-         //    returnObj.mbi =infoAry[iter+1];
-         // } else {
-            returnObj[infoAry[iter]]=infoAry[iter+1];
-         // }
-         if(logStuff) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
             console.log(">>",infoAry[iter],infoAry[iter+1]);
-         }
+        }
       }
       return returnObj;
    }
@@ -287,15 +316,15 @@
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
-   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
       var data;
       try {
          data = JSON.parse(copiedText);
       } catch(error) {
-         if(typeof hasHeaderOrHeaderString == "boolean") {
-            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
-         } else if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){ // first comment in an RFI
             data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
          } else {
             data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
          }
@@ -334,122 +363,672 @@
 
      return newCuInfoObj;
    }
-   
+
 
 /*** UTILITY ***/
+  /*** PAGE SETUP ***/
+   mpjq = "";
+   if(typeof mtjQuery == "undefined") {
+      setTimeout(()=>mpjq = mtjQuery,1000);
+   } else {
+      mpjq = mtjQuery;
+   }
 
-    /*  Function setUpKeyboardShortcuts
-        Sets up the listeners for the keyboard shortcuts */
-    function setUpKeyboardShortcuts() {
-        if(isDB()) {
+   /* Function setUpKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function setUpKeyboardShortcuts() {
+      document.addEventListener("keyup", triggerMARxRefresh);     // CTRL + SHIFT + F  // F for reFresh
+      document.addEventListener("keyup", triggerCopyMARxView);    // CTRL + SHIFT + B  // B for MBI
+      document.addEventListener("keyup", triggerEnrollInfoCopy);  // CTRL + SHIFT + E  // E for Enrollment
+      document.addEventListener("keyup", pasteInSearchInfo);      // CTRL + SHIFT + V // V b/c it's paste
+      console.warn(">> set up shortcuts");
+   }
+
+   /* Function clearKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function clearKeyboardShortcuts() {
+      document.removeEventListener("keyup", triggerMARxRefresh);
+      document.removeEventListener("keyup", triggerCopyMARxView);
+      document.removeEventListener("keyup", triggerEnrollInfoCopy);
+      document.removeEventListener("keyup", pasteInSearchInfo);
+      console.log(">> removed shortcuts");
+   }
+
+   /* Function unload
+      Removes the keyboard listeners from the page */
+   function unload() {
+      //remove mutation obsv
+      clearKeyboardShortcuts();
+      mp.ranSetup = false;
+   }
+
+  /*** SIDEBARS AND NAV ***/
+
+   /* Function openProfileSidebar */
+   function openProfileSidebar() {
+      console.log("opened profile");
+      mpjq("[data-testid='universal-navigation-view-profile']").click();
+   }
+
+   /* Function closeProfileSidebar */
+   function closeProfileSidebar() {
+      mpjq('[data-testid="profile-pane-close-button"]').click();
+   }
+
+   /* Function isProfileSidebarOpen */
+   function isProfileSidebarOpen() {
+      return mpjq(":contains('MBI Lookup')").length > 0;
+   }
+
+
+   /* Function openMARxSidebar 
+      You don't need to test if it's open, b/c the opening link only opens*/
+   function openMARxSidebar() {
+      openProfileSidebar();
+      var k = mpjq(".medicareEligibilityLookupControl-wrapper__dialog-view");
+      if(k.length == 0) {
+         k = getByDataTestId("medicareEligibilityLookupControl-viewButton");
+      }
+      console.log(">> Opened MARx sidebar", k);
+      k.click();
+   }
+
+   /* Function openMARxSidebarEdit 
+      You don't need to test if it's open, b/c the opening link only opens*/
+   function openMARxSidebarEdit() {
+      openProfileSidebar();
+      var k = mpjq(".medicareEligibilityLookupControl-wrapper__dialog-view");
+      if(k.length == 0) {
+         k = getByDataTestId("medicareEligibilityLookupControl-editButton");
+      }
+      console.log(">> Opened MARx sidebar", k);
+      k.click();
+   }
+
+   /* Function closeMARxSidebar */
+   function closeMARxSidebar() {
+      getByDataTestId("medicareEligibilityModal-closeButton").click();
+   }
+
+   /* Function isMARxSidebarOpen */
+   function isMARxSidebarOpen() {
+      console.log(">> is MARx Open:",mpjq("h2:contains('MBI Lookup')"))
+      // return mpjq(":contains('MBI Lookup /')").length > 0;
+      return getByDataTestId("medicareEligibilityModal-modalContent")
+             .find("h2:contains('MBI Lookup /')").length > 0;
+   }
+
+  /*** SELECTORS AND QUERIES ***/
+
+   /* Function getByDataTestId
+      Most of Marketplace */
+   function getByDataTestId(val) {
+      if(typeof val == "string") {
+         return mpjq("[data-testid='"+val+"']");
+      } else {
+         return null;
+      }
+   }
+
+   
+/*** AUTONAV ***/
+
+   /* Function getElToListenTo
+      Removes the autonav logic when we have arrived, to prevent 
+      issues when reloading */
+   function getElToListenTo() {
+      return qs('[aria-disabled="false"]');
+   }
+
+   /* Function removeAutoNavMutObsv
+      Removes the autonav logic when we have arrived, to prevent 
+      issues when reloading */
+   function removeAutoNavMutObsv() {
+      console.log(">> removed autonav");
+      getElToListenTo().removeEventMutObsv("load", autoNav);
+   }
+
+   /* Function addAutoNavMutObsv
+      Adds the autonav logic when.
+      Calling this fn multiple times isn't an issue, 
+      as it won't cause multiple runs, since the signature 
+      is the same. */
+   function addAutoNavMutObsv() {      
+      var el = getElToListenTo()
+      var obsv = new MutationObserver(() => console.log(">> something happened 2"));
+      obsv.observe(el, {childList:true});
+   }
+
+   /* Function getCurrStepNum
+      Searches for specific elements on the DOM to decide the current step the nave is at. */
+   function getCurrStepNum() {
+      if (getElByID('section.agenda.guidance.button.submit') != null) {
+         return 1;
+      } else if (getByDataTestId("medicare-disclaimer-section-submitButton").length != 0) {
+         return 2;
+      } else if(getByDataTestId("permission-to-call-back-button-yes").length != 0) {
+         return 3;
+      } else if (getByDataTestId("scope-of-appointment-section-submitButton").length != 0) {
+         return 4;
+      } else if (getByDataTestId("id-proof-submit-button").length != 0) {
+         console.log("step 5");
+         return 5;
+      } else if (getElByID('callerReview.guidance.button.submit') != null) {
+         console.log("step 6");
+         return 6;
+      } else if (qs('button > span') != null) {
+         console.log("step 7");
+         return 7;
+      } else if (getByDataTestId("preview-available-plans-button")) {
+         return 15;
+      }
+
+      console.warn("returned 0");
+      return 0;
+   }
+
+   /* Function autoNavSetup
+      Sets up the MutationObserver
+   */
+   function autoNavSetup(){
+      var el = getElToListenTo()
+      var obsv = new MutationObserver(autoNav);
+      obsv.observe(el, {childList:true});    
+   }
+
+   /* Function autoNav
+      Navigates from wherever you are in the "get to MARx" process to the next step in MARX. 
+      Utilizes "Load" even to decide where to go. 
+      Executed in context of main frame AND in context iframe.
+      Uses '$' when in main frame, uses iFrameJqry when in iframe.
+   */
+   function autoNav(){
+      // adding the same listener mult times won't cause it to fire mult times
+      switch(getCurrStepNum()) {
+         default: 
+            console.warn('!! Failed AutoNav');
+            break;
+         // THESE ARE FOR THE "REPEAT CALLER" SECTION, WHEN NO LEAD ID EXIST FOR THE CU
+         // EACH STEP IS ITS OWN PAGE
+         case 1: 
+            console.log("++ AutoNav: Step 1");
+            getElByID('section.agenda.guidance.button.submit').click();
+            break;
+         case 2: 
+            console.log("++ AutoNav: Step 2");
+            getByDataTestId("medicare-disclaimer-section-submitButton").click();
+            break;
+         case 3: 
+            console.log("++ AutoNav: Step 3");
+            //Permission to Call Back
+            getByDataTestId("permission-to-call-back-button-yes").click();
+            break;
+         case 4: 
+            console.log("++ AutoNav: Step 4");
+            getByDataTestId("scope-of-appointment-section-submitButton").click();
+            break;
+         case 5:
+            console.log("++ AutoNav: Step 5");
+            getByDataTestId("id-proof-submit-button").click();
+            break;
+         case 6:
+            console.log("++ AutoNav: Step 6");
+            getElByID('callerReview.guidance.button.submit').click();
+            break;
+         case 7:
+            console.log("++ AutoNav: Step 7");
+            qs('button > span').click();
+            break;
+         case 8:
+            console.log("++ AutoNav: Step 8");
+            removeAutoNavListener();
+            break;
+
+         case 15:
+            console.log("++ AutoNav: Step 1");
+            getByDataTestId("preview-available-plans-button").click();
+            break;
+
+
+         // TODO: Add check checkers. If checked, skip
+         // setTimeout(() => {var c = getElByID('section.agenda.guidance.button.submit'); if(c!=null){c.click();}},5);
+         // setTimeout(() => {var c = getElByID('section.medicareDisclaimer.guidance.button.submit'); if(c!=null){c.click();}},10);
+         // setTimeout(() => {var c = getElByID('section.callbackPermission.guidance.button.yes'); if(c!=null){c.click();}},100);
+         // setTimeout(() => {var c = getElByID('section.soa.guidance.button.submit'); if(c!=null){c.click();}},20);
+         // getElByID('').click();
+
+      }
+   }
+
+
+/*** ENABLE VIEW PROFILE ***/
+
+   /* Function enableViewProfile
+       */
+   function enableViewProfile() {
+      var disabledViewProfileLink = mpjq("span[aria-disabled='true']:contains('View Profile')");
+      if(disabledViewProfileLink.length > 0 ) {
+         disabledViewProfileLink.attr("aria-disabled",false);
+      }
+   }
+
+
+/*** OPEN MARKETPLACE VIEW ***/
+
+   /* Function openMarketplace
+       */
+   function openMarketplace() {
+      window.open(document.querySelector('#marketplaceV2MedicareLink').href);
+   }
+
+
+/*** JUMP TO END ***/
+
+   /* Function getSidFromURL */
+   function getSidFromURL() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get("sid");
+   }
+
+   /* Function jumpToTheEnd
+      Takes in an SID, and nav's to the plan page */
+   function jumpToTheEnd(sid) {
+      window.location.assign("https://www.gomedicarequotes.com/quotes?applicant_id=self&filter_visible=false&origin=guidedsalesselected_product=MEDICARE_ADVANTAGE&selected_sort_keys=planFitRank&sid="+sid+"&user_filter_interaction=false");
+   }
+
+   /* Function addJumpToEndEl
+      Adds in the link element that gets you to the plan page */
+   function addJumpToEndEl() {
+      var universalNavEl = getByDataTestId("universal-navigation-consumer-info"),
+          viewProfileEl = universalNavEl.next(),
+          jumpEl = document.createElement("span"),
+          cssEl, cssContent;
+
+      // if we're already at the end, or if it already exists, don't put it up.
+      if(getCurrStepNum() != 7 && mpjq("#jump_el").length == 0) {
+         jumpEl.classList.add(...viewProfileEl.attr("class").split(" "));
+         jumpEl.innerHTML = "Jump to Plans";
+         jumpEl.id = "jump_el";
+         jumpEl.addEventListener("click",() => jumpToTheEnd(getSidFromURL()));
+         mpjq(jumpEl).insertAfter(viewProfileEl);
+      }
+
+      console.log("yo yo");
+   }
+
+   /* Function removeJumpToEndEl
+      Adds in the link element that gets you to the plan page */
+   function removeJumpToEndEl() {
+
+   }
+
+
+/*** REFRESH MARX DATA ***/
+
+   /* Function triggerMARxRefresh */
+   function triggerMARxRefresh(evt) {
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 70) { // Ctrl + Shift + F for reFresh
+         if(mp.mydebug.isDB()) {
             console.warn(">> debug on");
-        }
+         }
+         refreshMARxData();
+      }
+   }
 
-        // commented out for now. Not sure why I needed this before
-        // it prevents things, now
-        // if(document.ranSetup) {
-        //  return;
-        // }
+   /* Function refreshMARxData
+      Gets the Cu's info in the format, like in the MARx file */
+   function refreshMARxData(data=null) {
+      var lookupContainer, dateRefreshed, dateRefreshedEl, timeSinceRefreshed,
+          threeDays = 3 * 24 * 60 * 60 * 1000,
+          closeSidebarAtEnd = !isMARxSidebarOpen(),
+          cuDataEl = getByDataTestId("personalInfo-subsection");
+      
+      openMARxSidebar();
 
-        const doc = getIframeDoc();
-        doc.addEventListener("keyup", selectCuInfo);
-        doc.addEventListener("keyup", pasteCuInfo);
-        doc.addEventListener("keyup", selectSearchBox);
-        doc.addEventListener("keyup", pageCopy);
-        doc.addEventListener("keyup", enrollInfoCopy);
-        console.log(">> set up shortcuts "+getCurrentTimestamp());
-    }
+      // Last Refreshed check. Don't refresh on the same day
+      dateRefreshedEl = mpjq("span:contains('Last MBI Lookup')");
+      dateRefreshed = new Date(dateRefreshedEl.children().html());
+      if(new Date() - dateRefreshed < threeDays && data == null) {
+         console.log(">> Skipping refresh. Refreshed on",dateRefreshed.toString().slice(0,15));
+         if(closeSidebarAtEnd) {
+            closeMARxSidebar();
+            closeProfileSidebar();
+         }
+         return;
+      } else {
+         console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));         
+      }
 
-    /*  Function removeKeyboardShortcuts
-        Remove the listeners for the keyboard shortcuts */
-    function removeKeyboardShortcuts() {
-        const doc = getIframeDoc();
-        doc.removeEventListener("keyup", selectCuInfo);
-        doc.removeEventListener("keyup", pasteCuInfo);
-        doc.removeEventListener("keyup", selectSearchBox);
-        doc.removeEventListener("keyup", pageCopy);
-        doc.removeEventListener("keyup", enrollInfoCopy);
-        console.log(">> set up shortcuts "+getCurrentTimestamp());
-    }
+      getByDataTestId("mbiResultsModal-refreshMbi").click();
+      getByDataTestId("medicareEligibilityLookupControl-editButton").click();
+      mpjq("label:contains('Yes')").click();
 
-    /*  Function setUpLoadListeners
-        Sets up all the load listeners, so that when site loads new cu, logic is re-added */
-    function setUpLoadListeners() {
-        if(isDB()) {
+      if(data != null) {
+         fillMbiLookup(data);
+      }
+
+      getByDataTestId("eligibilityLookupForm-submitButton").click();
+
+      lookupContainer = getByDataTestId("medicareBeneficiaryIdentifier-lookup-callout");
+
+      addMutationObs(lookupContainer.get(0),(a,b) => {
+         var viewMbiDataBtn = getByDataTestId("medicareEligibilityLookupModal-lookupResult-success-button");
+
+         if(viewMbiDataBtn.length != 0) {
+            viewMbiDataBtn.click()
+
+            if(closeSidebarAtEnd) {
+               closeMARxSidebar();
+               closeProfileSidebar();
+            }
+
+            console.warn(">> Refreshed MARx data!");
+         }
+      },{childList:true, subtree: true});
+
+   }
+
+
+/*** COPY MARX VIEW ***/
+
+   /* Function triggerCopyMARxView */
+   function triggerCopyMARxView(evt) {
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 66) { // Ctrl + Shift + B for MBI
+         if(mp.mydebug.isDB()) {
             console.warn(">> debug on");
-        }
-        var iframe = getIframe();
-        iframe.addEventListener("load", addToggleBtn);
-        iframe.addEventListener("load", setUpKeyboardShortcuts);
-        iframe.addEventListener("load", setUpPgCopy);
-        iframe.addEventListener("load", setUpEnrollInfoCopy);
-        iframe.addEventListener("load", setUpSessionRefresher);
-        iframe.addEventListener("load", showTableIfHasContent);
+         }
+         var closeSidebarAtEnd = !isMARxSidebarOpen();
+         openMARxSidebar();
+         copyMARxData().then(() => {
+            console.log(">> is sidebar: ",isMARxSidebarOpen());
+            if(closeSidebarAtEnd) {
+               closeMARxSidebar();
+               closeProfileSidebar();
+            }
+         });
+      }
+   }
 
-        // iframe.addEventListener("load", addMXtoIframe);
+   /* Function copyMARxData
+      Gets the Cu's info in the format, like in the MARx file */
+   function copyMARxData() {
+      if(!isMARxSidebarOpen()) {
+         console.warn(">> MARx sidebar not open to copy");
+         // copyStringToClipboard("Sidebar not open");
+         // return copyStringToClipboard("Sidebar not open");
+      }
 
-        /*** Libraries ***/
-        iframe.addEventListener("load", addHtml2Canvas);
-    }
+      var cuDataEl = getByDataTestId("personalInfo-subsection");
 
-    /*  Function removeLoadListeners
-        Removes all the load listeners */
-    function removeLoadListeners() {
-        if(isDB()) {
-            console.warn(">> debug on");
-        }
-        var iframe = getIframe();
-        iframe.removeEventListener("load", addToggleBtn);
-        iframe.removeEventListener("load", setUpKeyboardShortcuts);
-        iframe.removeEventListener("load", setUpPgCopy);
-        iframe.removeEventListener("load", setUpEnrollInfoCopy);
-        iframe.removeEventListener("load", setUpSessionRefresher);
-        iframe.removeEventListener("load", showTableIfHasContent);
+      copyElToClipboard(cuDataEl[0]);
+      return getClipboard().then((cuData) => {
+         var cuAddress, cuAddressEl, cuAddressParts, marxLikeString,
+             header = cuData.split("\n")[0],
+             cuDataObj = getObjFromCopiedText(cuData.replaceAll(/:\r?\n/g,":"),true);
 
-        // iframe.removeEventListener("load", addMXtoIframe);
+            cuAddressEl = mpjq("div span:contains('Verified')")
+                           .parent()
+                           .siblings()[0];
+            if(cuAddressEl == undefined) {
+               console.log("nope");
+               cuAddressEl = mpjq("div:contains('Verified')")
+                              .last()
+                              .siblings()[0]
+            }
+            cuAddressParts = cuAddressEl.innerHTML.split(/<br>|\r?\n/);
+            console.log(cuAddressParts);
+            if(cuAddressParts.length == 3) {
+               cuAddress = cuAddressParts[0] + " " + cuAddressParts[1] + "\n" +
+                           cuAddressParts[2];
+            } else {
+               cuAddress = cuAddressParts[0] + "\n" +
+                           cuAddressParts[1];
+            }
 
-        /*** Libraries ***/
-        iframe.removeEventListener("load", addHtml2Canvas);
-    }
+             marxLikeString = 
+               header + "\n" +
+               "MBI Number:\t" + cuDataObj.mbi + "\n" +
+               "Name:\t" + cuDataObj.Name + "\n" +
+               "Birth Date:\t" + (cuDataObj["Date of Birth"] || cuDataObj.dob) + "\n" +
+               "Date of Death: -" + "\n" +
+               "Sex:\t" + cuDataObj.Gender + "\n" +
+               "Address:\t" + cuAddress + "\n" +
+               "Most recent State:\t" + cuDataObj.State + "\n" +
+               "Most recent County:\t" + cuDataObj.County + "\n" +
+               "Medicaid:\t" + copyMedicaidInfoFromSideBar(); 
+                     // canwork? where would show need Mcd...?>> TODO: Put a "isDNSP()" here to blank this out if not applicable
 
-    /*  Function unloadMx
-        Removes the keyboard listeners from the page */
-    function unloadMx() {
-        removeKeyboardShortcuts();
-        removeLoadListeners();
+         copyStringToClipboard(marxLikeString.replaceAll(/  +/g,""));
+      });
+   }
 
-        console.log("removed shortcuts");
-        document.ranSetup = false;
-    }
+   //// SUB: GET MCD INFO////
+
+   /* Function openMedicareInfoSideBar
+      Takes the info copied from ZD and pastes it into the correct fields */
+   function openMedicareInfoSideBar() {
+      openProfileSidebar();
+      getByDataTestId("profile-pane-link-medicareInfo").click();
+   }
+
+   /* Function copyMedicaidInfoFromSideBar
+      Takes the info copied from ZD and pastes it into the correct fields */
+   function copyMedicaidInfoFromSideBar() {
+      var mcdId, mcdLvl;
+      openMedicareInfoSideBar();
+
+      mcdId = getByDataTestId("medicareInfoPane.medicaidId").html().replace("<b>Medicaid ID:</b> ","");
+      mcdLvl = getByDataTestId("medicareInfoPane.medicaidLevel").html().replace("<b>Medicaid Level:</b> ","");
+
+      return (mcdId || "-") + " / " + mcdLvl;
+   }
+
+
+/*** PASTE SEARCH INFO ***/
+
+   /* Function pasteInSearchInfo
+      Takes the info copied from ZD and pastes it into the correct fields */
+   function pasteInSearchInfo(evt) {
+      // CTRL + SHIFT + V // V b/c it's paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         console.log(">> ran pasteInSearchInfo");
+         navigator.clipboard
+            .readText()
+            .then((clipText) => {
+               var cuInfoObj = getObjFromCopiedText(clipText), 
+                   fillSuccessful;
+
+               // refreshMARxData(cuInfoObj);
+               fillMbiLookup(cuInfoObj);
+
+               // clearForm();
+               // fillSuccessful = fillMbiLookup(cuInfoObj);
+               // if(fillSuccessful) submitLookupIfComplete();
+            });
+      }
+
+   }
+
+
+   /* Function fillMbiLookup
+      Adds the info from data object provided to every field */
+   function fillMbiLookup(data=null) {
+      var mbiField, dobField;
+
+      // EligibilityLookupFormDateOfBirthField
+      // MedicareEligibilityLookupControllerApiFp / lookupMedicareEligibility / queryKey: ["medicareEligibilityLookup", r, n],
+      // MedicareEligibilityLookupQuery
+      // (\([^):{]+,)\n( +) >> for the regext to make it more readable
+         // also do ? : on separate lines
+         // for(...,\n ...) is really annoying
+         // }\n, is annoying
+
+
+      /* imported from refreshMARxData */
+      var lookupContainer, dateRefreshed, dateRefreshedEl, timeSinceRefreshed,
+          threeDays = 3 * 24 * 60 * 60 * 1000,
+          closeSidebarAtEnd = !isMARxSidebarOpen(),
+          cuDataEl = getByDataTestId("personalInfo-subsection");
+      
+      openMARxSidebar();
+
+      // Last Refreshed check. Don't refresh on the same day
+      dateRefreshedEl = mpjq("span:contains('Last MBI Lookup')");
+      dateRefreshed = new Date(dateRefreshedEl.children().html());
+      // if(new Date() - dateRefreshed < threeDays) {
+      //    console.log(">> Skipping refresh. Refreshed on",dateRefreshed.toString().slice(0,15));
+      //    if(closeSidebarAtEnd) {
+      //       closeMARxSidebar();
+      //       closeProfileSidebar();
+      //    }
+      //    return;
+      // } else {
+      //    console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));         
+      // }
+
+      getByDataTestId("mbiResultsModal-refreshMbi").click();
+      getByDataTestId("medicareEligibilityLookupControl-editButton").click();
+      mpjq("label:contains('Yes')").click();
+
+      /* end */
+
+
+
+      if(typeof data != "object") {
+         console.warn("Could not fill fields. Data is not an object");
+         return false;
+      }
+
+      if(data.dob != "" && data.dob != undefined) {
+         setDOBField(data.dob);         
+      }
+      
+      if(data.mbi != "" && data.mbi != undefined) {
+         setMBIField(data.mbi);
+      }
+      
+      return lookupFormIsComplete();
+   }
+
+
+   /* Function getDOBField */
+   function getDOBField(val="") {
+      return getByDataTestId("consumerDateOfBirth-input");
+   }
+
+   /* Function setDOBField */
+   function setDOBField(val="") {
+      var moddedVal, field = getDOBField();
+
+      if(!/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(val)){
+         moddedVal = val.replaceAll(/[\.\-]/g,"/")
+                        .replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+      } else {
+         moddedVal = val;
+      }
+
+      field.val(moddedVal);
+      field[0].dispatchEvent(new Event('input'));
+
+      return field.val() == moddedVal;
+   }
+
+   /* Function getMBIField */
+   function getMBIField(val="") {
+      return getByDataTestId("consumerMedicareBeneficiaryIdentifierNumber-input");
+   }
+
+   /* Function setMBIField */
+   function setMBIField(val="") {
+      var field = getMBIField();
+          moddedVal = "";
+
+      if(val != "") {
+         moddedVal = val.toUpperCase().replaceAll(/\-| /g,"");
+      }
+
+      field.val(moddedVal);
+      field[0].dispatchEvent(new Event('input'));
+
+      return field.val() == moddedVal;
+   }
+
+
+   /*** SUBMIT IF COMPLETE ***/
+
+   /* Function lookupFormIsComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function lookupFormIsComplete() {
+      var isValid = false,
+          dob = getDOBField().val(),
+          mbi = getMBIField().val();
+
+      isValid = dob != "" && mbi != "";
+
+      console.log("Auto submit " + (isValid ? "succeeded" : "failed"), "dob", dob != "", "mbi", mbi != "");
+
+      return isValid;
+   }
+
+   /* Function submitLookupIfComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function submitLookupIfComplete() {
+      console.log(">> 1 attempted submit");
+      if(lookupFormIsComplete()) {
+         // todo: fix this. Something's weird
+         console.log(">> 2 attempted debounced initiateSearch", debouncedInitiateSearch, "<< fn");
+         debouncedInitiateSearch();
+      }
+   }
+
+   /* Function initiateSearch
+      Triggers the search */
+   debouncedInitiateSearch = debounce(()=> {
+      console.log(">> 3 ran initiateSearch");
+      var submitButton = getSubmitBtn();
+      if(submitButton != null) {    
+         submitButton.click();
+      }
+   },3000,{leading:true});
+
+
+/*** CANVAS COPY CONTAINER ****/
 
     /*  Function addHtml2Canvas
         Sets up all the load listeners, so that when site loads new cu, logic is re-added */
     function addHtml2Canvas() {
-        const doc = getIframeDoc();
-        // doc = document;
-        const jsEl = doc.createElement("script");
-        // jsEl.src="https://github.com/niklasvh/html2canvas/releases/download/v1.4.1/html2canvas.min.js";
+        const jsEl = document.createElement("script");
         jsEl.src="https://html2canvas.hertzen.com/dist/html2canvas.js"
         jsEl.crossorigin="anonymous";
 
-        doc.childNodes[1].appendChild(jsEl);
+        document.childNodes[1].appendChild(jsEl);
     }
 
-
-   /*** CANVAS COPY CONTAINER ****/
+    /* Function getEnrollInfoCopyBtn
+        Gets the button we need to click in order to trigger the copy logic */
+    function getEnrollInfoCopyBtn() {
+        return mpjq('#enrollInfoCopyButton');
+    }
 
     /* Function makeCanvasContainer 
         Puts the canvasContainer into the DOM. Returns a ref to it. */
     function makeCanvasContainer() {
-        const doc = getIframeDoc();
-        const div = doc.createElement('div');
+        const div = document.createElement('div');
         div.id="canvasContainer";
         div.style="visibility:hidden; display:none;";
 
         //inner btn div
-        const btnDiv = doc.createElement('div');
+        const btnDiv = document.createElement('div');
 
-        doc.childNodes[1].appendChild(div).appendChild(btnDiv);
+        const enrollInfoCopyBtn = document.createElement('button');
+        enrollInfoCopyBtn.type='button';
+        enrollInfoCopyBtn.id='enrollInfoCopyButton';
+        enrollInfoCopyBtn.onclick = enrollInfoCopy;
+
+        // piece them together
+        btnDiv.appendChild(enrollInfoCopyBtn)
+        document.childNodes[1].appendChild(div).appendChild(btnDiv);
+
         return div;
     }
 
@@ -458,911 +1037,153 @@
         Can execute inside iframe context, or main window context */
     function getCanvasContainer() {
         // handle working in two different contexts
-        var jquery;
-        try {
-            jquery = getIframeJqry;
-        } catch {
-            jquery = $;
-        }
-
-        var canvasContainer = jquery('#canvasContainer')[0];
-        if(canvasContainer == undefined) {
+        var canvasContainer = mpjq('#canvasContainer');
+        if(canvasContainer.length == 0) {
             canvasContainer = makeCanvasContainer();
         }
         return canvasContainer;
     }
 
-    /* Function addBtnToCanvasContainer
-        Adds a button that can be clicked to the canvas
-        the first div holds the buttons */
-    function addBtnToCanvasContainer(btn) {
-        getCanvasContainer().children[0].appendChild(btn);
-    }
-
-        /* IMBEDDED TO IFRAME */
-
-    /* Function copyCanvasToClipboard
-        This executes in the context of the iframe, where 
-        document is the iframe doc. Important, b/c styling issues
-        
-        Copies canvas to clipboard */
+    /* Function copyCanvasToClipboard */
     function copyCanvasToClipboard(canvas) {
-        canvas.toBlob(function (blob) {
-            const item = new ClipboardItem({ "image/png": blob });
-            navigator.clipboard.write([item]); 
-        })
+      canvas.toBlob(function (blob) {
+         const item = new ClipboardItem({ "image/png": blob });
+         navigator.clipboard.write([item]); 
+      });
     }
 
-    /* Function saveNewCanvas (iframe embedded)
-        This executes in the context of the iframe, where 
-        document is the iframe doc. Important, b/c styling issues
-        
+    /* Function saveNewCanvas
         Removes old canvas, saves the new canvas to the DOM */
     function saveNewCanvas(canvas) {
-        var canvasContainer = getCanvasContainer();
-        //delete old canvas, if it exists
-        if(canvasContainer.children.length > 1) {
-            canvasContainer.removeChild(canvasContainer.children[1]);
-        }
+         var canvasContainer = getCanvasContainer();
+         //delete old canvas, if it exists
+         if(canvasContainer.children().length > 1) {
+            canvasContainer.children("canvas").remove();
+         }
 
-        //save new canvas into hidden el
-        canvasContainer.appendChild(canvas);
+         //save new canvas into hidden el
+         canvasContainer.append(canvas);
 
-        return canvas;
-    }
-
-    
-   /*** FIELD & IFRAME GETTERS/SETTERS ***/
-
-    /*  Function getIframe
-        Gets the iframe that contains the MARx cu lookup
-        Executed on main doc, outside o/iframe */
-    function getIframe() {
-        if(this.iframe == undefined) {
-            this.iframe = document.getElementById("obj_marxaws_wab_application");
-            console.log("doc", document,this.iframe, this.iframe != null && this.iframe.contentDocument);
-            var l = document.getElementsByClassName("cms-vertical-object ng-star-inserted");
-            console.log("doc", document,l, l != null && l.contentDocument);
-        }
-        return this.iframe;
-    }
-
-    /*  Function getIframeDoc
-        Gets the document belonging to the cu lookup iframe */
-    function getIframeDoc() {
-        var iframe = getIframe();
-        return iframe == undefined ? undefined : iframe.contentDocument;   
-    }
-
-    /*  Function getSubmitBtn */
-    function getSubmitBtn() {
-        return getIframeJqry()('[name=submitBtn]');
-    }
-
-    // FIELDS //
-
-    /*  Function getMBI */
-    function getMBI() {
-        return getIframeDoc().getElementById('claimNumber');
-    }
-
-    /*  Function setMBI */
-    function setMBI(newVal) {
-        var el = getMBI();
-
-        newVal = newVal.replaceAll(/( |-)/g,"/");
-
-        el.value = newVal;
-        return el.value == newVal;
-    }
-
-    /*  Function getFirstName */
-    function getFirstName() {
-        return getIframeDoc().getElementById('fName');
-    }
-
-    /*  Function setFirstName */
-    function setFirstName(newVal) {
-        var el = getFirstName();
-
-        el.value = newVal;
-        return el.value == newVal;
-    }
-
-    /*  Function getLastName */
-    function getLastName() {
-        return getIframeDoc().getElementById('lName');
-    }
-
-    /*  Function setLastName */
-    function setLastName(newVal) {
-        var el = getLastName();
-        el.value = newVal;
-        return el.value == newVal;
-    }
-
-    /*  Function getDOB */
-    function getDOB() {
-        return getIframeDoc().getElementById('dob');
-    }
-
-    /*  Function setDOB */
-    function setDOB(newVal) {
-        var el = getDOB();
-
-        newVal = newVal.replaceAll(/( |-)/g,"/");
-        // if()
-
-        el.value = newVal;
-        return el.value == newVal;
-    }
-
-    /*  Function getSSN */
-    function getSSN() {
-        return getIframeDoc().getElementById('ssn');
-    }
-
-    /*  Function setSSN */
-    function setSSN(newVal) {
-        var el = getSSN();
-
-        newVal = newVal.replaceAll(/[^\d]/gi,"");
-        el.value = newVal;
-        return el.value == newVal;
-    }
-
-    // TODO: These two are incomplete. Not sure how I'm going to do these
-    /*  Function getPartialMBI */
-    function getPartialMBI() {
-        // TODO: Add a "getvalue" to the returned el. 
-        return getIframeDoc().getElementById('prtMbiDiv');
-    }
-
-    /*  Function setPartialMBI */
-    function setPartialMBI() {
-        return getIframeDoc().getElementById('claimNumber');
+         return canvas;
     }
 
 
-/*** SET UP TOGGLE BUTTON ***/
-
-    /*  Function getToggleBtn */
-    function getToggleBtn() {
-        return getIframeDoc().getElementById('toggleBtn');
-    }
-
-    /*  Function setUpToggleBtn
-        Creates and adds to the DOM the toggle button and its logic. 
-        We can use "document" here b/c it's running inside the iframe */
-    function setUpToggleBtn() {
-        // Get the parent el, where we'll put the button.
-        document
-            .querySelectorAll('.eligTable4 tr:nth-child(2)')[0]
-            .classList.toggle('disp-none');
-
-        // Make the button 
-        const toggleFSHideBtn = document.createElement('button');
-        toggleFSHideBtn.innerHTML = '>';
-        toggleFSHideBtn.type='button';
-        toggleFSHideBtn.id='toggleBtn';
-        toggleFSHideBtn.onclick=function() {
-            // Toggle (hide/show) display:none, get resulting state, store in wasHidden
-            var wasHidden = document.querySelectorAll('.eligTable4 tr:nth-child(2)')[0].classList.toggle('disp-none');
-            if (wasHidden) {
-                this.innerHTML = '>';
-            } else {
-                this.innerHTML = 'v';
-            }
-        };
-
-        // Append button
-        document.querySelectorAll('.eligTable4 tr:first-child td:first-child')[0].appendChild(toggleFSHideBtn);
-    }
-
-    /*  Function addToggleBtn
-        Creates and adds the css/script elements needed to format/execute the button logic */
-    function addToggleBtn(evt) {
-        if(isDB()) {
-            console.warn(">> debug on");
-        }
-        var iframeDoc = getIframeDoc();
-
-        // Early escape if button already exists
-        if(getToggleBtn() != null) {
-            return;
-        }
-
-        // Make style content 
-        var cssContent = `
-            .eligTable4 .disp-none { 
-                display:none;
-            }`;
-
-        // Make the button creation auto-executing upon add
-        var jsContent = "("+setUpToggleBtn.toString()+")();";
-
-        addJsScript(jsContent, iframeDoc);
-        addCssEl(cssContent, iframeDoc)
-    }
-
-   /*** SHOW TABLE IF HAS CONTENT ***/
-
-    /*  Function isCuInfoTableHidden
-        Returns true if the search table has info used to search in it */
-    function isCuInfoTableHidden() {
-        return getIframeJqry()('.eligTable4 tr:nth-child(2)')[0].classList.contains('disp-none');
-    }
-
-    /*  Function searchTableHasContent
-        Returns true if the search table has info used to search in it */
-    function searchTableHasContent() {
-        var firstName = getFirstName().value,
-            lastName = getLastName().value,
-            dob = getDOB().value,
-            ssn = getSSN().value;
-
-        return firstName != ""
-            || lastName != ""
-            || dob != "" 
-            || ssn != "";
-    }
-
-    /*  Function showTableIfHasContent
-        Clicks the "hide/show" button if the table has content in it */
-    function showTableIfHasContent() {
-        var toggleBtn = getToggleBtn();
-
-        if(searchTableHasContent() && toggleBtn != null) {
-            toggleBtn.click();
-        }
-    }
-
-
-/*** AUTONAV ***/
-
-    /* Function removeAutoNavListener
-        Removes the autonav logic when we have arrived, to prevent issues when reloading */
-    function removeAutoNavListener() {
-        console.log(">> removed autonav");
-        getIframe().removeEventListener("load", autoNav);
-    }
-
-    /* Function addAutoNavListener
-        Removes the autonav logic when we have arrived, to prevent issues when reloading.
-        Calling this fn multiple times isn't an issue, 
-        as it won't cause multiple runs, since the signature 
-        is the same. */
-    function addAutoNavListener() {
-        var iframe = getIframe();
-        if(iframe != undefined) {
-            iframe.addEventListener("load", autoNav);
-        } else {
-            console.error("Could not add AutoNav listener. Iframe not defined");
-        }
-    }
-
-    // TODO: move this to getters
-    /*  Function getIframeJqry
-        Searches for specific elements on the DOM to decide the current step the nave is at. */
-    function getIframeJqry() {
-        var iframeDoc = getIframeDoc(),
-             el;
-        this.iFrameJqry = undefined;
-
-        if (iframeDoc != undefined) {
-            el = iframeDoc.querySelector('#pgTtle') != null ? iframeDoc.querySelector('#pgTtle') : iframeDoc.querySelector('.pageTitle');
-            this.iFrameJqry = el.ownerDocument.defaultView.$;
-        }
-
-        return this.iFrameJqry;
-    }
-
-    /* Function getCurrStepNum
-        Searches for specific elements on the DOM to decide the current step the nave is at. */
-    function getCurrStepNum() {
-        var iFrameJqry = getIframeJqry();
-        const doc = getIframeDoc();
-
-        if ($("#cms-marxaws-tile") != null && $("#cms-marxaws-tile").length != 0) { // no iframe on this step
-            return 1;
-        } else if (doc != undefined && doc.querySelector('.pageTitle').children[0].innerHTML == 'User Security Role Selection (M002)') {
-            return 2;
-        } else if(iFrameJqry != undefined) {
-            if (iFrameJqry('.pageTitle').children()[0].innerHTML == 'Welcome (M101)') {
-                return 3;
-            } else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiaries: Find (M201)') {
-                return 4;
-            } else if (iFrameJqry('#pgTtle').children()[0].innerHTML == 'Beneficiary: Eligibility (M232)') {
-                return 5;
-            }
-        }
-
-        console.warn("returned 0");
-        return 0;
-    }
-
-    /* Function autoNav
-        Navigates from wherever you are in the "get to MARx" process to the next step in MARX. 
-        Utilizes "Load" even to decide where to go. 
-        Executed in context of main frame AND in context iframe.
-        Uses '$' when in main frame, uses iFrameJqry when in iframe.
-    */
-    function autoNav(){
-        var iFrameJqry = getIframeJqry(); // so I can use "contains"
-        var iframeDoc = getIframeDoc();
-
-        /*
-         step 1 does something weird. The full page doesn't re-render, 
-         just the bottom part, replacing it with an iframe. So I need a 
-         different listener, or need to put one on a different element.
-         the remaining steps should be fine 
-        */
-
-        // adding the same listener mult times won't cause it to fire mult times
-        switch(getCurrStepNum()) {
-            default: 
-                console.warn('Failed AutoNav');
-                break;
-            case 1: 
-                $('#cms-marxaws-tile').click();
-                $('.cms-myapps-link')[0].click()
-                break;
-            case 2: 
-                addAutoNavListener();
-
-                //for some reason, can't get iframe's jquery here
-                iframeDoc.querySelector('#userRole').click();
-                break;
-            case 3: 
-                addAutoNavListener();
-
-                iFrameJqry('a:contains("Beneficiaries")')[0].click();
-                break;
-            case 4: 
-                addAutoNavListener();
-
-                iFrameJqry('a:contains("Eligibility")')[0].click();
-                break;
-            case 5: //we have arrived, run the usual stuff, stop auto-nav
-                removeAutoNavListener();
-
-                if(!document.ranSetup) {
-                    setup();
-                }
-                break;
-        }
-    }
-
-
-/*** AUTO REFRESHER ***/
-
-    const refreshCount = {
-        refreshCount: 0,
-        getValue: function() {
-            if (this.refreshCount == undefined) this.refreshCount = 0;
-            return this.refreshCount;
-        },
-        increment: function(){
-            console.log("incremented refreshCount @ "+getCurrentTimestamp());
-            return this.refreshCount++;
-        }
-    }
-
-    /*  Function getContinueSessionBtn
-        Gets the button on the modal that continues the session. 
-        Runs on main page, so can use document */
-    function getContinueSessionBtn() {
-        if(this.continueBtn == undefined) {
-            this.continueBtn = document.getElementById("cms-myprofile-session-xtend")[0];
-        }
-        return this.continueBtn;    
-    }
-
-    /*  Function setUpSessionRefresher
-        Auto-refreshes the interation w/MARx by re-submitting search*/
-    function setUpSessionRefresher(){
-        // $('#cms-myprofile-session-xtend');
-        // let it pass after 4 hours, use counter, check ever 1:45
-
-        // Does this need to be in iframe or main page?
-    
-        var iframeDoc = getIframeDoc();     // TODO: Change this to MX.refresherActive | need to get window?
-
-        if(iframeDoc.refresherActive) {
-            console.log(">> sessionRefresher running, cutoff ("+refreshCount.getValue()+")");
-            return;
-        }
-
-        console.log(">> started sessionRefresher ("+refreshCount.getValue()+") @ "+getCurrentTimestamp());
-
-        // message to let me know it's going
-        setInterval(function() {
-            console.log(">> Refresher active ("+refreshCount.getValue()+")");
-        }, 10*60*1000);
-
-        setInterval(function() {
-            // click on "Find", so it reloads the iframe
-            var continueBtn = getContinueSessionBtn();
-
-        // this didn't quite work... it didn't click. Also, the pop-up is on the main window
-        // two approaches -- 
-                // 1) catch it when visible (harder) 
-                // 2) click on the existing button (exists/works even when not visible?)
-
-            // temp1.checkVisibility()? to see if the el's visible. If so, the run thing. Otherwise no?
-            // Make a listener for visibilty?
-            // can totally click it, even if it's not visible
-
-            if(continueBtn) {
-                continueBtn.click();
-                refreshCount.increment();
-                console.log("<<< clicked submit button ("+refreshCount.getValue()+"/"+getCurrentTimestamp()+") >>>");
-            } else {
-                console.warn("couldn't find continueBtn");
-            }
-        }, 1.95*60*1000);
-        iframeDoc.refresherActive = true;
-    }
-
-
-/*** SEARCH BOX SELECT ***/
-
-    /*  Function selectSearchBox
-        Event listener to focus the MARx search box */
-    function selectSearchBox(evt) {
-        // CTRL + SHIFT + S // s for search
-        if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
-            if(isDB()) {
-                console.warn(">> debug on");
-            }
-
-            var mbiEl = getMBI();
-            mbiEl.focus({focusVisible:true});
-            mbiEl.select();
-        }
-    }
-
-
-/*** CU INFO SELECT ***/
-
-    // TODO: move this to getters
-    /*  Function getCuInfoTable 
-        Gets the info HTML table that contains the cu's info */
-    function getCuInfoTable() {
-        return getIframeDoc().getElementsByClassName('paraTitle alignR')[0].parentElement.parentElement;
-
-    }
-
-    /*  Function selectCuInfo
-        Selects the top part of the MARx page */
-    function selectCuInfo(evt) {
-        // CTRL + SHIFT + X // x b/c it's like copy
-        if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-            if(isDB()) {
-                console.warn("debug on");
-            }
-
-            copyElToClipboard(getCuInfoTable(), getIframeDoc());
-        }
-    }
-
-
-/*** ENROLLMENT/TOP INFO COPY ***/
-    /* This section is more than a bit convoluted. Because the
-        the functions usually run in the context of the *main* 
-        document, the CSS inside the iframe won't apply (proably
-        due to XSS stuff). So we create a button inside the 
-        iframe so the fns run from inside the iframe, to 
-        preserve the context.
-    */
-
-    /* Function getEnrollInfoCopyBtn
-        Gets the button we need to click in order to trigger the copy logic */
-    function getEnrollInfoCopyBtn() {
-        return getIframeJqry()('#enrollInfoCopyButton')[0];
-    }
-
-    /* Function enrollInfoCopy_iFrame (iframe embedded)
-        This executes in the context of the iframe, where 
-        document is the iframe doc. Important, b/c styling issues.
-
-        Gets the el to copy, calls html2canvas, saves it to the
-        clipboard */
-    function enrollInfoCopy_iFrame() {
-        var marxTBody = $('.eligTable5 > tbody')[0];
-        if(marxTBody == undefined) {
-            console.warn('Could not find MARx main tbody');
-            return;
-        }
-
-        var first =  marxTBody.children[1];
-        var second = marxTBody.children[2];
-        var third =  marxTBody.children[3];
-        var fourth =  marxTBody.children[4];
-
-        var config = {
-            ignoreElements: function(el){
-                if(el.contains(marxTBody.children[2]) 
-                    || fourth.contains(el)
-                    || third.contains(el)
-                    || second.contains(el)
-                    || first.contains(el)
-                    || el.nodeName == 'HEAD'
-                    || el.nodeName == 'LINK'
-                    || el.nodeName == 'STYLE') {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        }
-
-        html2canvas(marxTBody,config)
-            .then(saveNewCanvas)
-            .then(copyCanvasToClipboard)
-            .catch(function() {
-                console.warn("Failed to copy MARx enrollment info");
-            });
-    }
+   /*** ENROLLMENT INFO EL COPY ****/
 
     /* Function enrollInfoCopy
-        Refers the event to the function inside of the iframe */
-    function enrollInfoCopy(evt) {
-        // CTRL + SHIFT + 'E' // 'E' b/c "enroll"
-        if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
-            if(isDB()) {
-                console.warn("debug on");
-            }
+        Gets the el to copy, calls html2canvas, saves it to the
+        clipboard */
+    function enrollInfoCopy() {
+      console.log("yo");
+      var enrollmentInfoEl, closeSidebarAtEnd = true,
+          closeSidebar = () => { if(closeSidebarAtEnd) { closeMARxSidebar(); closeProfileSidebar(); } };
+      if(isMARxSidebarOpen()) {
+         closeMARxSidebar = false
+      }
+      openMARxSidebar();
+      enrollmentInfoEl = getByDataTestId("enrollmentInfo-subsection");
+      if(enrollmentInfoEl.length == 0) {
+         console.warn('Could not find Enrollment Info');
+         return;
+      }
+
+      var config = {
+         // ignoreElements: function(el){
+         //     if(el.contains(enrollmentInfoEl.children[2]) 
+         //         || fourth.contains(el)
+         //         || third.contains(el)
+         //         || second.contains(el)
+         //         || first.contains(el)
+         //         || el.nodeName == 'HEAD'
+         //         || el.nodeName == 'LINK'
+         //         || el.nodeName == 'STYLE') {
+         //         return false;
+         //     } else {
+         //         return true;
+         //     }
+         // }
+      }
+
+      html2canvas(enrollmentInfoEl[0],config)
+         .then(saveNewCanvas)
+         .then(copyCanvasToClipboard)
+         .then(closeSidebar)
+         .catch(function() {
+            if(closeSidebarAtEnd){ closeMARxSidebar(); closeProfileSidebar(); }
+             console.warn("Failed to copy enrollment info");
+         });
+   }
+
+   /* Function triggerEnrollInfoCopy
+      Refers the event to the function inside of the iframe */
+   function triggerEnrollInfoCopy(evt) {
+      // CTRL + SHIFT + 'E' // 'E' b/c "enroll"
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
+         if(mp.mydebug.isDB()) {
+            console.warn("debug on");
+         }
 
             getEnrollInfoCopyBtn().click();
         }
 
-    }
-
-    /* Function enrollInfoCopyBtnSetup (embeded in iframe)
-        Adds the onclick to the copy button. Needs to do this 
-        later, as it needs to refer to a fn native to the iframe */
-    function enrollInfoCopyBtnSetup() {
-        $('#enrollInfoCopyButton')[0].onclick = enrollInfoCopy_iFrame;
-        // TODO: Try out just adding this fn, w/o embedding it
-    }
-
-    /* Function setUpEnrollInfoCopy
-        Adds the canvas container div and copy button to the 
-        iframe. Injects the scripts into the iframe as native
-        functions */
-    function setUpEnrollInfoCopy() {
-        const doc = getIframeDoc();
-
-        // make button to click on, add it to canvasContainer
-        const enrollInfoCopyBtn = doc.createElement('button');
-        enrollInfoCopyBtn.type='button';
-        enrollInfoCopyBtn.id='enrollInfoCopyButton';
-        addBtnToCanvasContainer(enrollInfoCopyBtn);
-
-        // Add the "take a picture" functionality directly into the iframe's context
-        // This has to happen this way, as the button must refer to a 
-        // fn already in the iframe, for formatting
-        var scriptText = 
-            "enrollInfoCopy_iFrame = "+enrollInfoCopy_iFrame.toString()+";\n"+
-            "("+enrollInfoCopyBtnSetup.toString()+")();";
-        addJsScript(scriptText,doc);
-    }
-
-    /* Leave for future debugging. Simple way to check what's being rendered
-    html2canvas(temp1).then(function (canvas) {
-    document.body.appendChild(canvas);
-    });
-    */
-
-
-/*** PAGE COPY ***/
-    /* This section is more than a bit convoluted. Because the
-        the functions usually run in the context of the *main* 
-        document, the CSS inside the iframe won't apply (proably
-        due to XSS stuff). So we create a button inside the 
-        iframe so the fns run from inside the iframe, to 
-        preserve the context.
-    */
-
-    /* Function getPageCopyButton
-        Gets the button we need to click in order to trigger the copy logic */
-    function getPageCopyButton() {
-        return getIframeJqry()('#pageCopyButton')[0];
-    }
-
-    /* Function pageCopy_iFrame
-        This executes in the context of the iframe, where 
-        document is the iframe doc. Important, b/c styling issues.
-
-        Gets the el to copy, calls html2canvas, saves it to the
-        clipboard */
-    function pageCopy_iFrame() {
-        var marxTBody = $('.eligTable5 > tbody')[0];
-        if(marxTBody == undefined) {
-            console.warn('Could not find the MARx main tbody');
-            return;
-        }
-        html2canvas(marxTBody)
-            .then(saveNewCanvas)
-            .then(copyCanvasToClipboard)
-            .catch(function() {
-                console.warn("Failed to copy MARx main tbody");
-            });
-    }
-
-    /* Function pageCopy
-        Refers the event to the function inside of the iframe */
-    function pageCopy(evt) {
-        // CTRL + SHIFT + '/' // '/' b/c it's near enter
-        if (evt.ctrlKey && evt.shiftKey && evt.which == 220) {
-            if(isDB()) {
-                console.warn("debug on");
-            }
-
-            getPageCopyButton().click();
-        }
-
-    }
-
-    /* Function pageCopyBtnOnClickSetUp
-        Adds the onclick to the copy button. Needs to do this 
-        later, as it needs to refer to a fn native to the iframe */
-    function pageCopyBtnOnClickSetUp() {
-        $('#pageCopyButton')[0].onclick = pageCopy_iFrame;
-    }
-
-    /* Function setUpPgCopy
-        Adds the canvas container div and copy button to the 
-        iframe. Injects the scripts into the iframe as native
-        functions */
-    function setUpPgCopy() {
-        const doc = getIframeDoc();
-
-        // make button to click on
-        const pageCopyButton = doc.createElement('button');
-        pageCopyButton.type='button';
-        pageCopyButton.id='pageCopyButton';
-        addBtnToCanvasContainer(pageCopyButton);
-
-        // Add the "take a picture" functionality directly into the iframe's context
-                // TODO: Move these two fn's into their own place.
-        var scriptText = 
-            "pageCopy_iFrame = "+pageCopy_iFrame.toString()+";\n"+
-            "saveNewCanvas = "+saveNewCanvas.toString()+";\n"+
-            "copyCanvasToClipboard = "+copyCanvasToClipboard.toString()+";\n"+
-            "getCanvasContainer = "+getCanvasContainer.toString()+";\n"+
-            "("+pageCopyBtnOnClickSetUp.toString()+")();";
-        addJsScript(scriptText,doc);
-    }
-
-    /* Leave for future debugging. Simple way to check what's being rendered
-    html2canvas(temp1).then(function (canvas) {
-    document.body.appendChild(canvas);
-    });
-    */
-
-
-/*** PASTE SEARCH INFO***/
-
-    /*  Function fillFields 
-        Sets the info via MBI/Cu Info Table, then searches, if valid */
-    function fillFields(cuInfoObj) {
-        if(cuInfoObj.mbi != "") {
-            setMBI(cuInfoObj.mbi);
-            setFirstName("");
-            setLastName("");
-            setDOB("");
-            setSSN("");
-        } else {
-            if(isCuInfoTableHidden() == true ) {
-                getToggleBtn().click();
-            }
-            setMBI(""); // needed to not cause issues w/search
-            setFirstName(cuInfoObj.firstName);
-            setLastName(cuInfoObj.lastName);
-            setDOB(cuInfoObj.dob);
-            setSSN(cuInfoObj.ssn);
-        }
-    }
-
-
-   /* Function submitIfComplete
-      Checks if all required fields have been filled, and if so, it submits the search */
-   function submitIfComplete() {
-      console.log(">> attempted submit")
-      if(isSearchFormValid()) {
-         debouncedInitiateSearch();
-      }
    }
-
-
-    /*  Function isSearchFormValid 
-        Sets the info via MBI/Cu Info Table, then searches, if valid */
-    function isSearchFormValid() {
-        var firstName = getFirstName().value,
-            lastName = getLastName().value,
-            dob = getDOB().value,
-            ssn = getSSN().value,
-            mbi = getMBI().value,
-            mbiSearchValid, cuInfoSearchValid;
-
-        cuInfoSearchValid = firstName != ""
-            && lastName != ""
-            && dob != "" && /\d\d\/\d\d\/\d\d\d\d/.test(dob)
-            && ssn != "" && /\d{9}/.test(ssn)
-            && mbi == "";
-
-        mbiSearchValid = firstName == ""
-            && lastName == ""
-            && dob == ""
-            && ssn == ""
-            && mbi != "";
-
-        return cuInfoSearchValid || mbiSearchValid;
-    }
-    
-    /*  Function pasteCuInfo
-        Selects the top part of the MARx page */
-    function pasteCuInfo(evt) {
-        // CTRL + SHIFT + V // v b/c it's like paste
-        if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
-            console.log(">> ran pasteInSearchInfo");
-            navigator.clipboard
-                .readText()
-                .then((clipText) => {
-                    var cuInfoObj;
-                    try {
-                        cuInfoObj = JSON.parse(clipText);
-                    } catch(exception) {
-                        console.warn("Failed to parse clipText: ", clipText.slice(0,100));
-                        return;
-                    }
-
-                   fillFields(cuInfoObj);
-                   submitIfComplete();
-                });
-        }
-    }
-
-
-/*** AUTOSUBMIT ***/
-
-   /* Function initiateSearch
-      Triggers the search */
-   debouncedInitiateSearch = debounce(()=> {
-      var submitButton = getSubmitBtn();
-      if(submitButton.length > 0) {    
-         submitButton[0].click();
-      }
-   },3000,{leading:true});
-
-   /* Function initiateSearch
-      Triggers the search */
-   function initiateSearch(evt) {
-      // CTRL + Enter // b/c it's a common submit shortcut
-      if (evt.ctrlKey && evt.which == 13) {
-         debouncedInitiateSearch();
-      }
-   }
-
-
-/*** KEY UP CORRECTORS***/
-
-    /*  Function setUpCorrectors 
-        Hooks up the correctors below to their respective fields. */
-    function setUpCorrectors() {
-        $(getDOB()).on("blur",correctDOB);
-        $(getSSN()).on("blur",correctSSN);
-        $(getMBI()).on("blur",correctMBI);
-    }
-
-    /*  Function correctDOB 
-        Hooked to the onkeyup for DOB field. Removes invalid chars and formats. */
-    function correctDOB(evt) {
-        setDOB(evt.target.value.trim());
-    }
-
-
-    /*  Function correctMBI 
-        Hooked to the onkeyup for DOB field. Removes invalid chars and formats. */
-    function correctMBI(evt) {
-        setMBI(evt.target.value.trim());
-    }
-
-    /*  Function correctSSN 
-        Hooked to the onkeyup for SSN field. Removes invalid chars. */
-    function correctSSN(evt) {
-        setSSN(evt.target.value.trim());
-    }
 
 
 /*************
 * LOGIC
 **************/
-// Set up 
+if(location.href.includes("broker")){ // set up so it's easy to open MP
+   var state = $$('#address_1_state')[0].innerHTML;
+   var statesIServe = `AL|AR|AZ|CA|CO|CT|DE|FL|GA|IA|IL|IN|KS|KY|LA|MD|ME|MI|
+                       MN|MN|MO|MS|MT|NC|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|SC|TN|
+                       TX|UT|VA|WA|WI|WV`;
+   if(statesIServe.search(state) != -1) {
+      $("marketplaceV2MedicareLink").click();
+   } else {
+      $$("#address_1_state")[0].style.color = "red"
+      window.open("https://www.brokeroffice.com/leads/"+location.search.slice(9)+"/marketplaceV2/MEDICARE.do?call_type=OUTBOUND");
+   }
+} else {
 
-    /*  Function restoreConsoleLog
-        MARx for some reason removes the console.log functionality.
-        Not used now, just in case I need this in the future.
-        https://stackoverflow.com/questions/7089443/restoring-console-log */
-    function restoreConsoleLog(doc) {
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        window.console = iframe.contentWindow.console;
-        // with Chrome 60+ don't remove the child node
-        // iframe.parentNode.removeChild(iframe);
-    }
+   if(typeof mp == "undefined") {
+      window.mp = {
+         ranSetup: false
+      };
+      qs = (expr) => document.querySelector(expr);
+      qsAll = (expr) => document.querySelectorAll(expr);
+      getElByID = (expr) => document.getElementById(expr);
+   }
 
+   function main() {
+      if(mp.ranSetup != true) {
+         setUpKeyboardShortcuts();  // TODO: Should I restrict certain things to certain pages?
+         autoNavSetup();
+         addHtml2Canvas();
+         makeCanvasContainer();
+         refreshMARxData();
+         enableViewProfile();
+         addJumpToEndEl();
 
-function setup() {
-    // this stuff is the new format to put it in. When I have time
+         mp.ranSetup = true;
+         mp.unload = unload;
+         mp.alreadyPresent = alreadyPresent;
+         mp.mydebug = mydebug;
+      } else {
+         mp.alreadyPresent();
+      }
 
-    // if(typeof mx == "undefined") {
-    //  window.mx = {
-    //      ranSetup: false
-    //  };
-    // }
+      /*** Add AutoNav Functionality ***/
+      // need to add the listener upon code insert to page, 
+      // so it starts the loop for the navigation.
+      // autoNav();
 
-    // if(mx.ranSetup != true) {
-    //  setUpKeyboardShortcuts();
+      console.log("ran setup");
+   }
 
-    //  mx.ranSetup = true;
-    //  mx.unload = unload;
-    //  mx.alreadyPresent = alreadyPresent;
-    //  evt = { // For debugging/testing
-    //       ctrlKey:true,
-    //       shiftKey:true,
-    //       which:70
-    //  }
-    //  mx.mydebug = mydebug;
+   if(typeof mpjq == "undefined") {
+      setTimeout(main,1500);
+   } else {
+      main();
+   }
 
-    // } else {
-    //  mx.alreadyPresent();
-    // }
-
-
-    var doc = document;
-
-    if(!doc.ranSetup) {
-        //reinstating the log, b/c they killed it
-        if(console.log.toString() != 'function log() { [native code] }') {
-            console.log = getIframe().contentWindow.console.log;
-        }
-
-        doc.mxdebug = false;
-        console.log("ran setup");
-
-        // Environment set up
-        setUpLoadListeners();
-        setUpKeyboardShortcuts();
-        setUpCorrectors();
-        addToggleBtn();
-        addHtml2Canvas();
-        setUpPgCopy();
-        setUpEnrollInfoCopy();
-        setUpSessionRefresher();
-        // changeMaxLengthOnInputs(); // TODO
-
-        doc.ranSetup = true;
-        doc.unloadMX = unloadMx;
-        doc.alreadyPresent = alreadyPresent;
-    } else {
-        doc.alreadyPresent();
-    }
-}
-
-/*** Add AutoNav Functionality ***/
-// need to add the listener, so it starts the loop for the navigation until we arrive
-// this is only important if you enter when there is an iframe
-var iframe = getIframe();
-if(iframe != undefined) {
-    iframe.addEventListener("load", autoNav);
-}
-
-autoNav();
-document.addEventListener('load',k)
-var k = function() {
-    console.log(">> loaded");
 }
