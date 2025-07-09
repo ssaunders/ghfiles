@@ -1,0 +1,854 @@
+//~~~~ HUMANA CUSTOMIZATION ~~~~//
+
+// TODO: 
+
+	// 1  working on
+		// TODO: Add logic to get $ in multiple ways, and to show which one is needed to use
+      // TODO: Create CSS that will highlight important parts of the HM MC lookup
+
+	// 2 priority
+
+	// 3 backlog
+		// TODO: Change the placeholders in the file for the HM, HUMANA, 
+		// TODO: Figure out what kind of jquery/$ it uses
+		// TODO: Make sure it inserts into page correctly
+		// TODO: Test AutoNav
+		// TODO: Add the getters for buttons
+		// TODO: Add the auto-formatters for fields (when lose focus, setField)
+		// TODO: Add the getters/setters for fields
+			// A
+			// B
+			// C
+			// D
+		// TODO: Add Ctrl + Shift + V shortcut
+		// TODO: Write shortcut logic fn
+			// TODO: 
+		// TODO: Detail the other features I want to add here
+		// TODO: 
+		// TODO: 
+		// TODO: 
+
+/** DONE **/
+
+   /**** Post Version Release ****/
+
+
+/* Function function_name
+   NOTES_ON_FN */
+function function_name(argument) {
+	// body...
+}
+
+
+/*************
+* FUNCTIONS
+**************/
+
+/*** LIBRARY ***/
+
+	/* Function alreadyPresent
+		alerts that the code already exists */
+	function alreadyPresent() {
+		console.warn(">> hm Code already present");
+	}
+
+	/* Function DEBUG FUNCTIONS
+		tests for/starts/stops debug */
+	mydebug = {
+		isDebugging: false,
+		isDB: function () {
+			return this.isDebugging;
+		},
+		startDB: function() {
+			this.isDebugging = true;
+		},
+		endDB: function() {
+			this.isDebugging = false;	
+		}
+	};
+
+	/* Function copyStringToClipboard
+		Copies a string to the computer clipboard */
+	function copyStringToClipboard(string) {
+		if(string == null) {
+			console.warn(">> Nothing to copy");
+			return;
+		}
+
+		navigator.clipboard.writeText(string)
+			.then(() => {
+			  console.log('>> Content copied to clipboard');
+			},() => {
+			  console.error('>> Failed to copy');
+			});
+	}
+
+	/* Function copyElToClipboard
+		Copies the content of an el to the computer clipboard */
+	function copyElToClipboard(htmlEl) {
+		if(htmlEl == null) {
+			console.warn(">> Nothing to copy");
+			return;
+		}
+
+	    var range = document.createRange();
+	    var sel = document.getSelection();
+
+	    sel.removeAllRanges();
+	    range.selectNodeContents(htmlEl);
+		sel.addRange(range);
+		document.execCommand("Copy");
+	}
+
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+      
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+	/* Function getCurrentTimestamp
+		Returns a string of the current timestamp */
+	function getCurrentTimestamp() {
+		return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+	}
+
+   /* Function addMutationObs
+      Adds a mutation observer to targetEl. Returns the observer. 
+      The fn passed in will receive these arguments: */
+   function addMutationObs(targetEl, fn, options) {
+      if(typeof fn != "function") {
+         fn = () => console.log("ran mutationObserver for ",targetEl);
+      }
+      if(typeof options != "object") {
+         options = {childList:true, subtree:true};
+      }
+      if(targetEl.val) { // strip out the jQuery object
+         targetEl = targetEl[0];
+      }
+
+      var mutationObs = new MutationObserver(fn);
+      mutationObs.observe(targetEl, options);
+
+      return mutationObs;
+   }
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+	evt = { // For debugging/testing
+		ctrlKey:true,
+		shiftKey:true,
+		which:70
+	}
+
+   /* Function debounce
+      Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log(a,b,c);
+   }
+
+   /* Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+   function standardizeFullDateString(fullDate) {
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry;
+
+      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, not preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+         // If it has a 2-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } 
+
+      // Split it into parts, so that you can 0 pad
+      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+      if(partsAry == null ) {
+         console.warn("~~ full date", fullDate);
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it 
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   function convertColonListToJsonObj(colonList, hasHeader) {
+      var logStuff = false;
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Skip the header
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+        }
+      }
+      return returnObj;
+   }
+
+   /* Function firstCommentPreProcessing
+      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
+      */
+   function firstCommentPreProcessing(copiedText="") {
+      var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
+          dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
+      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
+   }
+
+   /* Function getObjFromCopiedText
+      Also calls standardizeCuInfo, which is specific to cu info, 
+      but I'm including it b/c it's simpler than knowing you have 
+      to always pair the two fn's.
+      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+      */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
+      var data;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+      }
+
+      return standardizeCuInfo(data);
+   }
+
+   /* Function standardizeCuInfo
+      Takes cu input from wherever I have copied it, in whatever format,
+      and standardizes the data names.
+      */
+   function standardizeCuInfo(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, namePartsFirst, namePartsSecond;
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      } 
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+
+      nameParts = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "").match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+     return newCuInfoObj;
+   }
+
+
+/*** UTILITY ***/
+   jq = mtjQuery;
+
+	/* Function setUpKeyboardShortcuts
+	   Sets up the keyboard listeners to the page */
+	function setUpKeyboardShortcuts() {
+      document.addEventListener("keyup", initiateSearch);      // CTRL + Enter // b/c it's a common submit shortcut
+      document.addEventListener("keyup", pasteInSearchInfo);   // CTRL + SHIFT + V // V b/c it's paste
+      // document.addEventListener("keyup", copyMcdId);           // CTRL + SHIFT + X // X b/c it's copy (I know)
+		console.warn(">> set up shortcuts");
+	}
+
+   /* Function removeKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function removeKeyboardShortcuts() {
+      document.removeEventListener("keyup", initiateSearch);
+      document.removeEventListener("keyup", pasteInSearchInfo);
+      // document.removeEventListener("keyup", copyMcdId);
+      console.log(">> removed shortcuts");
+   }
+	/* Function unload
+	   Removes the keyboard listeners from the page */
+	function unload() {
+		// unloadManagedMutators();
+		removeKeyboardShortcuts();
+
+		hm.ranSetup = false;
+	}
+
+   /* Function setNativeValue
+      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
+      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
+   function setNativeValue(element, value) {
+      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+      const prototype = Object.getPrototypeOf(element);
+      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+      if (valueSetter && valueSetter !== prototypeValueSetter) {
+         prototypeValueSetter.call(element, value);
+      } else {
+         valueSetter.call(element, value);
+      }
+   }
+
+
+/*** GETTERS & SETTERS ***/
+   /* Function setInputField
+      Gets the First Name field */
+   function setInputField(input, val) {
+      var evtConfig = {
+         bubbles: true,
+         cancelBubble: false,
+         cancelable: false,
+         composed: true,
+         currentTarget: null,
+         data: val,
+         dataTransfer: null,
+         defaultPrevented: false,
+         inputType: "insertText",
+         srcElement: input,
+         target: input,
+         type: "input"
+      }
+
+      if(input.get != undefined) {
+         input = input.get(0);
+      }
+
+      setNativeValue(input, val);
+
+      input.dispatchEvent(new Event('input',evtConfig));
+   }
+
+   /* Function setDDField
+      Gets the First Name field */
+   function setDDField(input, val) {
+      var ddContainer = $(".abyss-select-input-portal-container");
+   }
+
+   // FIRST NAME //
+   /* Function getFirstNameField
+      Gets the First Name field */
+   function getFirstNameField() {
+      return jq("input[placeholder='First Name']");
+   }
+
+   /* Function setFirstNameField
+      Sets the First Name field */
+   function setFirstNameField(val) {
+      var field = getFirstNameField();
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // LAST NAME //
+   /* Function getLastNameField
+      Gets the Last Name field */
+   function getLastNameField() {
+      return jq("input[placeholder='Last Name']");
+   }
+
+   /* Function setLastNameField
+      Sets the Last Name field */
+   function setLastNameField(val) {
+      var field = getLastNameField();
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // DOB //
+   /* Function getDOBField
+      Gets the First Name field */
+   function getDOBField() {
+      return jq("#dateOfBirth");
+   }
+
+   /* Function setDOBField
+      Sets the First Name field */
+   function setDOBField(val) {
+      var moddedVal, field = getDOBField();
+
+      if(!/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(val)){
+         moddedVal = val.replaceAll(/[\.\-]/g,"/")
+                        .replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+      } else {
+         moddedVal = val;
+      }
+
+      setInputField(field,val);
+
+      return field.val() == moddedVal;
+   }
+
+   // MBI //
+   /* Function getMBIField
+      Gets the First Name field */
+   function getMBIField() {
+      return jq("#medicareId");
+   }
+
+   /* Function setMBIField
+      Sets the First Name field */
+   function setMBIField(val="") {
+      var field = getMBIField(),
+          modifiedVal;
+
+      if(val != "") {
+         modifiedVal = val.toUpperCase().replaceAll(/\-| /g,"");
+      }
+
+      setInputField(field,val);
+
+      return field.val() == modifiedVal;
+   }
+
+   // GENDER //
+   /* Function getGenderField
+      Gets the First Name field */
+   function getGenderField() {
+      var el = jq("[name='gender']");
+      el.val = function(){
+         return this[0].innerHTML;
+      }
+
+      return el;
+   }
+
+   /* Function setGenderField
+      Sets the First Name field */
+   function setGenderField(val) {   // TODO: How to figure out how to get this set to ""
+      if(typeof val != "string") {
+         return;
+      }
+
+      var cbLabelEls = getGenderField().parent();
+
+      if(val.toUpperCase() == "M" || val.toUpperCase() == "MALE"){
+         cbLabelEls[0].click();
+      } else if(val.toUpperCase() == "F" || val.toUpperCase() == "FEMALE"){
+         cbLabelEls[1].click();
+      }
+   }
+
+   // MEDICAID ID //
+   /* Function getMedicaidIDField
+      Gets the medicaid id field */
+   function getMedicaidIDField() {
+      return jq("#medicaidId");
+   }
+
+   /* Function setMedicaidIDField
+      Sets the medicaid id field */
+   function setMedicaidIDField(val, alt, state) {
+      var field = getMedicaidIDField();
+
+      if(val == "" || typeof val == undefined) {
+         if(typeof alt == "string") {
+            newVal = alt.replaceAll(/\-/g,"");
+         } else {
+            // called w/empty string or undefined info
+            newVal = "";
+         }
+      } else {
+         newVal = val;
+
+         if(state != undefined) {
+            if(!stateDB.isValidMcdNum(state, newVal)) {
+               sendMessage("Mcd ID does not match format: \n"+stateDB.getStateInfo(state).mcdIdFormat, 
+                  MESSAGE_TYPE.WARNING, 4000);
+            }
+         }
+      }
+
+      setInputField(field,val);
+
+      return field.val() == newVal;
+   }
+
+   // SSN //
+   /* Function getSSNField
+      Gets the SSN field */
+   function getSSNField() {
+      return jq("#socialSecurityNumber");
+   }
+
+   /* Function setSSNField
+      Sets the SSN field */
+   function setSSNField(val){
+      var field = getSSNField();
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // State //
+   /* Function getStateField
+      Gets the State field */
+   function getStateField() {
+      var el = jq("#states");
+      el.val = function(){
+         return this[0].innerHTML;
+      }
+
+      return el;
+   }
+
+   /* Function setStateField
+      Sets the First Name field */
+   function setStateField(val) {
+      if(typeof val != "string" || !allowedStatesDB.isStateAllowed(val)) {
+         return;
+      }
+
+      if(stateDB.getStateInfo(val).ltcWaiver == "x"){
+         sendMessage("State uses an LTC waiver", MESSAGE_TYPE.WARNING, 60000);
+      }
+
+      selectEl = $('mat-form-field mat-select')[1];
+      selectEl.click();
+      optionEl = $('.cdk-overlay-container span:contains("'+val+'")');
+      optionEl.click();
+
+      return getStateField().val() == val;
+   }
+
+   function checkGetters() {
+      console.log("getStateField", getStateField());
+      console.log("getFirstNameField", getFirstNameField());
+      console.log("getLastNameField", getLastNameField());
+      console.log("getDOBField", getDOBField());
+      console.log("getGenderField", getGenderField());
+      console.log("getSSNField", getSSNField());
+      console.log("getMedicaidIDField", getMedicaidIDField());
+      console.log("getMBIField", getMBIField());
+   }
+
+   function checkSetters() {
+      // console.log("setStateField", setStateField("123"));
+      console.log("setFirstNameField", setFirstNameField("abc"));
+      console.log("setLastNameField", setLastNameField("abc"));
+      console.log("setDOBField", setDOBField("10/01/2024"));
+      console.log("setGenderField", setGenderField("Male"));
+      console.log("setSSNField", setSSNField("123"));
+      console.log("setMedicaidIDField", setMedicaidIDField("123"));
+      console.log("setMBIField", setMBIField("1AC2DE4FG56"));
+   }
+
+
+/*** AUTOSUBMIT ***/
+
+   /* Function getSubmitBtn
+      Returns the submit button */
+   function getSubmitBtn(evt) {
+      return jq("button:contains('Submit')");
+   }
+
+   /* Function initiateSearch
+      Triggers the search */
+   debouncedInitiateSearch = debounce(()=> {
+      console.log(">> 3 ran initiateSearch");
+      var submitButton = getSubmitBtn();
+      if(submitButton != null) {    
+         submitButton.click();
+      }
+   },3000,{leading:true});
+
+   /* Function initiateSearch
+      Triggers the search */
+   function initiateSearch(evt) {
+      // CTRL + Enter // b/c it's a common submit shortcut
+      if (evt.ctrlKey && evt.which == 13) {
+         console.log("ran initiateSearch");
+         debouncedInitiateSearch();
+      }
+   }
+
+
+/*** CLEAR FORM ***/
+
+   /* Function clearForm
+      Empties the search form */
+   // function clearFormShortcut(evt) {
+   //    // CTRL + Enter // b/c it's a common submit shortcut
+   //    if (evt.ctrlKey && evt.which == 13) {
+   //       clearForm();
+   //    }
+   // }
+
+   /* Function clearForm
+      Empties the search form */
+   function clearForm(evt) {
+      setFirstNameField("");
+      setLastNameField("");
+      setDOBField("");
+      setMBIField("");
+      setMedicaidIDField("");
+      setSSNField("");
+   }
+
+
+/*** PASTE SEARCH INFO ***/
+
+   /* Function pasteInSearchInfo
+      Takes the info copied from ZD and pastes it into the correct fields */
+   function pasteInSearchInfo(evt) {
+      // CTRL + SHIFT + V // V b/c it's paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         console.log(">> ran pasteInSearchInfo");
+         navigator.clipboard
+            .readText()
+            .then((clipText) => {
+               var cuInfoObj = getObjFromCopiedText(clipText), 
+                   fillSuccessful;
+
+               clearForm();
+               fillSuccessful = fillFields(cuInfoObj);
+               if(fillSuccessful) submitIfComplete();
+            });
+      }
+
+   }
+
+   /* Function fillFields
+      Adds info from data object provided to every field */
+   function fillFields(data) {
+      if(typeof data != "object") {
+         console.warn("Could not fill fields. Data is not an object");
+         return false;
+      }
+
+      if(data.state != "" && data.state != undefined) {
+         // if(!allowedStatesDB.isStateAllowed(data.state)) {
+         //    sendMessage("State not availble in ThinkAgent", MESSAGE_TYPE.WARNING, 3500);
+         //    return false;
+         // }
+
+         // setStateField(data.state);
+      }
+
+      if(data.firstName != "" && data.firstName != undefined) {
+         setFirstNameField(data.firstName);
+      }
+      
+      if(data.lastName != "" && data.lastName != undefined) {
+         setLastNameField(data.lastName);
+      }
+      
+      if(data.dob != "" && data.dob != undefined) { 
+         setDOBField(data.dob);
+      }
+      
+      if(data.sex != "" && data.sex != undefined) {
+         setGenderField(data.sex);
+      }
+      
+      if(data.mbi != "" && data.mbi != undefined) {
+         setMBIField(data.mbi);
+      }
+      
+      if((data.mcdId != "" || data.ssn != "") && (data.mcdId != undefined || data.ssn != undefined)) {
+         setMedicaidIDField(data.mcdId, data.ssn, data.state);
+      }
+      
+      if(data.ssn != "" && data.ssn != undefined) {
+         setSSNField(data.ssn.replaceAll(/\-/g,""));
+      }
+
+      return true;
+   }
+
+   /*** SUBMIT IF COMPLETE ***/
+
+   /* Function formIsComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function formIsComplete() {
+      var isValid = false,
+          firstName = getFirstNameField().val(),
+          lastName  = getLastNameField().val(),
+          dob = getDOBField().val(),
+          mbi = getMBIField().val(),
+          gender = getGenderField().val(),
+          state = getStateField().val(),
+          mcdId = getMedicaidIDField().val(),
+          ssn = getSSNField().val();
+
+      // these are the states that require Mcd/SSN
+      if("NY|WV|CT".search(state) > -1){
+         if(mcdId == "" && ssn == "") {
+            console.log("Auto submit failed -- SSN/mcdId");
+            return false;
+         }
+      }
+
+      isValid = firstName != "" && lastName != "" && dob != "" && mbi != "" 
+               && (gender != "" && gender   != "Select Gender") 
+               && (state  != "" && state    != "Select State" );
+
+      console.log("Auto submit " + (isValid ? "succeeded" : "failed"), 
+         "firstName", firstName != "", "lastName", lastName != "", "dob", dob != "", "mbi", mbi != "",
+         "gender",   (gender != "" && gender != "Select Gender"),
+         "state",    (state  != "" && state  != "Select State" ));
+
+      return isValid;
+   }
+
+   /* Function submitIfComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function submitIfComplete() {
+      console.log(">> 1 attempted submit");
+      if(formIsComplete()) {
+         // todo: fix this. Something's weird
+         console.log(">> 2 attempted debounced initiateSearch", debouncedInitiateSearch, "<< fn");
+         debouncedInitiateSearch();
+      }
+   }
+
+
+
+/*************
+* LOGIC
+**************/
+
+var firstBtn = jq('#nothing');
+var secondBtn = jq('#nothing');
+if(firstBtn.length != 0) {		
+	//** AUTONAV 1 **//
+   firstBtn.click();
+} else if(secondBtn.length != 0) {			
+	//** AUTONAV 2 **//
+   secondBtn.click();
+   // set timeout and nav to https://app.thinkagent.com/home-tabs/tabs/medicaid-eligibility  ?
+} else {	
+	//** PAGE LOGIC **//
+	if(typeof hm == "undefined") {
+		window.hm = {
+			ranSetup: false
+		};
+      qs = (expr) => document.querySelector(expr);
+      qsAll = (expr) => document.querySelectorAll(expr);
+      getElByID = (expr) => document.getElementById(expr);
+	}
+	if(hm.ranSetup != true) {
+		setUpKeyboardShortcuts();
+
+		hm.ranSetup = true;
+		hm.unload = unload;
+		hm.alreadyPresent = alreadyPresent;
+		hm.mydebug = mydebug;
+
+      console.log(">> Inserted HM logic");
+	} else {
+		hm.alreadyPresent();
+	}
+}
+
