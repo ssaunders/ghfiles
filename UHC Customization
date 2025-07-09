@@ -1,0 +1,992 @@
+//~~~~ UNITED HEALTH CARE CUSTOMIZATION ~~~~//
+
+// TODO: 
+
+   // 1  working on
+      // TODO: Figure out how to set a drop-down field (State)
+      // TODO: Figure out how to set the DOB field
+
+   // 2 priority
+
+   // 3 backlog
+      // TODO: Add in a Ctrl X, to get the screenshot of UHC
+      // TODO: Change the placeholders in the file for the UHC, UNITED HEALTH CARE, 
+      // TODO: Add the auto-formatters for fields (when lose focus, setField)
+      // TODO: Write shortcut logic fn
+         // TODO: Add Ctrl Enter
+      // TODO: 
+      // TODO: 
+      // TODO: 
+
+/** DONE **/
+
+   /**** Post Version Release ****/
+   // TODO: Add Ctrl + Shift + V shortcut
+   // TODO: Add Ctrl Enter
+   // TODO: Add the getters for buttons
+   // TODO: Test AutoNav
+   // TODO: Make sure it inserts into page correctly
+   // TODO: Figure out what kind of jquery/$ it uses
+   // TODO: Add the getters for buttons
+   // TODO: Add the getters/setters for fields
+
+/*************
+* DATABASES
+**************/
+//// GENERAL ////
+
+   /*** ALLOWED STATES DB ***/
+   allowedStatesDB = {
+      _DB: {   //ADD STATES HERE
+         allowedStates: [ "AL", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", 
+                          "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", 
+                          "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", 
+                          "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", 
+                          "WY", "DC" ]
+      },
+      isStateAllowed: function(state) {
+         return this._getDB().includes(state.toUpperCase());
+      }, 
+      _getDB: function() {return this._DB.allowedStates}
+   }
+
+
+/*************
+* FUNCTIONS
+**************/
+
+
+/*** LIBRARY ***/
+
+   /* Function alreadyPresent
+      alerts that the code already exists */
+   window.alreadyPresent = function() {
+      console.warn(">> UHC code already present");
+   }
+
+   /* Function DEBUG FUNCTIONS
+      tests for/starts/stops debug */
+   mydebug = {
+      isDebugging: false,
+      isDB: function () {
+         return this.isDebugging;
+      },
+      startDB: function() {
+         this.isDebugging = true;
+      },
+      endDB: function() {
+         this.isDebugging = false;  
+      }
+   };
+
+   /* Function copyStringToClipboard
+      Copies a string to the computer clipboard */
+   window.copyStringToClipboard = function(string) {
+      if(string == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      navigator.clipboard.writeText(string)
+         .then(() => {
+           console.log('>> Content copied to clipboard');
+         },() => {
+           console.error('>> Failed to copy');
+         });
+   }
+
+   /* Function copyElToClipboard
+      Copies the content of an el to the computer clipboard */
+   window.copyElToClipboard = function(htmlEl) {
+      if(htmlEl == null) {
+         console.warn("Nothing to copy");
+         return;
+      }
+
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
+      }
+
+      var range = document.createRange();
+      var sel = document.getSelection();
+
+      sel.removeAllRanges();
+      range.selectNodeContents(htmlEl);
+      sel.addRange(range);
+      document.execCommand("Copy");
+   }
+
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   window.getClipboard = function(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   window.addCssEl = function(cssText, doc=document) {
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+      
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   window.addJsScript = function(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   window.addJsFromURL = function(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   window.getCurrentTimestamp = function() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+   }
+
+   /* Function addMutationObs
+      Adds a mutation observer to targetEl. Returns the observer. 
+      The fn passed in will receive these arguments: */
+   window.addMutationObs = function(targetEl, fn, options) {
+      if(typeof fn != "function") {
+         fn = () => console.log("ran mutationObserver for ",targetEl);
+      }
+      if(typeof options != "object") {
+         options = {childList:true, subtree:true};
+      }
+      if(targetEl.val) { // strip out the jQuery object
+         targetEl = targetEl[0];
+      }
+
+      var mutationObs = new MutationObserver(fn);
+      mutationObs.observe(targetEl, options);
+
+      return mutationObs;
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. 
+      eventFilter is ....
+      { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
+      "mouse"
+      // Options: animation*, on*, mouse*, pointer*, transition*, click, blur, dblclick, scroll*
+      */
+   function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
+      var eventTypes, regexString, filterToUse;
+         
+         eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
+      // Figure out if it's a string event name, a regex, or an obj
+      if(typeof eventFilter == "string") {
+         filterToUse = eventFilter;
+      } else if(typeof eventFilter == "object") {
+         if(eventFilter.test == undefined) {
+            eventTypes =
+               eventFilter.mouse      ? "|mouse" : "" +
+               eventFilter.click      ? "|click" : "" +
+               eventFilter.pointer    ? "|pointer" : "" +
+               eventFilter.animation  ? "|animation" : "" +
+               eventFilter.transition ? "|transition" : "" +
+               eventFilter.key        ? "|key" : "";
+            regexString = eventFilter.exclude ? "^on(?!.*("+eventTypes.slice(1)+").*$" : "^on.*("+eventTypes.slice(1)+").*$"
+            filterToUse = new RegExp(regexString);
+         } else { // eventFilter is a regex
+            filterToUse = eventFilter
+         }
+      } else {
+         console.warn("Failed to listen to events. Could not recognize filter");
+      }
+
+      for (var key in el) {
+         if (key.search(filterToUse) === 0) {
+            console.log("added to ",key)
+            el.addEventListener(key.slice(2), fn)
+         }
+      }
+
+      return {
+         removeListeners: () => {
+            for (var key in el) {
+               if (key.search(filterToUse) === 0) {
+                  console.log("removed from",key)
+                  el.removeEventListener(key.slice(2), fn)
+               }
+            }
+         }
+      }
+   }
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
+   /* Function debounceFn
+      Debounces a fn */
+   window.debounce = function(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   window.fnLogger = function(a,b,c) {
+      console.log(a,b,c);
+   }
+
+   /* Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+   window.standardizeFullDateString = function(fullDate) {
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry;
+
+      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, not preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+         // If it has a 2-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } 
+
+      // Split it into parts, so that you can 0 pad
+      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+      if(partsAry == null ) {
+         console.warn("~~ full date", fullDate);
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it 
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   window.convertColonListToJsonObj = function (colonList, hasHeader) {
+      var logStuff = false;
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Skip the header
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+        }
+      }
+      return returnObj;
+   }
+   
+   /* Function firstCommentPreProcessing
+      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
+      */
+   window.firstCommentPreProcessing = function(copiedText="") {
+      var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
+          dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
+      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
+   }
+
+   /* Function getObjFromCopiedText
+      Also calls standardizeCuInfo, which is specific to cu info, 
+      but I'm including it b/c it's simpler than knowing you have 
+      to always pair the two fn's.
+      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+      */
+   window.getObjFromCopiedText = function(copiedText="", hasHeaderOrHeaderString=false) {
+      var data;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+      }
+
+      return standardizeCuInfo(data);
+   }
+
+   /* Function standardizeCuInfo
+      Takes cu input from wherever I have copied it, in whatever format,
+      and standardizes the data names.
+      */
+   window.standardizeCuInfo = function(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, namePartsFirst, namePartsSecond;
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      } 
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+
+      nameParts = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "").match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+     return newCuInfoObj;
+   }
+
+   // https://raw.githubusercontent.com/ssaunders/ghfiles/refs/heads/main/AE%20customization.js
+
+
+/*** UTILITY ***/
+
+   /* Function setUpKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   window.setUpKeyboardShortcuts = function() {
+      document.addEventListener("keyup", pasteInSearchInfo);   // CTRL + SHIFT + V // V b/c it's paste
+      document.addEventListener("keyup", initiateSearch);      // CTRL + ENTER       // b/c standard
+
+      console.warn(">> set up shortcuts");
+   }
+
+   /* Function removeKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   window.removeKeyboardShortcuts = function() {
+      document.removeEventListener("keyup", pasteInSearchInfo);
+      console.log(">> removed shortcuts");
+   }
+   
+   /* Function unload
+      Removes the keyboard listeners from the page */
+   window.unload = function() {
+      removeKeyboardShortcuts();
+
+      uhc.ranSetup = false;
+   }
+
+
+/*** CLICKABLE GETTERS & SETTERS ***/
+
+   /* Function getMcdEligibilityTab
+      Gets the el to click to change the view to the medicaid tab */
+   window.getMcdEligibilityTab = function() {
+      var el = $('[label="Medicaid Eligibility"]');
+
+      return el;
+   }
+
+   /* Function getMcdNumRadio */
+   window.getMcdNumRadio = function() {
+      var el = $('[value="medicaidNumber"]');
+
+      return el;
+   }
+
+   /* Function getSSNRadio */
+   window.getSSNRadio = function() {
+      var el = $('[value="ssn"]');
+
+      return el;
+   }
+
+   /* Function getPermissionToVerifyYesRadio */
+   window.getPermissionToVerifyYesRadio = function() {
+      var el = $('[value="yes"]');
+
+      return el;
+   }
+
+   /* Function getClearBtn */
+   window.getClearBtn = function() {
+      var el = $("#clearMedicaidButton");
+
+      return el;
+   }
+
+   /* Function getSubmitButton */
+   window.getSubmitButton = function() {
+      var el = $("#checkMedicaidButton");
+
+      return el;
+   }
+
+
+/*** GETTERS & SETTERS ***/
+   // GENERAL SETTER FN'S //    
+   /* Function setInputField
+      Gets the First Name field */
+   window.setInputField = function(input, val) {
+      var evtConfig = {
+         bubbles: true,
+         cancelBubble: false,
+         cancelable: false,
+         composed: true,
+         currentTarget: null,
+         data: val,
+         dataTransfer: null,
+         defaultPrevented: false,
+         inputType: "insertText",
+         srcElement: input,
+         target: input,
+         type: "input"
+      }
+
+      if(input.val != undefined) {
+         input.val(val);
+         input[0].dispatchEvent(new Event('input',evtConfig));
+      } else {
+         input.value = val;
+         input.dispatchEvent(new Event('input',evtConfig));
+      }
+      input.focus();
+   }
+
+   /* Function setDDField
+      Gets the First Name field */
+   window.setDDField = function(input, val) {
+      var ddContainer = $(".abyss-select-input-portal-container");
+   }
+
+   // ZIP CODE //
+   /* Function getZipField
+      Gets the First Name field */
+   window.getZipField = function() {
+      return $('[name="zip"]');
+   }
+
+   /* Function setZipField
+      Sets the First Name field */
+   window.setZipField = function(val) {
+      var field = getZipField();
+      setInputField(field,val);
+      field[0].dispatchEvent(new Event('input'));
+      return field.val() == val;
+   }
+
+   // FIRST NAME //
+   /* Function getFirstNameField
+      Gets the First Name field */
+   window.getFirstNameField = function() {
+      return $('[name="firstName"]');
+   }
+
+   /* Function setFirstNameField
+      Sets the First Name field */
+   window.setFirstNameField = function(val) {
+      var field = getFirstNameField();
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // LAST NAME //
+   /* Function getLastNameField
+      Gets the First Name field */
+   window.getLastNameField = function() {
+      return $('[name="lastName"]');
+   }
+
+   /* Function setLastNameField
+      Sets the First Name field */
+   window.setLastNameField = function(val) {
+      var field = getLastNameField();
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // DOB //
+   /* Function getDOBField
+      Gets the First Name field */
+   window.getDOBField = function() {
+      return $('[name="dateOfBirth"]');
+   }
+
+   /* Function setDOBField
+      Sets the First Name field */
+   window.setDOBField = function(val) {
+      var moddedVal, field = getDOBField();
+
+      if(!/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(val)){
+         moddedVal = val.replaceAll(/[\.\-]/g,"/")
+                        .replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+      } else {
+         moddedVal = val;
+      }
+
+      field.val(moddedVal);
+      field[0].dispatchEvent(new Event('input'));
+
+      return getDOBField().val() == moddedVal;
+   }
+
+   // MBI //
+   /* Function getMBIField
+      Gets the First Name field */
+   window.getMBIField = function() {
+      return $('[name="medicareNumber"]');
+   }
+
+   /* Function setMBIField
+      Sets the First Name field */
+   window.setMBIField = function(val="") {
+      var field = getMBIField(),
+          modifiedVal;
+
+      if(val != "") {
+         modifiedVal = val.toUpperCase().replaceAll(/\-| /g,"");
+      } else if(useFakeMBI == true) {
+         modifiedVal = "1AC2DE4FG56";
+      }
+
+      setInputField(field,modifiedVal);
+      return field.val() == modifiedVal;
+   }
+
+   // GENDER //
+   /* Function getGenderField
+      Gets the First Name field */
+   window.getGenderField = function() {
+      return el = $('[placeholder="Select a Gender"]'); // ugly to use "Placeholder" find a better one
+   }
+
+   /* Function setGenderField
+      Sets the First Name field */
+   window.setGenderField = function(val) {   // TODO: How to figure out how to get this set to ""
+      var field = getMBIField(),
+         modifiedVal;
+
+      if(typeof val != "string") {
+         return;
+      }
+
+      if(val.toUpperCase() == "M" ) {
+         modifiedVal = "Male";
+      } else if(val.toUpperCase() == "F" ) {
+         modifiedVal = "Female";
+      } else {
+         modifiedVal = val;
+      }
+
+      setDDField(field, modifiedVal);
+      return field.val() == modifiedVal;
+   }
+
+   // MEDICAID ID //
+   /* Function getMedicaidIDField
+      Gets the medicaid id field */
+   window.getMedicaidIDField = function() {
+      return $("[name='medicaidNumber']");
+   }
+
+   /* Function setMedicaidIDField
+      Sets the medicaid id field. It usually comes in as "### / LVL", so it strips it down */
+   window.setMedicaidIDField = function(val, state) {
+      var field = getMedicaidIDField(),
+          newVal = val.split(" / ")[0];
+
+      setInputField(field,newVal);
+      return field.val() == newVal;
+   }
+
+   // SSN //
+   /* Function getSSNField
+      Gets the SSN field */
+   function getSSNField() {
+      return $("[name='ssn']");
+   }
+
+   /* Function setSSNField
+      Sets the SSN field */
+   function setSSNField(val) {
+      var field = getSSNField()
+
+      setInputField(field,val);
+      return field.val() == val;
+   }
+
+   // State //
+   /* Function getStateField
+      Gets the State field */
+   window.getStateField = function() {
+      var el = $("[placeholder='Select a State']");
+
+      return el;
+   }
+
+   /* Function setStateField
+      Sets the First Name field */
+   window.setStateField = function(val) {
+      if(typeof val != "string" || !allowedStatesDB.isStateAllowed(val)) {
+         return;
+      }
+
+      if(stateDB.getStateInfo(val).ltcWaiver == "x"){
+         sendMessage("State uses an LTC waiver", MESSAGE_TYPE.WARNING, 60000);
+      }
+
+      selectEl = $('mat-form-field mat-select')[1];
+      selectEl.click();
+      optionEl = $('.cdk-overlay-container span:contains("'+val+'")');
+      optionEl.click();
+
+      return getStateField().val() == val;
+   }
+
+   // County //
+   /* Function getCountyField
+      Gets the State field */
+   window.getCountyField = function() {
+      var el = $("[placeholder='Select a State']");
+
+      return el;
+   }
+
+   /* Function setCountyField
+      Sets the First Name field */
+   window.setCountyField = function(val) {
+      if(typeof val != "string" || !allowedStatesDB.isStateAllowed(val)) {
+         return;
+      }
+
+      if(stateDB.getStateInfo(val).ltcWaiver == "x"){
+         sendMessage("State uses an LTC waiver", MESSAGE_TYPE.WARNING, 60000);
+      }
+
+      selectEl = $('mat-form-field mat-select')[1];
+      selectEl.click();
+      optionEl = $('.cdk-overlay-container span:contains("'+val+'")');
+      optionEl.click();
+
+      return getStateField().val() == val;
+   }
+
+   window.checkGetters = function() {
+      console.log("getZipField", getZipField());
+      console.log("getFirstNameField", getFirstNameField());
+      console.log("getLastNameField", getLastNameField());
+      console.log("getDOBField", getDOBField());
+      console.log("getMBIField", getMBIField());
+      console.log("getGenderField", getGenderField());
+      console.log("getMedicaidIDField", getMedicaidIDField());
+      console.log("getSSNField", getSSNField());
+      console.log("getStateField", getStateField());
+      console.log("getCountyField", getCountyField());
+   }
+
+   window.checkSetters = function() {
+      console.log("setZipField", setZipField("28262"));
+      console.log("setFirstNameField", setFirstNameField("123"));
+      console.log("setLastNameField", setLastNameField("123"));
+      console.log("setDOBField", setDOBField("123"));
+      console.log("setMBIField", setMBIField("123"));
+      console.log("setGenderField", setGenderField("123"));
+      console.log("setMedicaidIDField", setMedicaidIDField("123"));
+      console.log("setSSNField", setSSNField("123"));
+      console.log("setStateField", setStateField("123"));
+      console.log("setCountyField", setCountyField("123"));
+   }
+
+   //// MISC ////
+
+
+/*** AUTONAV ***/
+
+   /* Function navToMedicaidTab
+      Changes the view to the medicaid tab */
+   window.navToMedicaidTab = function() {
+      getMcdEligibilityTab().click();
+   }
+
+
+/*** PASTE SEARCH INFO ***/
+   
+   /* Function clearForm
+      Clears the Mcd form */
+   function clearForm() {
+      getClearBtn().click();
+   }   
+
+   /* Function pasteInSearchInfo
+      Takes the info copied from ZD and pastes it into the correct fields */
+   function pasteInSearchInfo(evt) {
+      // CTRL + SHIFT + V // V b/c it's paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         console.log(">> ran pasteInSearchInfo");
+         navigator.clipboard
+            .readText()
+            .then((clipText) => {
+               var cuInfoObj = getObjFromCopiedText(clipText), 
+                   fillSuccessful;
+
+               getZipField().attr("maxlength",6); // dumb, but b/c I have to edit the zip in order for it to recalc
+
+               // clearForm();
+               fillSuccessful = fillFields(cuInfoObj);
+               if(fillSuccessful) submitIfComplete();
+            });
+      }
+
+   }
+
+   /* Function fillFields
+      Adds info from data object provided to every field */
+   function fillFields(data) {
+      if(typeof data != "object") {
+         console.warn("Could not fill fields. Data is not an object");
+         return false;
+      }
+
+      // state is set by UHC, so no need for this
+      // if(data.state != "" && data.state != undefined) {
+      //    if(!allowedStatesDB.isStateAllowed(data.state)) {
+      //       sendMessage("State not availble in ThinkAgent", MESSAGE_TYPE.WARNING, 3500);
+      //       return false;
+      //    }
+
+      //    setStateField(data.state);
+      // }
+
+      if(data["Cust Addr"] != "" && data["Cust Addr"] != undefined) {
+         setZipField(data["Cust Addr"].slice(-5));
+      }
+
+      if(data.firstName != "" && data.firstName != undefined) {
+         setFirstNameField(data.firstName);
+      }
+      
+      if(data.lastName != "" && data.lastName != undefined) {
+         setLastNameField(data.lastName);
+      }
+      
+      if(data.dob != "" && data.dob != undefined) { 
+         setDOBField(data.dob);
+      }
+      
+      if(data.sex != "" && data.sex != undefined) {
+         setTimeout(() => setGenderField(data.sex), 1500);
+      }
+      
+      if(data.mbi != "" && data.mbi != undefined) {
+         setMBIField(data.mbi);
+      }
+      
+      if(data.mcdId != "" && data.mcdId != undefined) {
+         getMcdNumRadio().click();
+         setMedicaidIDField(data.mcdId, data.state);
+      } else if(data.ssn != "" && data.ssn != undefined){
+         setSSNField(data.ssn);
+      }
+
+      getPermissionToVerifyYesRadio().click();
+
+      return getSubmitButton().disabled;
+   }
+
+   /*** SUBMIT IF COMPLETE ***/
+
+   /* Function formIsComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function formIsComplete() {
+      var isValid = false,
+          firstName = getFirstNameField().val(),
+          lastName  = getLastNameField().val(),
+          dob = getDOBField().val(),
+          mbi = getMBIField().val(),
+          gender = getGenderField().val(),
+          state = getStateField().val(),
+          mcdId = getMedicaidIDField().val(),
+          ssn = getSSNField().val();
+
+      // these are the states that require Mcd/SSN
+      if("NY|WV|CT".search(state) > -1){
+         if(mcdId == "" && ssn == "") {
+            console.log("Auto submit failed -- SSN/mcdId");
+            return false;
+         }
+      }
+
+      isValid = firstName != "" && lastName != "" && dob != "" && mbi != "" 
+               && (gender != "" && gender   != "Select Gender") 
+               && (state  != "" && state    != "Select State" );
+
+      console.log("Auto submit " + (isValid ? "succeeded" : "failed"), 
+         "firstName", firstName != "", "lastName", lastName != "", "dob", dob != "", "mbi", mbi != "",
+         "gender",   (gender != "" && gender != "Select Gender"),
+         "state",    (state  != "" && state  != "Select State" ));
+
+      return isValid;
+   }
+
+   /* Function submitIfComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function submitIfComplete() {
+      console.log(">> 1 attempted submit");
+      if(formIsComplete()) {
+         // todo: fix this. Something's weird
+         console.log(">> 2 attempted debounced initiateSearch", debouncedInitiateSearch, "<< fn");
+         debouncedInitiateSearch();
+      }
+   }
+
+
+/*** KEYBOARD SHORTCUTS ***/
+
+   /* Function initiateSearch
+      Triggers the search */
+   function initiateSearch(evt) {
+      // CTRL + Enter // b/c it's a common submit shortcut
+      if (evt.ctrlKey && evt.which == 13) {
+         console.log("ran initiateSearch");
+         var submitButton = getSubmitButton();
+         if(submitButton != null) {    
+            submitButton.click();
+         }
+      }
+   }
+
+
+/*** FEATURE NAME ***/
+
+   /* Function exampleFn
+      DESCRIPTION */
+   window.exampleFn = function() {
+      // var firstInfoElList = $('div.uhc-comment:contains("Agent Name:")');
+      // var firstInfoElListLn = firstInfoElList.length;
+      // if (firstInfoElListLn == 0) {
+      //    return null;
+      // } else {
+      //    return firstInfoElList[firstInfoElListLn-1];
+      // }
+   }
+
+   /**** SUB FEATURE ****/
+
+   /* Function subfeatureFn
+      DESCRIPTION */
+   window.subfeatureFn = function() {
+
+   }
+
+
+/*************
+* LOGIC
+**************/
+var firstStepBtn = (typeof $ != "undefined") ? firstStepBtn = $("#signInOptumId") : firstStepBtn = null;
+var secondStepBtn = document.getElementById('btnLogin'); // also third step // ?? can this be a single step. Page doesn't reload...
+
+
+if(firstStepBtn != null && firstStepBtn.length != 0) {
+   firstStepBtn.click();
+} else if(secondStepBtn != null && secondStepBtn.length != 0) {
+   secondStepBtn.click();
+} else if(window.location.href == "https://www.uhcjarvis.com/content/jarvis/en/secure/home.html") {
+   window.location.assign("https://www.uhcjarvis.com/content/jarvis/en/secure/tools/eligibility_lookup.html");
+} else {
+   //** PAGE LOGIC **//
+   if(typeof uhc == "undefined") {
+      window.uhc = {
+         ranSetup: false
+      };
+   }
+   if(uhc.ranSetup != true) {
+      navToMedicaidTab();
+      setUpKeyboardShortcuts();
+
+      uhc.ranSetup = true;
+      uhc.unload = unload;
+      uhc.alreadyPresent = alreadyPresent;
+      uhc.mydebug = mydebug;
+
+      console.log(">> Inserted uhc logic");
+   } else {
+      uhc.alreadyPresent();
+   }
+}
+
