@@ -1,0 +1,3841 @@
+//~~~~ ZD CUSTOMIZATION ~~~~//      
+   /* 
+      assignee:me form:emedon created>=10hours
+   */
+// 
+/* TODO: 
+
+   /**  1  WORKING ON **
+    //~~ GENERAL ~~
+      // TODO: have Ctrl+L / openBoTab open using a phone number
+      // TODO: Have a "label" area for ZD, so I know what window is doing what.
+      // TODO: fix https://gohealth.zendesk.com/agent/tickets/17930894
+      // TODO: Have Phone Numbers remove the - auto
+ 
+    //~~ LEGAL/QA ~~
+ 
+    //~~ PREV ISSUE ~~
+      // TODO: T2F: make fn get 'Conclusion' 
+      // TODO: T2F: Add transfer reference # to T2f copy
+      // TODO: T2F: T2 UID showed up wrong for OneDigital https://gohealth.zendesk.com/agent/tickets/17866936
+      // TODO: T2F: Fix '&' in the copy/paste
+ 
+    //~~ T2 FEEDBACK ~~
+      // TODO: T2F: Fix T2F copy, picking up , and -
+      // TODO: T2F: fillOutT2Form
+         // TODO: 
+         /* DTC Carrier*
+            Transfer Reference Number*
+            Are you submitting feedback for a T2/T3 Agent?
+            vConnect Agent Name*
+            Select Feedback Coaching* >> This one might need a DB
+            TeleCare/T3 Agent Name*
+            If applicable, select Case Management support agent*
+            Date Coaching sent by Case Management* >> today
+            Provide context and detailed notes on coaching feedback >> Get "conclusion" one
+         */
+
+   /**  2  PRIORITY   **
+      // TODO: have all the "get..El" functions return jQuery els, rather than html els << FOR TEP?
+      // TODO: Add "Ct + Sh + R" for "Refresh results" in the search section
+
+      // TODO: Figure out how to make these work:
+      Was it sold by a GH agent?
+         Y
+         |     Was there a Resolve agent?
+         |       Y
+         |       |     (GH) Resolve - Anything that goes through resolve (including the other kinds) > will be in MPL, may have resolve notes
+         |       N 
+         |             Is the selling agent a sales agent?
+         |               Y
+         |               |     Captive Legacy - captive sale, not through resolve
+         |               N
+         |                     MS Legacy - MS sale, not through resolve
+         N
+         Was there a Resolve agent?
+               Y
+               |     vConnect Resolve - A vconn sale using resolve - is in MPL, may have resolve notes, check bottom of TEP/they're not in teams
+               N
+                     GPS Legacy - it's only in TEP, did it through marketplace, (can't pull call or look at MP details)
+   
+      GPS Express - Not active yet (April)
+   
+      Is the agent in Teams?
+         Y
+         |   Is there a record in TEP?
+         |      Y
+         |      |  Does it show a vConn partner at the bottom?
+         |      |     Y
+         |      |     |  vConnect Resolve - A vconn sale using resolve - is in MPL, may have resolve notes
+         |      |     N
+         |      |        (GH) Resolve - Anything that goes through resolve > will be in MPL, may have resolve notes
+         |      N
+         |         Captive Legacy - direct sale from captive, not through resolve
+         N
+         GPS Legacy - it's only in TEP, did it through marketplace
+   
+      GPS Express - Not active yet
+   
+            Is it only in TEP with no notes? Legacy
+            Is it Broker? Captive or Resolve
+               Is there Resolve?
+         
+
+   /**  3  BACKLOG    **
+    //~~ EMDEON ~~
+      // TODO: Add allowed states db, to simplify changing things
+         // TODO: Test Oklahoma takes just fine
+      // TODO: SSN \d{9} picks up 9 digit MCD id's. huh. put in a /(mcd|medicaid )id/\d{9}/ removal? only for certain states?
+      // TODO: Transfer code logic picks up Mcd id (make sensitive to state?), so if I remove it from Mcd delimited....
+         // https://gohealth.zendesk.com/agent/tickets/17813416
+      // TODO: Scroll down isn't working sometimes
+      // TODO: Fix name to allow for hyphenated/O'neal https://gohealth.zendesk.com/agent/tickets/17785617
+      // TODO: Fix the detect state to handle states that don't have a ST abbr at the beginning, w/o relying on addr
+      // TODO: Make the "get first comment" and "process comment" into a library fn
+      // TODO: make shortcut to turn internal note into chat dialog
+      // TODO: Detect when it's like "116828351 - Medicaid number", for TC, too? Lead id
+      // TODO: FL => Floor in address causes cut to think state is FL. Get addr and cut it out?
+      // Incorporate "Member's Name (exact spelling)"
+
+    //~~ CSNP ~~
+
+    //~~ GENERAL ~~
+      // TODO: Make a subject sorter...for just the view page.
+         // (needs to ignore !)
+         // (sort groups of things seperately)
+      // TODO: Rework "copy Lead ID" shortcut C+S+L, since the shortcut is duped
+      // TODO: Make view refresher that sends me a notification if certain views have stuff available.
+
+/** DONE **/
+   // TODO: Added a "BO opening" button on the left side
+   // TODO: Finish adding ZD object
+   // TODO: Get it unset ZD
+   // TODO: Reworked the notification element to copy the first comment, when a "Cu/agent Info" header doesn't exist
+   // TODO: Reworked the notification element to flash when cut/paste is triggered
+   // TODO: Have the "copy" indicator on the left apply for Ctrl X (and Ctrl V?)
+   // TODO: Close out the "interpret" banner on fillRFI run
+   // TODO: Add a slot for the cu's name, just under where the name would be. Have it added...when? listener? shortcut? (at least on ctrl v)
+   // TODO: Fixed cu name parser for UHC CSNP Deeming.
+   // TODO: make shortcut to focus on internal note
+   // TODO: Add getLeadId to grab form field, if top link doesn't have it.
+   // TODO: Make a "CSNP setup" shortcut: set "member", add due date, fill out AOR info
+   // TODO: Add in the Lead id if it's empty on every "fill in" shortcut
+   // TODO: Fix the search box select, which isn't selecting the box. Manually worked ok, but using shortcut didn't?
+   // TODO: T2F: make fn "get ticket created date"
+   // TODO: Get the Lead ID (in subject)
+   // TODO: Fix "Cares Form" issues with getTicketFormFieldTopEl. When searching for "Form", it picks up the "cares form", in "Requester"
+
+  /**** Post Version Release ****/
+   
+   // TODO: LIB: Fix colon list converter to take \r\n, too
+   // Fixed issue with state not being found next to "County"
+   // TODO: isPreventableIssue => Detect when ticket is Prev Issue
+   // TODO: Figure out how to test for colon list. "Lead ID:"?
+   // TODO: Getting first comment causes loop.
+   // Improved name detection on copy
+   // Better delimiter detection
+   // TODO: Added excludeData to getMcdIdFromDelimitedText
+   // TODO: Figure out how to implement the regex search for a cu's Mcd ID
+   // TODO: Solve the "span" problem when there's an email link. it breaks it into multiple spans
+   // Added IA, PA, OK, DE, ME
+   // Improved the ability to get the cu's name
+   // TODO: Figure out what's wrong with the ...eliminateData when getting name
+   // TODO: Add /(_|/) to delimited text
+   // Improved state name detection
+   // Improved DOB detection
+   // TODO: Make a Ctrl+Shift+X shortcut to scroll to the Cu Info
+   // TODO: Make Ctrl + Shift +X just scrapes the page until it gets a diff username if nothing is highlighted
+   // TODO: Figure out how to do "Ref #" better for Ct+Sh+X (A#####)
+   // Fixed bug w/pasting in Transfer Codes / Ref #'s
+   // TODO: Made the indicator square clickable, so that it copies like the shortcut
+   // TODO: Add a checkmark / fade to copied indicator
+   // TODO: Rework name detection to remove stuff and look for a name w/ middle first, then other options
+   // TODO: Make TC work w/ the spaces
+   // TODO: Fix TC not pasting into Lead ID space
+   // Improved name detection
+   // TODO: Fixed issue when full name state is at the end of the string
+   // TODO: Make an indication that the ZD shortcuts have been pasted in (ZD in a color on the sidebar)
+      // TODO: Indicator as green/red, w/a copied/not icon
+   // TODO: Implement McdID for Ct+Sh+X   
+   // TODO: Implement First Name/last name
+   // TODO: Add a "keyup" event at after inputting text into the form, as an attempt to prevent it from suddenly dissappearing
+   // TODO: figure out "in" being picked up as a state. Seperate it?
+   // TODO: CTL+SH+V doesn't keep when submitting
+   // TODO: Make Ctrl + Shift +V drop the info into the ZD forms
+      // TODO: make a fn that gets an el in the Active form <<<<
+      // TODO: if the value in the paste is "", don't put it in
+      // TODO: Make Ctrl + Shift +V scroll the form view down (focus? Scoll to el?)
+   // TODO: Figure out how to do "State" better for Ct+Sh+X
+   // TODO: Make a "copy MBI" shortcut C+S+B
+   // TODO: Make interpretClipboard process w/the label first, then if it didn't work, then w/o
+   // TODO: Make C+S+S not put something down if the -ST is already there
+   // TODO: Make Ctrl+Shift+E also work for Dev RFI'S
+   // TODO: Make a " - XX" addition for state for Subj C+S+T
+   // TODO: Make Ctrl+Shift+S also focus search bar
+   // TODO: TEST to see if HM email copy fn actually filters out correct plans
+   // TODO: Make "focus to subject" shortcut C+S+... ('s'? used already)
+   // TODO: Make Ct+Sh+x get PI header, too
+   // TODO: Make it so that I can copy HM email directly from the ticket
+   // TODO: Make shortcut for DNE (name, email, first)
+   // TODO: Figure out why the debug isn't working
+   // TODO: Figure out why there are multiple div's w/Cu/Agent Info...and how to fix it. (Lead ID: XX?)
+   // TODO: Make shortcut to pull first comment. use "Agent Name:" ?
+   // TODO: get key binding that won't interfere
+   // TODO: Figure out what to do if multiple fit
+   // TODO: Figure out how to get/select/copy the particular element containing the thing
+   // TODO: Make an unload fn
+   // TODO: Make document hold ref's to all these things, so can test/call/replace
+
+/** Random notes:
+ {{ticket.requester.customfields.state}}
+ {{ticket.requester.customfields.carrier}}
+ {{ticket.title}}
+**/
+
+/* ORDER:
+.    EMDEON CHAT
+.    LQA
+.    PREVENTABLE ISSUE
+.    RFI
+.    T2/T3 FEEDBACK */
+
+/*************
+* DATABASES
+**************/
+//// GENERAL ////
+   /*** STATE DB ***/
+   stateDB = {
+      _DB: {
+         stateInfo:{
+            AK: {
+               stateCode:'AK',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            AL: {
+               stateCode:'AL',
+               mcdIdFormat:'13 characters, #\'s only',
+               mcdIdExample:'1234567890123',
+               format: '\\d{13}',
+            },
+            AR: {
+               stateCode:'AR',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            AZ: {
+               stateCode:'AZ',
+               mcdIdFormat:'9 characters, letters and #\'s. Starts with A',
+               mcdIdExample:'A23456789',
+               format: 'A\\d{8}',
+            },
+            CA: {
+               stateCode:'CA',
+               mcdIdFormat:'9 or 14 characters, letters and #\'s. 9th character a letter',
+               mcdIdExample:'12345678A01234 OR 12345678A',
+               format: '\\d{8}[A-Z](\\d{5})?',
+            },
+            CO: {
+               stateCode:'CO',
+               mcdIdFormat:'7 characters, letters and #\'s. 1st character is letter.',
+               mcdIdExample:'A234567',
+               format: '[A-Z]\\d{6}',
+            },
+            CT: {
+               stateCode:'CT',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            DC: {
+               stateCode:'DC',
+               mcdIdFormat:'8 characters, #\'s only',
+               mcdIdExample:'12345678',
+               format: '\\d{8}',
+            },
+            DE: {
+               stateCode:'DE',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            FL: {
+               stateCode:'FL',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            GA: {
+               stateCode:'GA',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            HI: {
+               stateCode:'HI',
+               mcdIdFormat:'10 characters, letters and #\'s. 2nd character is letter.',
+               mcdIdExample:'1A34567890',
+               format: '\\d[A-Z]\\d{7}',
+            },
+            IA: {
+               stateCode:'IA',
+               mcdIdFormat:'8 characters, letters and #\'s. 1st character is letter.',
+               mcdIdExample:'A2345678',
+               format: '[A-Z]\\d{7}',
+            },
+            ID: {
+               stateCode:'ID',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            IL: {
+               stateCode:'IL',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            IN: {
+               stateCode:'IN',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            KY: {
+               stateCode:'KY',
+               mcdIdFormat:'11 characters, #\'s only',
+               mcdIdExample:'12345678901',
+               format: '\\d{10}',
+            },
+            KS: {
+               stateCode:'KS',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{11}',
+            },
+            LA: {
+               stateCode:'LA',
+               mcdIdFormat:'13 characters, #\'s only',
+               mcdIdExample:'1234567890123',
+               format: '\\d{13}',
+            },
+            MA: {
+               stateCode:'MA',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            MD: {
+               stateCode:'MD',
+               mcdIdFormat:'11 characters, #\'s only',
+               mcdIdExample:'12345678901',
+               format: '\\d{11}',
+            },
+            ME: {
+               stateCode:'ME',
+               mcdIdFormat:'None',
+               mcdIdExample:'None',
+               format: '',
+            },
+            MI: {
+               stateCode:'MI',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            MN: {
+               stateCode:'MN',
+               mcdIdFormat:'8 characters, #\'s only',
+               mcdIdExample:'12345678',
+               format: '\\d{8}',
+            },
+            MO: {
+               stateCode:'MO',
+               mcdIdFormat:'8 characters, #\'s only',
+               mcdIdExample:'12345678',
+               format: '\\d{8}',
+            },
+            MS: {
+               stateCode:'MS',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            MT: {
+               stateCode:'MT',
+               mcdIdFormat:'7 characters, #\'s only',
+               mcdIdExample:'1234567',
+               format: '\\d{7}',
+            },
+            NC: {
+               stateCode:'NC',
+               mcdIdFormat:'10 characters, letters and #\'s. Ends with a letter',
+               mcdIdExample:'123456789A',
+               format: '\\d{9}[A-Z]',
+            },
+            ND: {
+               stateCode:'ND',
+               mcdIdFormat:'9 characters, letters and #\'s. Starts with ND',
+               mcdIdExample:'ND3456789',
+               format: 'ND\\d{7}',
+            },
+            NE: {
+               stateCode:'NE',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            NH: {
+               stateCode:'NH',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            NJ: {
+               stateCode:'NJ',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            NM: {
+               stateCode:'NM',
+               mcdIdFormat:'14 characters, #\'s only',
+               mcdIdExample:'12345678901234',
+               format: '\\d{14}',
+            },
+            NV: {
+               stateCode:'NV',
+               mcdIdFormat:'11 characters, #\'s only',
+               mcdIdExample:'12345678901',
+               format: '\\d{11}',
+            },
+            NY: {
+               stateCode:'NY',
+               mcdIdFormat:'8 characters, letters and #\'s. 1st, 2nd & 8th characters are letters.',
+               mcdIdExample:'AB34567C',
+               format: '[A-Z]{2}\\d{5}[A-Z]',
+            },
+            OH: {
+               stateCode:'OH',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            OK: {
+               stateCode:'OK',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            OR: {
+               stateCode:'OR',
+               mcdIdFormat:'8 characters, letters and #\'s. 1st, 2nd, 6th & 8th characters are letters.',
+               mcdIdExample:'AB345C7D',
+               format: '[A-Z]{2}\\d{4}[A-Z]{3}',
+            },
+            PA: {
+               stateCode:'PA',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            RI: {
+               stateCode:'RI',
+               mcdIdFormat:'None',
+               mcdIdExample:'None',
+               format: '',
+            },
+            SC: {
+               stateCode:'SC',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            SD: {
+               stateCode:'SD',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            TN: {
+               stateCode:'TN',
+               mcdIdFormat:'11 characters, letters and #\'s. Starts with TD',
+               mcdIdExample:'TD345678901',
+               format: 'TD\\d{9}',
+            },
+            TX: {
+               stateCode:'TX',
+               mcdIdFormat:'9 characters, #\'s only',
+               mcdIdExample:'123456789',
+               format: '\\d{9}',
+            },
+            UT: {
+               stateCode:'UT',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            VA: {
+               stateCode:'VA',
+               mcdIdFormat:'12 characters, #\'s only',
+               mcdIdExample:'123456789012',
+               format: '\\d{12}',
+            },
+            VT: {
+               stateCode:'VT',
+               mcdIdFormat:'7 characters, #\'s only',
+               mcdIdExample:'1234567',
+               format: '\\d{7}',
+            },
+            WA: {
+               stateCode:'WA',
+               mcdIdFormat:'11 characters, letters and #\'s. Ends with WA',
+               mcdIdExample:'123456789WA',
+               format: '\\d{9}WA',
+            },
+            WI: {
+               stateCode:'WI',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            },
+            WV: {
+               stateCode:'WV',
+               mcdIdFormat:'11 characters, #\'s only',
+               mcdIdExample:'12345678901',
+               format: '\\d{11}',
+            },
+            WY: {
+               stateCode:'WY',
+               mcdIdFormat:'10 characters, #\'s only',
+               mcdIdExample:'1234567890',
+               format: '\\d{10}',
+            }
+         }
+      },
+      isValidMcdNum: function(stateAbbr,mcdNum) {
+         if (stateAbbr.length!=2) {
+            throw "Could not validate state, b/c the abbreviation is off: "+stateAbbr;
+         }
+         var tester,
+             state = this._getDB()[stateAbbr];
+
+         if(state!= undefined) {
+            tester = new RegExp(state.format);
+         } else {
+            throw "Input give is not a state: "+stateAbbr;
+         }
+
+         return tester.test(mcdNum);
+      },
+      getStateInfo: function(stateAbbr) {
+         return this._getDB()[stateAbbr.toUpperCase()];
+      },
+      _getDB: function() {return this._DB.stateInfo}
+   }
+
+   /*** ALLOWED STATES DB ***/
+   // should include any state chat can handle
+   allowedStatesDB = {
+      _DB: {   // ADD STATES HERE
+         abbrs: [ 
+            "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "IL", "IN", 
+            "KS", "KY", "LA", "MD", "ME", "MI", "MO", "MS", "NC", "NJ", "NV", "NY", "OH", 
+            "OK", "PA", "SC", "SD", "TN", "TX", "WA", "WI", "WV"
+         ],
+         names: [
+            "Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+            "Delaware", "Florida", "Georgia", "Iowa", "Illinois", "Indiana", "Kansas", 
+            "Kentucky", "Louisiana", "Maine", "Maryland", "Michigan", "Mississippi", 
+            "Missouri", "Nevada", "New Jersey", "New York", "North Carolina", "Ohio", 
+            "Oklahoma", "Pennsylvania", "South Carolina", "South Dakota", "Tennessee", 
+            "Texas", "Washington", "West Virginia", "Wisconsin"
+          ],
+      },
+      isStateAllowed: function(stateNameOrAbbr) {
+         if(stateNameOrAbbr.length == 2) {
+            return this.getAbbrs().includes(stateNameOrAbbr);
+         } else {
+            return this.getNames().includes(stateNameOrAbbr);
+         }
+      }, 
+      getAbbrs: function() {
+         return this._DB.abbrs;
+      },
+      getNames: function() {
+         return this._DB.names;
+      }
+      
+   }
+
+   /*** STATE NAME TO ABBR DB ***/
+   stateNameToAbbrDB = {
+      _DB: {
+         nameToAbbr: {
+            "Alabama": "AL",
+            "Alaska": "AK",
+            "Arizona": "AZ",
+            "Arkansas": "AR",
+            "California": "CA",
+            "Colorado": "CO",
+            "Connecticut": "CT",
+            "Delaware": "DE",
+            "District of Columbia": "DC",
+            "Florida": "FL",
+            "Georgia": "GA",
+            "Guam": "GU",
+            "Hawaii": "HI",
+            "Idaho": "ID",
+            "Illinois": "IL",
+            "Indiana": "IN",
+            "Iowa": "IA",
+            "Kansas": "KS",
+            "Kentucky": "KY",
+            "Louisiana": "LA",
+            "Maine": "ME",
+            "Maryland": "MD",
+            "Massachusetts": "MA",
+            "Michigan": "MI",
+            "Minnesota": "MN",
+            "Mississippi": "MS",
+            "Missouri": "MO",
+            "Montana": "MT",
+            "Nebraska": "NE",
+            "Nevada": "NV",
+            "New Hampshire": "NH",
+            "New Jersey": "NJ",
+            "New Mexico": "NM",
+            "New York": "NY",
+            "North Carolina": "NC",
+            "North Dakota": "ND",
+            "Ohio": "OH",
+            "Oklahoma": "OK",
+            "Oregon": "OR",
+            "Pennsylvania": "PA",
+            "Rhode Island": "RI",
+            "South Carolina": "SC",
+            "South Dakota": "SD",
+            "Tennessee": "TN",
+            "Texas": "TX",
+            "Utah": "UT",
+            "Vermont": "VT",
+            "Virgin Islands": "VI",
+            "Virginia": "VA",
+            "Washington": "WA",
+            "West Virginia": "WV",
+            "Wisconsin": "WI",
+            "Wyoming": "WY"
+         }
+      },
+      getAbbr: function(stateFullName="") {
+         if(typeof stateFullName != "string") {
+            return "";
+         }
+
+         var stateAbbr = this._getDB()[stateFullName.toProper()];
+
+         // If we were passed an abbreviation
+         if(stateAbbr == undefined && this.isStateAbbr(stateFullName)) {
+            stateAbbr = stateFullName.toUpperCase();
+         }
+
+         return stateAbbr;
+      }, 
+      isStateAbbr: function(abbr) {
+         return typeof abbr == "string" && this._stateAbbrListRegex.test(abbr);
+      },
+      _getDB: function() {return this._DB.nameToAbbr},
+      _stateAbbrListRegex: /^(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)$/i
+   }
+
+/*************
+* FUNCTIONS
+**************/
+
+/*** LIBRARY ***/
+
+   /* Function alreadyPresent
+      alerts that the code already exists */
+   function alreadyPresent() {
+      console.warn(">> ZD Code already present");
+   }
+
+   /* Function DEBUG FUNCTIONS
+      tests for/starts/stops debug */
+   mydebug = {
+      isDebugging: false,
+      isDB: function () {
+         return this.isDebugging;
+      },
+      startDB: function() {
+         this.isDebugging = true;
+      },
+      endDB: function() {
+         this.isDebugging = false;
+      }
+   };
+
+   //// CLIPBOARD ////
+
+   /* Function copyStringToClipboard
+      Copies a string to the computer clipboard */
+   function copyStringToClipboard(string, printResult) {
+      if(string == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      return navigator.clipboard.writeText(string)
+         .then((data) => {
+            console.log('>> Content copied to clipboard');
+            if(printResult) {
+               console.log("Copied: ", data);
+            }
+         },() => {
+           console.error('>> Failed to copy');
+         });
+   }
+
+   /* Function copyElToClipboard
+      Copies the content of an el to the computer clipboard */
+   function copyElToClipboard(htmlEl) {
+      if(htmlEl == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
+      }
+
+      var range = document.createRange();
+      var sel = document.getSelection();
+
+      try {
+         sel.removeAllRanges();
+         range.selectNodeContents(htmlEl);
+         sel.addRange(range);
+         document.execCommand("Copy");
+         flashNotificationEl();
+      } catch (error) {
+         console.warn()
+      }
+   }
+
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+   
+   //// ADD ELS ////
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+      
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+   
+   //// MUTATORS ////
+
+   mutatorArray = [];
+
+   /* Function addManagedMutationObs
+      Adds a mutation observer to targetEl. Returns the observer.
+      The fn passed in will receive these arguments: 
+      mutationList - the list of changes.    
+      observer - The observer instance. 
+      https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+      */
+   function addManagedMutationObs(targetEl, fn, options) {
+      var mutaObs = addMutationObs(targetEl, fn, options);
+      mutaObs.target = targetEl;
+      mutatorArray.push(mutaObs);
+      return mutaObs;
+   }
+
+   /* Function unloadManagedMutators
+      Removes the keyboard listeners from the page and undoes everything in runSetup */
+   function unloadManagedMutators() {
+      mutatorArray.map((muta) => {
+         muta.disconnect();
+      });
+      mutatorArray = [];
+   }
+
+   /* Function addMutationObs
+      Adds a mutation observer to targetEl. Returns the observer.
+      The fn passed in will receive these arguments: 
+      mutationList - the list of changes.    
+      observer - The observer instance. 
+      https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+      */
+   function addMutationObs(targetEl, fn, options={childList:true}) {
+      if(typeof fn != "function") {
+         fn = () => console.log("ran mutationObserver for ",targetEl);
+      }
+      if(typeof options != "object") {
+         options = {childList:true, subtree:true};
+      }
+      if(targetEl.val) { // strip out the jQuery object
+         targetEl = targetEl[0];
+      }
+
+      var mutationObs = new MutationObserver(fn);
+      mutationObs.observe(targetEl, options);
+
+      return mutationObs;
+   }
+
+   //// MISC ////
+
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   function getCurrentTimestamp() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+   }
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
+   /* Function debounce
+      Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait)
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log("logging: "+Math.round(Math.random()*1000),a,b,c);
+   }
+
+   /* Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+   function standardizeFullDateString(fullDate) {
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry;
+
+      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, not preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+         // If it has a 4-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+         // If it has a 2-digit year, preceded by a /
+         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+         // if you want to default to another century, do "+defaultCentury+" on the line above
+      } 
+
+      // Split it into parts, so that you can 0 pad
+      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+      if(partsAry == null ) {
+         console.warn("~~ full date", fullDate);
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it 
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   function convertColonListToJsonObj(colonList, hasHeader) {
+      var logStuff = false;
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Skip the header
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+        returnObj[infoAry[iter]]=infoAry[iter+1];
+        if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+        }
+      }
+      return returnObj;
+   }
+
+   /* Function firstCommentPreProcessing
+      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
+      */
+   function firstCommentPreProcessing(copiedText="") {
+      var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
+          dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
+
+      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
+
+   }
+
+   /* Function getObjFromCopiedText
+      Also calls standardizeCuInfo, which is specific to cu info, 
+      but I'm including it b/c it's simpler than knowing you have 
+      to always pair the two fn's.
+      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+      */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
+      var data;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+
+         // if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){ // First comment
+         //    data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         // } else if(/Cu\/Agent Info/.test(copiedText)) { // Processed Cu/Agent info
+         //    data = convertColonListToJsonObj(copiedText, true);
+         // } else if(/^.*:.*\r?\n/.test(copiedText)) { // If its first line has a colon deliminated key:val pair
+         //    data = convertColonListToJsonObj(copiedText, false);
+         // } else if(typeof hasHeaderOrHeaderString == "string") { // if given a specific header to look for
+         //    data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         // } else {
+         //    data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         // }
+      }
+
+      return standardizeCuInfo(data);
+   }
+
+   /* Function standardizeCuInfo
+      Takes cu input from wherever I have copied it, in whatever format,
+      and standardizes the data names.
+      */
+   function standardizeCuInfo(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, 
+          namePartsFirst, namePartsSecond, typeOfSub, npnPartyIdParts;
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      } 
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+      newCuInfoObj.leadId = cuInfoObj["Lead ID"] || cuInfoObj["Lead Id"] || cuInfoObj["Lead id"] || cuInfoObj["lead id"] || cuInfoObj["lead_id"]
+                         || cuInfoObj["leadId"]  || cuInfoObj["leadid"]  || cuInfoObj["LeadID"]  || cuInfoObj["LeadId"];
+
+      newCuInfoObj.fullName = cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "";
+      nameParts = newCuInfoObj.fullName.match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+      // ** Agent Info ** //
+      typeOfSub = getTypeOfSubmission(cuInfoObj);
+
+      if(typeOfSub == "GPS Legacy") { // just sold by the GPS agent
+         newCuInfoObj.agency = agencyInterpreter(cuInfoObj["Agent GH Info"]);
+         newCuInfoObj["Agent GH Info"] = "X / X / X / X"
+      } else if(typeOfSub == "vConnect Resolve") { // there is a T2 (vConn) and T3 (Resolve)
+         newCuInfoObj.agency = agencyInterpreter(cuInfoObj["T2 Agent"].split(" / ")[1]);
+      }
+
+      if(/\//.test(cuInfoObj["Agent NPN/Party ID"])) {
+         npnPartyIdParts = cuInfoObj["Agent NPN/Party ID"].split(" / ");
+         newCuInfoObj.npn = npnPartyIdParts[0];
+         newCuInfoObj.partyId = npnPartyIdParts[1];
+      } else {
+         newCuInfoObj.npn = cuInfoObj["Agent NPN"];
+      }
+
+     return newCuInfoObj;
+   }
+
+
+/*** UTILITY ***/
+
+  //// SET UP ////
+
+   /* Function setUpKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function setUpKeyboardShortcuts() {
+      document.addEventListener("keyup", triggerCopyTicketInfo);    // CTRL + SHIFT + X  // X b/c convenient
+      document.addEventListener("keyup", selectFirstComment);  // CTRL + SHIFT + F  // F for "first"
+      document.addEventListener("keyup", selectDNEInfo);       // CTRL + SHIFT + E  // E for "engage"
+      document.addEventListener("keyup", selectHumEmailInfo);  // CTRL + SHIFT + H  // H for "Humana"
+      document.addEventListener("keyup", selectUHCEmailInfo);  // CTRL + SHIFT + U  // U for "UHC"
+      document.addEventListener("keyup", selectUHCChatInfo);  // CTRL + SHIFT + ALT + U  // U for "UHC"
+      document.addEventListener("keyup", subjectFocus);        // CTRL + SHIFT + S  // S for subject
+      document.addEventListener("keyup", searchBoxFocus);      // CTRL + SHIFT + S  // S for Search
+      document.addEventListener("keyup", copyMBI);             // CTRL + SHIFT + B  // B b/c MBI
+      document.addEventListener("keyup", pasteTicketInfo);     // CTRL + SHIFT + V  // V b/c that's how it is
+      document.addEventListener("keyup", openBoLead);          // CTRL + SHIFT + L  // L for "Lead id"
+      document.addEventListener("keyup", fixUserNameIssue);    // CTRL + SHIFT + 1  // 1 b/c I wanted to
+
+      document.addEventListener("keyup", setFocusToActiveNoteEl);  // CTRL + ALT + S  // Mimics the ZD shortcut
+      console.warn(">> set up shortcuts");
+   }
+
+   /* Function removeKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function removeKeyboardShortcuts() {
+      document.removeEventListener("keyup", triggerCopyTicketInfo);
+      document.removeEventListener("keyup", selectFirstComment);
+      document.removeEventListener("keyup", selectDNEInfo);
+      document.removeEventListener("keyup", selectHumEmailInfo);
+      document.removeEventListener("keyup", selectUHCEmailInfo);
+      document.removeEventListener("keyup", selectUHCChatInfo);      
+      document.removeEventListener("keyup", subjectFocus);
+      document.removeEventListener("keyup", searchBoxFocus);
+      document.removeEventListener("keyup", copyMBI);
+      document.removeEventListener("keyup", pasteTicketInfo);
+      document.removeEventListener("keyup", openBoLead);
+      document.removeEventListener("keyup", fixUserNameIssue);
+
+      document.removeEventListener("keyup", setFocusToActiveNoteEl);
+      console.log(">> removed shortcuts");
+   }
+
+   /* Function unload
+      Removes the keyboard listeners from the page */
+   function unload() {
+      unloadManagedMutators();
+      removeKeyboardShortcuts();
+      removeNotificationEl();
+      removeBOOpenerEl();
+
+      zd.ranSetup = false;
+   }
+
+  //// TICKET TYPE: GENERAL ////
+
+   /* Function getActiveTabEl
+      To make things faster, ZD keeps tabs that have been loaded on the page,
+      which makes selectors a beast. This fn is intended to simplify things
+      by getting the active tab, so that you know you won't get any weirdness. */
+   /* fr-focus is only added when the focus is *inside* the tab. So it's not actually reliable. 
+      The "style" attr is updated to "visibility: hidden" on the tab's top-level div 
+      when it is not the active tab.
+      There will be two sections in a tab after you access the "user" side of things
+   */ 
+   function getActiveTabEl() {
+      var mainPanes = $("#main_panes"), 
+          activeTabEl = mainPanes.find(">div[style=''],>div:not([style])").filter(":not('.is-cached')");
+
+      activeTabEl.getHeaderEl = () => {
+         return activeTabEl.find("header");
+      }
+      activeTabEl.getTicketEl = () => {
+         return activeTabEl.find("section.main_panes.ticket");
+      }
+      activeTabEl.getUserEl = () => {
+         return activeTabEl.find("section.main_panes.user");
+      }
+      activeTabEl.getByDataTestId = (val) => {
+         return getByDataTestId(val,activeTabEl);
+      }
+
+      return activeTabEl;
+   }
+
+   //// TICKET TYPE: TICKET INFO ////
+
+   //// TICKET TYPE: COMMENT AREA ////
+
+   //// TICKET TYPE: SIDEBAR ////
+
+   /* Function getRequesterEmail
+      To make things faster, ZD keeps tabs that have been loaded on the page,
+      which makes selectors a beast. This fn is intended to simplify things
+      by getting the active tab, so that you know you won't get any weirdness. */
+   function getRequesterEmail() {
+      return getActiveTabEl().getTicketEl().find('[data-customercontext-id="userinfo.card"] [color=blue]').html();
+   }
+
+   /* Function getTicketFormFieldTopEl
+      To make things faster, ZD keeps tabs that have been loaded on the page,
+      which makes selectors a beast. This fn is intended to simplify things
+      by getting the active tab, so that you know you won't get any weirdness. 
+      TEXT LABEL IS CASE SENSITIVE */
+   function getTicketFormFieldTopEl(formTextLabel="") {
+      var returnEl,
+          activeTktEl = getActiveTabEl().getTicketEl(),
+          sideBox = activeTktEl.find('.sidebar_box_container')
+      /* #wrapper
+            #main_panes
+               ..tabs..
+                  .ticket-panes-grid
+                     .ticket-panes-grid-layout.active
+                        forms (1)    // data-garden-id="pane", data-test-id="column-1" << this is the leftmost one
+                           .grid-ticket-fields-panel
+                              .ember-view.pane.left.section.ticket-sidebar
+                                 .ticket_fields.with_omnipanel
+                                    .sidebar_box_container
+                                       // form fields
+                        comments (2) // data-garden-id="pane", data-test-id="column-2"
+                        details (3)  // data-garden-id="pane", data-test-id="column-2"
+      */
+      // Sometimes the active el is not the section
+      if(activeTktEl[0].nodeName != "SECTION") { // TODO: Figure out if we need this anymore
+         activeTktEl = activeTktEl.closest("section.ember-view");
+      }
+
+      returnEl = sideBox.find("[data-garden-container-id='containers.field.label']:contains('"+formTextLabel+"')").parents(".form_field");
+
+
+      if(returnEl.length == 0) {
+         returnEl = sideBox.find("[class*='custom_field']:contains('"+formTextLabel+"')");
+         if(returnEl.length == 0) 
+            console.warn("code edit: [class*='custom_field']:contains('"+formTextLabel+"') found something")
+      }
+
+      if(returnEl.length == 0) {
+         returnEl = sideBox.find(".property_box>div").filter(":contains('"+formTextLabel+"')");
+         if(returnEl.length == 0) 
+            console.warn("code edit: (.property_box>div) .filter(:contains('"+formTextLabel+"') found something");
+      }
+
+      // if(returnEl.length == 0 || formTextLabel == "Form") { //TODO: Make this better. It's a hack. 
+      //    // HACK: Basically, when it's a "Formulary issue", the first pull gets the wrong el.
+      //    returnEl = sideBox.find(".form_field:contains('"+formTextLabel+"')");
+      //    if(returnEl.length == 0) 
+      //       console.warn("code edit: .form_field:contains('"+formTextLabel+"') found something");
+      // }
+
+      if(returnEl.length != 0) {
+         return returnEl;  
+      } else {
+         return null;
+      }
+   }
+
+   /* Function getTicketFormFieldVal
+      Get the Form Element, then get the val from it */
+   function getTicketFormFieldVal(formTextLabel="") {
+      var formDataEl,
+          formEl = getTicketFormFieldTopEl(formTextLabel);
+
+      if(formEl == null) {
+         return undefined;
+      }
+
+      // DD
+      formDataEl = formEl.find("[class*='StyledSelect'] div");
+      if(formDataEl.length != 0) {
+         return formDataEl.html();
+      }
+
+      // Checkbox / Text
+      formDataEl = formEl.find("input");
+      if(formDataEl.length != 0) {
+         if(formDataEl.is(":text,input[type=number]")) {
+            return formDataEl.val();
+         } else {
+            return formDataEl.is(":checked");
+         }
+      }
+   }
+
+   /* Function getFieldType
+      Returns a string containing the type of field is passed in.
+      Takes the *top* element, containing label & field */
+   function getFieldType(topEl) {
+      var typeEl = $(topEl).find("[data-test-id]"),
+          // typeEl = $(grandChild[0]),
+          // typeElForDate = grandChild.children()[0],
+          // typeElForTextArea = grandChild.find("textarea"),
+          testId = typeEl.attr("data-test-id");
+
+      if(/-text-field-/.test(testId)) {
+         return "text";
+      } else if(/-numeric-field-/.test(testId)) {
+         return "numeric";
+      } else if(/-dropdown-field-/.test(testId)) {
+         return "dropdown";
+      } else if(/-checkbox-field-/.test(testId)) {
+         return "checkbox";
+      // } else if(/-date-field-?/.test($(typeElForDate).attr("data-test-id"))) {
+      } else if(/-date-field-?|-ticket-date/.test(testId)) {
+         return "datefield";
+      // } else if(/-multiline-field/.test(typeElForTextArea.attr("data-test-id"))) {
+      } else if(/-multiline-field/.test(testId)) {
+         return "textarea";
+      } else {
+         return "unknown";
+      }
+   }
+
+   /* Function setTicketFormFieldVal
+      Get the Form Element, then set the val on it */
+   function setTicketFormFieldVal(formTextLabel="", value="", ddAfterFn) {
+      var formType, formVal, formDataEl, ddLabel, ddMenu, 
+          returnFocus = false,
+          topEl = getTicketFormFieldTopEl(formTextLabel);
+
+      if(topEl == null) return false;
+      if(value == "" || value == null) return false;
+
+      formDataEl = topEl.find("input, textarea");
+      if(formDataEl.length != 0) {
+
+         formType = getFieldType(topEl);
+         switch(formType) {
+         case "dropdown":
+            ddLabel = topEl.find("label");
+            if(ddLabel != 0) {
+               // open menu
+               formDataEl = ddLabel.next();
+
+               addManagedMutationObs(formDataEl,(mutaList, observer) => {
+                  var targetLi, valueLn = value.length;
+
+                  // choose item
+                  ddMenu = topEl.find("[data-garden-id='dropdowns.menu_wrapper']");
+                  if(ddMenu.length != 0) {
+                     console.warn("step 1")
+                     targetLi = ddMenu.find("li:contains('"+value.trim()+"')");
+
+                     // if there's multiple matches, pick the one that most closely
+                     // resemble it
+                     if(targetLi.length > 1) {
+                        targetLi = targetLi.find("span").filter((index,el)=>{
+                           // console.log(el.innerHTML, el.innerHTML.length==value.length); 
+                           return el.innerHTML.length==value.length
+                        });
+                     }
+
+                     if(targetLi.length != 0) {
+                        console.log("step 2")
+                        observer.disconnect();
+                        targetLi.click();
+                     } else {
+                        console.warn("Value not found in DD: |"+value+"|");
+                        observer.disconnect();
+                        formDataEl.click();
+                     }
+                  } else {
+                     console.warn("step back");
+                     observer.disconnect();
+                     formDataEl.click();
+                  }
+
+                  if(ddAfterFn != undefined) ddAfterFn();
+               }, {childList:true,subtree: false});
+
+               formDataEl.click();
+            }
+            break;
+
+         case "datefield":
+            setNativeValue(formDataEl[0], value);
+            formDataEl[0].dispatchEvent(new Event('input', { bubbles: true }));
+            formDataEl.focus();
+            formDataEl.blur();
+            break;
+
+         case "numeric":
+         case "text":
+            setNativeValue(formDataEl[0], value);
+            formDataEl[0].dispatchEvent(new Event('input', { bubbles: true }));
+            break;
+            
+         case "textarea":
+            formDataEl = topEl.find("textarea");
+            setNativeValue(formDataEl[0], value);
+            formDataEl[0].dispatchEvent(new Event('input', { bubbles: true }));
+            break;
+
+         case "checkbox":
+            if(getTicketFormFieldVal(formTextLabel) != value) {
+               console.log("clicked");
+               formDataEl.click();
+            }
+            break;
+
+         default:
+            console.warn("Well that's new. Tried to set the value on an unknown type of form field", topEl, formDataEl);
+            setNativeValue(formDataEl[0], value);
+            formDataEl[0].dispatchEvent(new Event('input', { bubbles: true }));
+         }
+      }
+
+      return;
+   }
+
+   /* Function setNativeValue
+      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
+      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
+   function setNativeValue(element, value) {
+      if(element.get != undefined) {
+         element = element.get(0);
+      }
+
+      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+      const prototype = Object.getPrototypeOf(element);
+      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+      if (valueSetter && valueSetter !== prototypeValueSetter) {
+         prototypeValueSetter.call(element, value);
+      } else {
+         valueSetter.call(element, value);
+      }
+   }
+
+   /* Function pasteTicketInfo
+      Copies the MBI from the cu data */
+   function pasteTicketInfo(evt) {
+      // CTRL + SHIFT + V  //V b/c it's like paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+
+         var translateDismissBtn = getByDataTestId("conversation-translator-button-dismiss-translate");
+         if(translateDismissBtn.length != 0){
+            translateDismissBtn.click();
+         }
+
+
+         // TODO: make the transition to this, so that we only have get obj called in one place:
+         /* getClipboard().then(function pasteTicketInfoSubFn(copiedText) {
+            var data;
+
+            if(!isStringOkToFillTicket(copiedText)) {
+               return;
+            }
+
+            data = getObjFromCopiedText(copiedText);
+
+            if(isEmdeonChat()) {
+               fillOutChatForm(data);
+            } else if(isPreventableIssue()) {
+               fillOutPIForm(data);
+            } else if(isRFI()) {
+               fillOutRfiForm(data);
+            } else if(isT3Feedback()) {
+               fillOutT2FeedbackForm(data);
+            } else {
+               fillDeemingForm(data);
+            }
+         }) */
+
+
+         if(isEmdeonChat()) {
+            getClipboard().then(fillOutChatForm);
+         } else if(isPreventableIssue()) {
+            getClipboard().then(fillOutPIForm);
+         } else if(isRFI()) {
+            getClipboard().then(fillOutRfiForm);
+         } else if(isT3Feedback()) {
+            getClipboard().then(fillOutT2FeedbackForm);
+         } else {
+            getClipboard().then(fillDeemingForm);
+         }
+
+         flashNotificationEl();
+         insertCuNameElIfNeeded();
+      }
+   }
+
+   /* Function isStringOkToFillTicket
+      Tests a string to see if it has a colon/new line structure to it. (Can have header)
+      If it doesn't, then it's not fillable */
+   function isStringOkToFillTicket(copiedText=""){
+      if(copiedText=="") return;
+
+      return /.*:\s+.*\r?\n/.test(copiedText);
+   }
+   
+   /* Function scrollFieldsIntoView
+      Scrolls the Emdeon fields into view */
+   function scrollFieldsIntoView(input) {
+      var fieldContainer;
+      if(typeof input == "string") {
+         fieldContainer = $(input);
+      } else if(typeof input == "object") {
+         fieldContainer = input;
+      }
+
+      if(fieldContainer.scrollIntoView) { fieldContainer[0].scrollIntoView(); }
+   }
+
+   /* Function isCarrierPlan
+      Takes a el containing the cu info, and searches for the specified carrier */
+   function isCarrierPlan(cuInfoEl,carrierName) {
+      if(carrierName == undefined || carrierName == null) return false;
+      
+      var regExp = new RegExp("Plan Name:\\s+"+carrierName), 
+          carrierOnTicket = getTicketFormFieldVal("RFI Carrier"),
+          returnVal;
+
+      switch(carrierName.toLowerCase()) {
+       case "aetna":
+         returnVal = carrierOnTicket == "Aetna"; break;
+
+       case "anthem":
+         returnVal = carrierOnTicket == "Anthem"; break;
+       case "simply":
+         returnVal = carrierOnTicket == "Simply" || carrierOnTicket == "Anthem"; break;
+       case "highmark":
+         returnVal = carrierOnTicket == "Highmark"; break;
+
+       case "cigna":
+         returnVal = carrierOnTicket == "Cigna"; break;
+
+       case "devoted":
+         returnVal = carrierOnTicket == "Devoted"; break;
+
+       case "humana":
+         returnVal = carrierOnTicket == "Humana"; break;
+       case "careplus":
+         returnVal = carrierOnTicket == "CarePlus" || carrierOnTicket == "Humana"; break;
+
+       case "kaiser":
+         returnVal = carrierOnTicket == "Kaiser"; break;
+
+       case "uhc":
+       case "united healthcare":
+       case "united":
+         returnVal = carrierOnTicket == "United"; break;
+
+       case "wellcare":
+         returnVal = carrierOnTicket == "WellCare"; break;
+       case "allwell":
+         returnVal = carrierOnTicket == "AllWell" || carrierOnTicket == "WellCare"; break;
+
+       case "zing":
+         returnVal = carrierOnTicket == "Zing"; break;
+      }
+
+      if(!returnVal) {
+         returnVal = (cuInfoEl.innerHTML || cuInfoEl.html()).replaceAll("&nbsp;"," ").search(regExp) != -1;
+      }
+
+      return returnVal;
+   }
+
+   /* Function getCuInfoAsObj
+      Get's the cu's info as an object*/
+   function getCuInfoAsObj() {
+      var rawCuInfo = getTicketInfoEl().html(),
+          emptyValProtection = rawCuInfo.replaceAll(/:(|( |&nbsp;)+)<br>/g,":-<br>"),     // give empty items a -
+          delimitedText = emptyValProtection.replaceAll(/ ?&nbsp; ?|<br>|:( +)?/g,"|"),   // make delimiter
+          cuInfoAry = delimitedText.replaceAll(/\|+/g,"|").split('|'),
+          returnObj = {};
+
+      // var forDebugging = rawCuInfo.replaceAll(/:(&nbsp;| )+/g,": "); // so you can read look at the string easier
+
+      var iter = cuInfoAry[1] == "Lead ID" ? 1 : 2;
+
+      for (iter; iter < cuInfoAry.length; iter+=2) {
+         returnObj[cuInfoAry[iter]]=cuInfoAry[iter+1]
+      }
+
+      return standardizeCuInfo(returnObj);
+   }
+
+   /* Function formatDateForZDForm
+      */
+   function formatDateForZDForm(dateString="") {
+      var date;
+
+      if(/GMT-\d{4}/.test(dateString) || (typeof dateString == "object" && dateString.getWeek != undefined)) {
+         // already in expected format or is a date object
+         moddedDateString = dateString.toString().replace(/[a-z]+ ([a-z]{3} \d\d) (\d{4}).*/i,"$1, $2");
+      } else if(/\d?\d[/.-]\d?\d[/.-]\d{2,4}/.test(dateString)) {
+         date = new Date(dateString+" GMT-0700").toString(); // The last bit b/c dates are weird
+                           // https://medium.com/@sungbinkim98/is-your-javascript-date-one-day-off-c56afb37e4bc
+         moddedDateString = date.toString().replace(/[a-z]+ ([a-z]{3} \d\d) (\d{4}).*/i,"$1, $2");
+      }
+
+      return moddedDateString;
+   }
+
+   /* Function getTicketCreatedDate
+      Grabs the ticket created date from the tooltip on the first comment. 
+      A ticket cannot be created w/o a first comment. */
+   function getTicketCreatedDate() {
+      var firstTimeEl = getActiveTabEl().getTicketEl().find('time[data-test-id="timestamp-relative"]'),
+          rawCreatedDate = firstTimeEl.first().attr("datetime"),
+          dateParts = rawCreatedDate.toString().slice(0,10).split('-');
+
+      return dateParts[1]+"/"+dateParts[2]+"/"+dateParts[0];
+   }
+
+   /* Function getByDataTestId */
+   function getByDataTestId(val, el=null) {
+      if(typeof val == "string") {
+         if(el != null) {
+            return $(el).find("[data-test-id='"+val+"']");
+         } else {
+            return $("[data-test-id='"+val+"']");
+         }
+      } else {
+         return null;
+      }
+   }
+
+   /* Function getPICarrierFromPlanName */
+   function getPICarrierFromPlanName(val="") {
+      var carrier = val.split(" ")[0];
+      if(carrier == "AARP" || carrier == "UHC") carrier = "UnitedHealthcare";
+      if(carrier == "HumanaChoice") carrier = "Humana";
+      if(carrier == "Wellcare") carrier = "WellCare";
+      if(carrier == "Wellpoint") carrier = "Anthem";
+
+      return carrier;
+   }
+
+   /* Function getRFICarrierFromPlanName*/
+   function getRFICarrierFromPlanName(val="") {
+      var carrier = val.split(" ")[0];
+      if(carrier == "AARP" || carrier == "UHC" || "UnitedHealthcare") carrier = "United";
+      if(carrier == "HumanaChoice") carrier = "Humana";
+      if(carrier == "Wellcare") carrier = "WellCare";
+      if(carrier == "Wellpoint") carrier = "Anthem";
+
+      return carrier;
+   }
+
+   /* Function getFirstCommentEl
+      Selects the el that contains the cu's info, which is the first comment.
+      Returns null if not in a format recognized */
+   function getFirstCommentEl() {
+      var firstInfoEl = getActiveTabEl().getTicketEl().find('div.zd-comment')[0];
+
+      // if(firstInfoEl == undefined) {
+      //    return null;
+      // }
+
+      return firstInfoEl;
+   }
+
+   /* Function getFirstCommentElText
+      Returns the text contents of the el that contains the cu's info, which is the first comment. */
+   function getFirstCommentElText() {
+      var firstInfoEl = getFirstCommentEl(),
+          result;
+
+      console.warn("debugging getFirstCommentElText")
+
+      if(firstInfoEl && firstInfoEl.childElementCount == 1) {
+         result = firstInfoEl.children[0].getHTML()
+      } else if(isCaresForm()) {
+         result = $(firstInfoEl).html()
+                    .replaceAll(/<br>/g,"\n")
+                    .replaceAll(/\n?<\/?(strong|b|u|span).*?>\n?/g," ")
+                    .replaceAll(/\n?<\/?p.*?>\n?/g,"\n")
+                    .replaceAll(/\n+ +/g,"\n");
+      } else {
+         result = firstInfoEl;
+      }
+
+      return result;
+   }
+
+   /* Function partifyName
+      Splits a name into first/last */
+   function partifyName(name) {
+      // TODO: add middle initial and middle name?
+      nameParts = name.match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+
+      return {
+         full: name,
+         first: namePartsFirst,
+         last: namePartsSecond
+      }
+   }
+
+   /* Function getTypeOfSubmission
+      Returns a string, which is the type of submission the RFI is:
+         Captive Legacy
+         Resolve
+         vConnect Resolve
+         GPS Legacy
+         GPS Express */
+   function getTypeOfSubmission(data) {
+      var leadId;
+
+      if(typeof data.leadId != "undefined") {
+         if (data.leadId == "-") { 
+            leadId = getLeadId();
+            if(leadId == "999999999"){
+               return "vConnect Resolve"; // there isn't a lead id in data, but the user's one is this one
+            } else if(leadId == "997997997") { 
+               return "GPS Legacy"; // there isn't a lead id in data, but the user's one is this one
+            } else if(/\//.test(data['T2 Agent'])) {
+               return "vConnect Resolve";
+            }
+         } else if(/^\d+$/.test(data.leadId)) { 
+            if(data['T2 Agent'] == "-") {
+               return "Captive Legacy"; // there's a lead id, but no T2 agent
+            } else {
+               return "Resolve"; // there's a lead id, and a T2 agent
+            }
+         }
+      }
+
+      return "unknown";
+   }
+
+   /* Function closeTranslationBanner
+      Closes the translation banner when it is present */
+   function closeTranslationBanner(){
+      var translationBanner = getByDataTestId("conversation-translator-language-detection-prompt", getActiveTabEl()),
+          closeBtn = getByDataTestId("conversation-translator-button-dismiss-translate", translationBanner);
+
+      closeBtn.click();
+   }
+
+   /* Function agencyInterpreter
+      Takes the raw value from an RFI (usually a UHC Deeming ticket) and interprets it
+      for the agency DD */
+   function agencyInterpreter(agencyName){
+      switch(agencyName){
+      case "OneDigital": return "OneDigital";
+      case "OneDigital Medicare Services LLC": return "OneDigital";
+      case "Ping Health LLC": return "Ping Health";
+      case "Charles Tapert Agency": return "Charles W Tapert";
+      }
+      return agencyName.toProper();
+   }
+
+   /* Function getCuName
+      Get's the cu's name from the header, and if that is non-name like (i.e. 123456@gohealth.com)
+      it gets it from the first comment */
+   function getCuName() {
+      var cuName;
+
+      if(isTicketNameElAName()) {
+         cuName = getCuNameFromHeader();
+      } else {
+         cuName = getCuNameFromFirstComment();
+      }
+
+      return cuName;
+   }
+
+   /* Function getCuNameFromHeader 
+      Returns the contents even if they are not name-like (eg 123456@gohealth.com) */
+   function getCuNameFromHeader() {
+      var cuName = getActiveTabEl().getByDataTestId('card-header-label-test-id');  // "essentials-header-title" << old value?
+      return cuName.length > 0 ? cuName.html() : undefined;
+   }
+
+   /* Function getCuNameFromFirstComment */
+   function getCuNameFromFirstComment() {
+      var firstCommentText = getFirstCommentElText(),
+          cuName="", matches;
+
+      if(firstCommentText == undefined) {
+         return cuName;
+      }
+
+      if(isCaresForm()) {
+         cuName = firstCommentText.match(/RFI to be looked into for\s+(.*?)\s+in a\s/)[1];
+      } else if(isRFI()) {
+         matches = firstCommentText.match(/Customer Name: *(.*)( |\n<br>)DOB:/);
+         if(matches != null) {
+            cuName = matches[1];
+         } else {
+            console.warn("unable to parse cu's name");
+         }
+      } else if(isPreventableIssue()) {
+         console.warn("getCuNameFromFirstComment not implemented for PI");
+      } else {
+         console.warn("getCuNameFromFirstComment not implemented for whatever this is.");
+      }
+
+      return cuName;
+   }
+
+   /* Function getLeadId
+      Get's the lead id from the page. It could be either in the email address on the right, in 
+      the Cu/Agent Info post, in the ticket subject (Cares form) or in the Lead ID field on the 
+      left */
+   function getLeadId() {
+      var leadId, subjectLineEl;
+
+      // Check email address
+      leadId = getActiveTabEl().getByDataTestId("email-value-test-id").html();
+      if(/^\d{8,9}@gohealth.com/.test(leadId)) {
+         leadId = leadId.replace('@gohealth.com','');
+
+      // Check Cares form/Legal QA, which have the lead in the subj line
+      } else if(leadId && leadId.search("caresform") == 0 || getTicketFormFieldVal("Form") == "Legal QA") {
+         // TODO: cares form is not always a Resolve, so doesn't always have the lead id in the subject. 
+                  // a transfer code is 10 digits? so maybe we can use that?
+         subjectLineEl = getSubjLineEl();
+         leadId = subjectLineEl.value.match(/\d{8,9}/)[0];
+
+      // Check in the form elements
+      } else {
+         leadId = getTicketFormFieldVal("Lead ID");
+         if(!/^1[0-4]\d{7}|\d{1,8}/.test(leadId)) {
+            leadId = null;
+         }
+      }
+
+      return leadId;
+   }
+
+  //// TICKET TYPE: EMDEON CHAT ////
+
+   /* Function isEmdeonChat
+      Determines if the current  */
+   function isEmdeonChat() {
+      return  $("article div:contains('Joined')").length > 0;
+   }
+
+  //// TICKET TYPE: LQA ////
+
+  //// TICKET TYPE: PREVENTABLE ISSUE ////
+
+   /* Function isPreventableIssue
+      Decides if the el passed in is the first comment on a Dev RFI*/
+   function isPreventableIssue() {
+      return getTicketFormFieldVal('Form') == "*New* Preventable Issue";
+   }
+
+  //// TICKET TYPE: RFI ////
+
+   /* Function isRFI
+      Uses the form to determine if it's an RFI */
+   function isRFI(el=null) {
+      return getTicketFormFieldVal('Form') == "RFIs/D-SNP Denials";
+   }
+
+   /* Function isDevotedRFI
+      Decides if the el passed in is the first comment on a Dev RFI*/
+   function isDevotedRFI(el=null) {
+      if(el == null) {
+         return isDevotedRFI(getFirstCommentEl());
+      } 
+
+      return (el.innerHTML || el.html()).search(/<table>/) == 0;
+   }
+
+   /* Function isRegularRFI
+      Decides if the el passed in is the regular type of first comment on a RFI
+      (vs an RFI created using an email) */
+   function isRegularRFI(el=null) {
+      var html, result1, result2, result3;
+
+      if(el == null) {
+         return isRegularRFI(getFirstCommentEl());
+      } 
+
+      html = (el.innerHTML || el.html());
+
+      result1 = html.search(/Customer Name\:/);
+      result2 = html.search(/DOB\:/);
+      result3 = html.search(/Agent Name\:/);
+
+      return (result1 != -1 && result2 != -1 && result3 != -1) && (result3 > result2 && result2 > result1 );
+   }
+
+   /* Function isCSNP*/
+   function isCSNP() {
+      return getTicketFormFieldVal("RFI/D-SNP Denial Reason") == "C-SNP";
+   }
+
+   /* Function isCaresForm*/
+   function isCaresForm() {
+      return getTicketFormFieldVal("Requester") == "Cares Form" 
+             || $(getFirstCommentEl()).parents("article").find("a>span:contains('Cares RFIs')").length > 0;
+   }
+
+  //// TICKET TYPE: T2/T3 FEEDBACK ////
+
+   /* Function isT3Feedback
+      Decides if the el passed in is the first comment on a Dev RFI*/
+   function isT3Feedback(el=null) {
+      var firstCommentEl;
+      // if(el == null) {  // TODO: fix this. It's a pain b/c it causes stack issues
+      //    firstCommentEl = getFirstCommentEl();
+      //    return isT3Feedback(firstCommentEl);
+      // } 
+
+      if(el==null) return false;
+
+      return (el.innerHTML || el.html()).search(/Hi Case Management/) != -1;
+   }
+
+
+/*** GEN: FOCUS INTERNAL NOTE ***/
+
+   /* Function getActiveNoteEl
+      Selects the correct node that contains the cu's processed and formatted info */
+   function getActiveNoteEl() {
+      return getByDataTestId("omnicomposer-rich-text-ckeditor",getActiveTabEl());
+   }
+
+   /* Function setFocusToActiveNoteEl
+      Event function that selects and copies the correct node containing the cu's processed and formatted info */
+   function setFocusToActiveNoteEl(evt) {
+      // CTRL + ALT + X          // Because it mirrors the ZD shorctut to switch to a private chat
+      if (evt.ctrlKey && evt.altKey && evt.which == 88) {
+         if(zd.mydebug.isDB()) {
+                  console.warn(">> debug on");
+         }
+
+         getActiveNoteEl().focus();
+
+         insertCuNameElIfNeeded();
+      }
+   }
+
+
+/*** GEN: FOCUS SUBJECT LINE ***/
+
+   /* Function getSubjLineEl
+      Gets the subject element */
+   function getSubjLineEl() {
+      var firstInfoElList = getActiveTabEl().getTicketEl().find('[placeholder="Subject"]');
+      if (firstInfoElList.length == 0) {
+         return null;
+      } else {
+         return firstInfoElList[0];
+      }
+   }
+
+   /* Function subjectFocus
+      Event function that selects the Subject line, and focuses the cursor at the start */
+   function subjectFocus(evt) {
+      // CTRL + SHIFT + S //s for subject
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
+         var subjLineEl = getSubjLineEl();
+         if(subjLineEl == null) {
+            console.log(">> Could not find a subject line");
+            return;
+         }
+
+         if(subjectIsFocused() && !hasStateAbbr()) {
+            addStateAbbr();
+         } else {
+            subjLineEl.focus();     // TODO: make this go to the END, not the beginning
+            subjLineEl.selectionStart = 0;
+            subjLineEl.selectionEnd = 0;
+         }
+      }
+   }
+
+   /**** ADD STATE ABBREVIATION ****/
+
+   /* Function subjectIsFocused
+      Event function that selects the Subject line, and focuses the cursor at the start */
+   function subjectIsFocused() {
+      return document.activeElement === getSubjLineEl();
+   }
+
+   /* Function addStateAbbr
+      Event function that selects the Subject line, and focuses the cursor at the start */
+   function addStateAbbr() {
+      var subjLineEl = getSubjLineEl(),
+          ticketInfoEl = getTicketInfoEl(),
+          stateAbbr;
+
+      if(subjLineEl === undefined) {
+         console.warn(">> Could not add state abbr to subject: subject line not found");
+      } else if (ticketInfoEl.length != 0) {
+         console.warn(">> Could not add state abbr to subject: processed ticket info not found");
+      }
+
+      //have to declare variables here, b/c minifier madness
+      var ticketInfo = ticketInfoEl.html().replaceAll("&nbsp;","");
+      var stringPos = ticketInfo.search(/, ([A-Z]{2}) \d{5}/);
+      // extra space to give something to backspace, so there
+      // is a keystroke that triggers the logic to set the value
+      stateAbbr = " - "+ticketInfo[stringPos+2]+ticketInfo[stringPos+3]+" ";
+
+      // will this work?
+      subjLineEl.value += stateAbbr;
+   }
+
+   /* Function hasStateAbbr
+      Event function that selects the Subject line, and focuses the cursor at the start */
+   function hasStateAbbr() {
+      var subjLineEl = getSubjLineEl();
+
+      if(subjLineEl === undefined) {
+         console.warn(">> Could not add state abbr to subject: subject line not found");
+      }
+
+      return subjLineEl.value.search(/ \- [A-Z]{2}/) != -1;
+   }
+
+
+/*** GEN: FOCUS ACTIVE SEARCH ***/
+
+   /* Function getSearchBox
+      Gets the search Box */
+   function getSearchBox() {
+      var searchBox = $('.search [data-garden-id="forms.faux_input"] input')[0];
+      if (searchBox == undefined) {
+         return null;
+      } else {
+         return searchBox;
+      }
+   }
+
+   /* Function searchBoxFocus
+      Event fn that moves the focus to the active search box */
+   function searchBoxFocus(evt) {
+      // CTRL + SHIFT + S //s for Search
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
+         var searchBoxEl = getSearchBox();
+         if(searchBoxEl == null) {
+            console.warn(">> Could not find an active search box ",searchBoxEl);
+            return;
+         }
+
+         searchBoxEl.focus();
+         searchBoxEl.select();
+      }
+   }
+
+
+/*** GEN+: PASTE INTO DEEMING FORM ***/
+
+   /* Function fillDeemingForm
+      Puts the data in the sidebar form */
+   function fillDeemingForm(copiedText) {
+      var data, agentInfo, uid, aorRegion, 
+          activeEl = document.activeElement;
+
+      // if it starts w/a "key: val\n" pair, then it doesn't have a header
+      data = getObjFromCopiedText(copiedText,/^.*:.*\r?\n/.test(copiedText));
+
+         // use the RFI one, b/c it has a similar UHC name
+      setTicketFormFieldVal("Carrier", data.carrier || getRFICarrierFromPlanName(data["Plan Name"])); 
+      setTicketFormFieldVal("Member Name", data.fullName);
+      setTicketFormFieldVal("Phone Number", data.phoneNumber);      
+      if(getTicketFormFieldVal("Lead ID") == "")
+         setTicketFormFieldVal("Lead ID", data.leadId || data["Ref #"]|| getLeadId());
+            
+      setTicketFormFieldVal("Requester", data.leadId || getLeadId());
+
+      setTimeout(()=>activeEl.focus(),125);
+   }
+
+
+   /* Function scrollChatFieldsIntoView
+      Scrolls the Emdeon fields into view */
+   function scrollChatFieldsIntoView() {
+      var fieldContainer = $('.ember-view.property_box.ticket_properties');
+
+      if(fieldContainer.length != 0) { fieldContainer[0].scrollIntoView(); }
+   }
+
+
+/*** GEN: FIRST COMMENT SELECT ***/
+
+   /* Function processCaresFormComment
+      Processes the content of the initial comment of a Cares form into the standardized format */
+   function processCaresFormComment(el) {
+      /*
+         "this is an Advocate Submission" > T2
+         "this is an vConnect Submission" > vconn https://gohealth.zendesk.com/agent/tickets/17768580
+
+         not handled:
+         Invalid SEP (if applicable): OEP
+         Correct SEP (if applicable): INT
+         Medicaid Number (if applicable):
+         (vConnect)Transfer Code:
+
+      */
+
+      var noHtmlString = $(el).html()
+                          .replaceAll(/\n?<\/?(strong|b|br|u|span).*?>\n?/g," ")
+                          .replaceAll(/\n?<\/?p.*?>\n?/g,"\n")
+                          .replaceAll(/\n+ \n? */g,"\n"),
+          posOfTrasnfCodeEntry = noHtmlString.search(/Lead ID: +Transfer Code: [\d ]+ Ref. Number: [A-Z0-9]+/),
+          splitParts, specialParts, transCodePart, transferCode, refNumber, returnVal;
+
+      console.warn("debugging processCaresFormComment");
+
+      if(posOfTrasnfCodeEntry != -1) {
+         transCodePart = noHtmlString.substring(250,400);
+         transferCode = transCodePart.match(/Transfer Code: ([\d ]+)/)[1].replaceAll(" ","");
+         refNumber = transCodePart.match(/Ref\. Number: ([A-Z0-9]+)/);
+         noHtmlString = noHtmlString.replace(/Lead ID: +Transfer Code: [\d ]+ Ref. Number: [A-Z0-9]+/,"Lead ID: ");
+      }
+
+      splitParts = noHtmlString.split(/\n|: +/);
+      specialParts = splitParts[2].match(/(.*?)\s+has submitted a potential\s+(.*?)\s+RFI to be looked into for\s+(.*?)\s+in a/);
+
+
+      returnVal = `Customer Name: ${specialParts[3]}
+         DOB: ${splitParts[14]}
+         Medicare ID: ${splitParts[10].replaceAll("-","")}
+         Agent Name: ${specialParts[1]}
+         Campaign: 
+         Agent NPN/Party ID: 
+         Agent Writing Number/SAN : 
+         Sub Date: 
+         Eff Date: ${splitParts[16]} 
+         Due Date: 0
+         UHC Party ID: 
+         Case Number (Cigna*)/Broker Email (Aetna/United*):
+         Policy ID/Application ID: 
+         Reason: ${specialParts[2]}
+         Lead Id: ${splitParts[6] || "-"}`.replaceAll(/\n +/g,"\n");
+
+         // use standardizeFullDateString
+
+      return returnVal;
+   }
+
+   /* Function processDevotedRFIComment
+      Processes the content of a Devoted RFI initial comment into the standardized format */
+   function processDevotedRFIComment(el) {
+      var rfiParts = (el.innerHTML || el.html()).replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g);
+
+      var returnVal = "Agent Name: "+rfiParts[1]+" "+
+      " Agent NPN/Party ID: "+rfiParts[2]+" "+
+      " Agent Writing Number/SAN :" +
+      " Medicare ID: "+rfiParts[8]+" "+
+      " Sub Date: "+rfiParts[5]+" "+
+      " Due Date: "+
+      " Case Worker (Cigna*)/Broker Phone (Aetna/United*): "+
+      " Case Number (Cigna*)/Broker Email (Aetna/United*): "+
+      " Policy ID/Application ID: "+
+      " Reason: "+rfiParts[10];
+
+      return returnVal;
+   }
+
+   /* Function processT3FeedbackComment
+      Processes the content of a Devoted RFI initial comment into the standardized format */
+   function processT3FeedbackComment(el) {
+      console.warn("yo");
+      var returnVal, salesAgentType, 
+          commentParts= (el.innerHTML || el.html()).replaceAll(/:? ?<\/?(br|strong|u|p|b)>[\n]?(: )?( )?/g, "|").split(/\|+/g),
+          salesAgentInfo = commentParts[3].replaceAll(/Employee ID:|Transferring Agent:|\/| Jr| Sr/g,""),
+          leadId = getTicketFormFieldVal("Lead ID"),
+          vConnRegex = /(SHA|One Digital|1D|Smart Care|Ping Health|U\.?S medicare solutions|USMS|Senior Protect|Stone Tapert)/i;
+
+      if(/[a-z, ]+ *\d+/i.test(salesAgentInfo)) {
+         salesAgentType = "Captive";
+      } else if(vConnRegex.test(salesAgentInfo)) {
+         salesAgentType = salesAgentInfo.match(vConnRegex)[0];
+      } else {
+         salesAgentType = "vConnect"
+      }
+      // if(/[a-z, ]+ */i.test(salesAgentInfo)) {
+      //    salesAgentType = "-";
+      // } else 
+
+      returnVal =
+      "Date of Call:\t" + getTicketCreatedDate() + "\n" + 
+      "Transf Ref #:\t" + commentParts[9] + "\n" + 
+      "Transf Code:\t" + commentParts[7] + "\n" + 
+      "Lead Id:\t" +  leadId + "\n" + 
+      "Cu Phone #:\t" + commentParts[5].replaceAll(/[()-]/g,"") + "\n" + 
+      "T3 Agent:\t" + commentParts[1].replace(/ has submitted.*/,"") + "\n" + 
+      "T3 Team Mgr:\t" + commentParts[13] + "\n" + 
+      "T3 Director:\t" + commentParts[15] + "\n" + 
+      "T2 Agent:\t" + salesAgentInfo.replace(/ \d+( )*| One Digital| SHA/,"") + "\n" + 
+      "T2 UID:\t" + (salesAgentInfo.replace(/T2|[^\d]*/ig,"") || "-") + "\n" + 
+      "FB Action:\t" + commentParts[11] + "\n" + 
+      "FB Notes: \t" + commentParts[17].replaceAll(/\n|&nbsp;/g,"")  + "\n" + 
+      "Sales Agent Type:\t" + salesAgentType;
+
+      return returnVal;
+   }
+
+   /* Function selectFirstComment
+      Event function that selects and copies the initial comment containing the RFI's info */
+   function selectFirstComment(evt) {
+      // CTRL + SHIFT + F //(f for "first")
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+         var firstCommentEl = getFirstCommentEl();
+
+         if(firstCommentEl == null) {
+            console.warn("First comment not recognized");
+            return;
+         } else if(isRegularRFI(firstCommentEl)) {
+            copyElToClipboard(firstCommentEl);
+         } else if(isCaresForm()) {
+            copyStringToClipboard(processCaresFormComment(firstCommentEl));
+         } else if(isDevotedRFI(firstCommentEl)) {
+            copyStringToClipboard(processDevotedRFIComment(firstCommentEl));
+         } else if(isT3Feedback(firstCommentEl)) {
+            copyStringToClipboard(processT3FeedbackComment(firstCommentEl));
+         }
+
+         insertCuNameElIfNeeded();
+         closeTranslationBanner();
+      }
+   }
+
+
+/*** GEN: OPEN BO LEAD IN NEW TAB ***/
+   // TODO: move to onclick: https://stackoverflow.com/questions/4907843/open-a-url-in-a-new-tab-and-not-a-new-window
+
+   /* Function openBoTab
+      Opens a specific BO tab if given the lead id, or searches using the phone number  */
+   function openBoTab(leadId) {
+      console.warn(">> running openBoTab: ",leadId, !/\d{8,9}/.test(leadId));
+      if(/\(|\)|\-/.test(leadId)) {
+         window.open("https://www.brokeroffice.com/leads/advancedSearch.do?subscriber_id=55432&quickSearchTerm=phone:"+leadId+"&isQuickSearch=yes")
+      } else if (!/\d{8,9}/.test(leadId)) {
+         console.warn(">> Failed to open BO lead: "+leadId);
+      } else {
+         if(leadId == 999999999 || leadId == 997997997) {
+            leadId = 132948932;
+         }
+         window.open("https://www.brokeroffice.com/leads/leadViewEdit.jsp?lead_id="+leadId);
+      }
+   }
+
+   /* Function openBoLead
+      Event function that selects and copies the initial comment containing the RFI's info */
+   function openBoLead(evt) {
+      // CTRL + SHIFT + L // L for "Lead ID"
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 76) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+
+         openBoTab(getLeadId());
+         evt.stopImmediatePropagation(); // TEST IT OUT; TO KILL THE LINE BEING ADDED
+         evt.preventDefault();
+      }
+   }
+
+
+/*** GEN: COPY MBI ***/
+
+   /* Function copyMBI
+      Pulls out the MBI from the cu's data */
+   function getMBIfromCuInfo() {
+      return getCuInfoAsObj()["Medicare ID"];
+   }
+
+   /* Function copyMBI
+      Copies the MBI from the cu data */
+   function copyMBI(evt) {
+      // CTRL + SHIFT + B  //B b/c MBI
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 66) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+
+         copyStringToClipboard(getMBIfromCuInfo());
+      }
+   }
+
+
+/*** GEN: CU INFO SELECT ***/
+
+   /* Function getTicketInfoEl
+      Gets the most recent comment with the app's processed and formatted info */
+   function getTicketInfoEl() {
+      var cuInfoElList = getActiveTabEl().getTicketEl().find('div.zd-comment:contains("Cu/Agent Info")'),
+          cuInfoElListLn = cuInfoElList.length,
+          t3InfoEl, returnEl;
+
+      if (cuInfoElListLn == 0) {
+         t3InfoEl = getActiveTabEl().getTicketEl().find('div.zd-comment:contains("T2 Feedback Info")');
+         if(t3InfoEl.length == 0) {
+            console.warn(">> Could not find an element containing 'Cu/Agent Info' or 'T2 Feedback Info'");
+            return null;
+         } else {
+            return t3InfoEl;
+         }
+      } else {
+         return cuInfoElList.last(); // most recent version (most correct, hopefully)
+      }
+
+   }
+
+   /* Function getUserInfoFromAgentMessage
+      Used in a reduce fn to process an article to get the innerHTML from it */
+   function getUserInfoFromAgentMessage(articles) {
+      var agentsName = "", earlyExit = false, text = "";
+      
+      text = Array.prototype.reduce.call(articles,(accum, article) => {
+         if (earlyExit) {return accum;}
+
+         var textNode = $($(article).find("div[data-test-id='omni-log-message-content'] span").get(0)),
+             userNameNode = $(article).find("a span");
+
+         if(textNode == undefined) {
+            return accum;
+         }
+
+         if(agentsName == "" && userNameNode.length > 0) {
+            agentsName = userNameNode.html();
+         }
+
+         if(userNameNode.length > 0 && agentsName != userNameNode.html()) {
+            earlyExit = true;
+            return accum;
+         }
+
+         switch(textNode.children().length) {
+         case 0: 
+               return accum;
+               break;
+         case 1: 
+               return accum + "\n" + textNode.html();
+               break;
+         default: 
+               return accum + "\n" + Array.prototype.reduce.call(textNode.children(),(accum,el) => {
+                  return accum + (el.innerHTML || el.html())
+               },"");
+         }
+      }, "");
+
+      return text;
+   }
+
+   /* Function noSelectionEmdeonInput
+      Copies the text of the first comments by the agent, then parses it */
+   function noSelectionEmdeonInput() {
+      var articles = getActiveTabEl().getByDataTestId("omni-log-container").children(),
+          text = getUserInfoFromAgentMessage(articles);
+
+         copyStringToClipboard(JSON.stringify(interpretClipboard(text)));
+         flashNotificationEl();
+   }
+
+   /* Function getAgentEmdeonInput
+      Copies the selection, then parses it */
+   function getAgentEmdeonInput() {
+      var hasHighlight = document.getSelection().toString() != "";
+
+      if(hasHighlight) {
+         document.execCommand("copy");
+         getClipboard(interpretClipboard)
+            .then((agentInputInterpreted) => {
+               return copyStringToClipboard(JSON.stringify(agentInputInterpreted));
+            })
+            .then(flashNotificationEl);
+      } else {
+         noSelectionEmdeonInput();
+      }
+   }
+
+   /* Function triggerCopyTicketInfo
+      Event function that copies the most recent comment with the app's processed and formatted info */
+   function triggerCopyTicketInfo(evt) {
+      // CTRL + SHIFT + X  // X b/c convenient, and kind of like cut
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
+
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+         copyTicketInfo();
+         flashNotificationEl();
+         insertCuNameElIfNeeded();
+      }
+   }
+
+   /* Function copyTicketInfo
+      Copies the most recent comment with the app's/chat's processed and formatted info */
+   function copyTicketInfo(){
+      var ticketInfo, ticketInfoEl;
+
+      if(isEmdeonChat()) {
+         getAgentEmdeonInput(); // TODO: get this to return a string, so that it's standard
+      } else if(isT3Feedback()){
+         ticketInfo = getT3FeebackInfo();
+         copyStringToClipboard(ticketInfo);
+      } else if(getActiveTabEl().getTicketEl().find('div.zd-comment:contains("Cu/Agent Info")').length != 0){
+         ticketInfoEl = getTicketInfoEl();
+         copyElToClipboard(ticketInfoEl);
+      } else {
+         ticketInfoEl = getFirstCommentEl();
+         copyElToClipboard(ticketInfoEl);
+      }
+   }
+
+
+/*** GEN: INSERT CU NAME IN USER ***/  /// DEPRECATED, B/C THEY DON'T WANT US TO
+
+   /* Function getNavToUser
+      */
+   function getNavToUser() {
+      return getByDataTestId("tabs-nav-item-users", getActiveTabEl().getHeaderEl());
+   }
+
+   /* Function getNavToTicket
+      */
+   function getNavToTicket() {
+      return getByDataTestId("tabs-section-nav-item-ticket", getActiveTabEl().getHeaderEl());
+   }
+
+   /* Function getUserNameEl
+      There will be two sections in a tab after you access the "user" side of things.
+      So if you want to change anything on the User portion, you have to access it first */
+   function getUserNameEl() {
+      return getActiveTabEl().getUserEl().find("input[data-track-id='asdw-user-profile-page-name-click']");
+   }
+
+   /* Function replaceLeadIdWUserNameInUser
+      Will only set the user's name if the current name is the lead id.
+      There will be two sections in a tab after you access the "user" side of things.
+      So if you want to change anything on the User portion, you have to access it first. */
+   function replaceLeadIdWUserNameInUser() {
+      var cuName,
+          userNameEl = getUserNameEl();
+
+      if(userNameEl.val().search("@gohealth") != -1) {
+         cuName = getFirstCommentElText().match(/Name: *([A-Za-z \.\-\']+?) *DOB:/)[1];
+
+         userNameEl.val(cuName);
+      }
+   }
+
+   /* Function putCuNameInUser
+      */
+   function putCuNameInUser() {
+      // access user tab and back to ticket tab
+      // settimeout a thing to change the username...unless it's cool to do so already while hidden
+   }
+
+   /* Function fixUserNameIssue
+      B/c programming is stupid sometimes, the username must be clicked on BEFORE
+      this is run. Otherwise it won't work.
+      */
+   function fixUserNameIssue(evt) {
+      // CTRL + SHIFT + 1 // (1 b/c I wasn't trying to be creative)
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 49) {
+         getNavToUser().click();
+         replaceLeadIdWUserNameInUser();
+         return;
+      }
+   }
+
+
+/*** GEN: INSERT CU NAME EL ***/
+   /* Function isTicketNameElAName
+       These days, most customer names are now just lead id's. But some aren't.
+       Find out if the name el already is using a name */
+   function isTicketNameElAName(){
+      var cuName = getCuNameFromHeader()
+      return cuName == undefined ? false : cuName.search(/@|\//) == -1 && cuName != "Cares Form" && cuName != "GPS Legacy RFI";
+   }
+
+   /* Function insertCuNameEl
+      Inserts an element with the cu's name just under where it should be in the "User Info" section.
+      But only if the name isn't already where it's supposed to be. 
+      Updates the name, if the el already exists. */
+   function insertCuNameEl(name=null){
+      var activeTab = getActiveTabEl(),
+          existingCuNameEl=activeTab.find("#cu_name_el"),
+          cuName = getCuName(),
+          beforeEl = activeTab.getByDataTestId("card-header-row-test-id"),
+          newCuNameEl;
+
+      if(existingCuNameEl.length != 0) {
+         existingCuNameEl.html(cuName);
+      } else {
+         if(cuName==undefined) console.warn("FAILED TO GET CU NAME", getCuNameFromFirstComment(), " | ", getCuNameFromHeader());
+
+         newCuNameEl = $(`<div id="cu_name_el" class="" style="margin-left: 64px;margin-top: -18px;">${cuName}</div>`);
+
+         newCuNameEl.insertAfter(beforeEl);
+      }
+
+   }
+
+   /* Function insertCuNameElIfNeeded
+       Inserts the Cu Name el if the name element in ZD doesn't already contain a name */
+   function insertCuNameElIfNeeded(){
+      if(!isTicketNameElAName())
+         insertCuNameEl(getCuNameFromFirstComment());
+   }
+
+   /* Function removeCuNameEl
+       Removes the cu name on the CURRENT tab */
+   function removeCuNameEl(){
+      $("#cu_name_el").remove();
+   }
+
+
+/*** EMD: EMDEON CHAT COPY INFO ***/
+
+   // SHORTCUT FOR THIS FUNCTIONALITY IS IN "CU INFO SELECT" -- triggerCopyTicketInfo
+
+   /* Function getDelimitedText
+      Essentially a pre-parser. Parses the raw text into a format more palatable for a computer. 
+      Adds a delimiter '|' in between key words/symbols to break up the text and make it easeier
+      to parse the info out of */
+   function getDelimitedText(clipText) {
+         // The first pass is intended to remove all the ZD chat paraphenalia   // TODO: Add " Time Created 08/20/24 10:47 AM EDT" to firstPass #17810234
+         // The second replace is to break things up by delimiters
+      if(showClipText) {console.warn("clipText: ", JSON.stringify(clipText))}
+
+      var regexAry = [
+            "(Avatar|(\\d+|less than a) minute(s)? ago([\\r\\n]+Joined)?",
+            "[A-Za-z \\-]+?[\\r\\n]+(Assign[\\r\\n]+)?•",
+            "[\\r\\n]+\\d\\d:\\d\\d|[A-Za-z]+day \\d{2}:\\d{2}",
+            "Time Created\\s\\d\\d\\/\\d\\d\\/\\d\\d \\d\\d:\\d\\d (A|P)M EDT)",
+            "<\\/?span>",
+            // add back in "via chat", b/c I'm annoyed at testing w/old structure
+          ],
+          killCounty = clipText.replace(/(\r?\n|<\/?span>)County:( +|\r?\n)?[A-Z\- ]+(\r?\n|<\/?span>)/i,"\n"),
+          firstPass = killCounty.replaceAll(new RegExp(regexAry.join("|"),"g"),""),
+          preDelimitedText = '|'+firstPass.replaceAll(/([\r]?[\n] *|[\t]+|  + ?|:( +)?| + ?- + ?|, +|\.\.+|\/( +|\/+)|=+)+/g,"|")+"|",// DOUBLE BAR? Causes issues w/Name regex
+          delimitedText = "",
+          // keywordLiterals = [
+          // ],
+          keywords = [        // .* county
+            "lead id",
+            "Transfer Code",
+            "(Customer |First | Last)?Name",
+            "DOB|Date of Birth|Birth Date",
+            "sex|gender",
+            "SSN|SSI|SS#|SSN#",
+            "(Most recent )?state( of)?","\\|ST\\|", // add \w to ST? B/c it's catching in words
+            "Most recent County",
+            "MBI( Number| #)?",
+            "(MCD|Medicaid)( Number| #| id| level)?( for)?","MCN",
+            "need","level","lookup","the","for","in","is","have","verification", "get","of", "have",
+               "verify","eligibility","check","please","I[^\.]","and"]; // TODO: I IS GOING TO BE A PROBLEM. Make it [^\.]?
+            // ^^^^ putting these words in as a keyword breaks up the text flow, so it doesn't get mistaken for a name
+            // double bar these? so that we can have it recognized anyway, when same is side-by-side?
+
+          /* 
+            This thing must:
+            1. Be able to break up words that don't work, that look like names
+            2. Seperate out the usual labels
+            3. Break things up by the assumed delimiter 
+            4. Remove spaces in the edges (can be done in a different step)
+          */
+
+
+      if(stopExec) {debugger;}
+      if(showPreDelimit) {console.warn("pre-delimit: ", preDelimitedText)}
+
+      delimitedText = preDelimitedText
+            // these ones are guaranteed not to have accidental issues
+         // .replaceAll(new RegExp("\\|?( *)?("+keywordLiterals.join("|")+")( *)?\\|?","ig"),"|$2|") 
+            // get rid of spaces around keywords and delimit them
+         .replaceAll(new RegExp("\\|?( *)?[^A-Z0-9]("+keywords.join("|")+")[^A-Z0-9]( *)?\\|?","ig"),"|$2|") 
+            // get rid of spaces around |, and combine excess |
+         .replaceAll(/\|?( *)?\|( *)?\|?/g,"|");
+
+      if(showPostDelimit) {console.warn("post-delimit: ", delimitedText)}
+
+      return delimitedText;
+   }
+
+   /* Function getLeadIdFromDelimitedText
+      Parses delimitedText to get LeadId*/
+   function getLeadIdFromDelimitedText(delimitedText) {
+      var cuLeadId = "", matchResult;
+
+      // catches the Lead Id. Get Lead id first, since it's easier to find? Then cut it out of the string?
+      matchResult = delimitedText.match(/(LEAD( ID)?)(\|| +)(1([1-3])\d{7})/i);
+      if(matchResult != null) {
+         cuLeadId = matchResult != null ? matchResult[4] : "";
+      } else {
+         matchResult = delimitedText.match(/(LEAD( ID)?)?(\|| +)(1([1-3])\d{7})/i);
+         cuLeadId = matchResult != null ? matchResult[4] : "";
+      }
+
+      // TODO: Make sure this doesn't pick up numbers in the middle of numbers
+
+      
+      // if(cuLeadId == null) { // to catch it when posted behind
+      //    cuLeadId = delimitedText.match(/(())\|?(1(2|3)\d{7})( |\|)(LEAD ID)/i);
+      //    cuLeadId != null ? cuLeadId[3] : "";
+      // }
+
+      return cuLeadId
+   }
+
+   /* Function getTransferCodeFromDelimitedText
+      Parses delimitedText to get TransferCode*/
+   function getTransferCodeFromDelimitedText(delimitedText) {
+      var transferCode = "", matchResult;
+
+      matchResult = delimitedText.match(/(Transfer Code)\|(TC ?)?(\d{3} ?\d{3} ?\d{4})[^A-Z0-9]/i);
+      if(matchResult != null) {
+         transferCode = matchResult != null ? matchResult[3] : "";
+      } else {
+         // TODO: Need to figure out who this can be ok. It's grabbing random numbers that don't work
+
+         // matchResult = delimitedText.match(/(Transfer Code)?(\||[^A-Z0-9])(TC ?)?(\d{3} ?\d{3} ?\d{4})[^A-Z0-9]/i);
+         // transferCode = matchResult != null ? matchResult[4] : "";
+      }
+
+      return transferCode;
+   }
+
+   /* Function getRefNumFromDelimitedText
+      Parses delimitedText to get TransferCode*/
+   function getRefNumFromDelimitedText(delimitedText) {
+      var refNum = "", matchResult;
+
+      matchResult = delimitedText.match(/(Ref(erence|\.)? ?(#|num(ber)?))[^A-Z0-9](A\d{10})/i);
+      if(matchResult != null) {
+         refNum = matchResult != null ? matchResult[5] : "";
+      } else {
+         matchResult = delimitedText.match(/(Ref(erence|\.)? ?(#|num(ber)?))?[^A-Z0-9](A\d{10})/i);
+         refNum = matchResult != null ? matchResult[5] : "";
+      }
+
+      return refNum;
+   }
+
+   /* Function getDOBFromDelimitedText
+      Parses delimitedText to get DOB*/
+   function getDOBFromDelimitedText(delimitedText) {
+      var modifiedDOB, cuDOB;
+
+      // 1. Check w/the label
+      cuDOB = delimitedText.match(/(DOB|Date of Birth|Birth Date)\|(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}|\d{2}))/i);
+      if(cuDOB == null) {
+         // 2. Check w/o the label
+         cuDOB = delimitedText.match(/(DOB|Date of Birth|Birth Date)?[^\dA-Z](\d\d?[\/\-\.]\d\d?[\/\-\.](\d{4}|\d{2}))/i);
+      }
+
+      // fix the formatting
+      if(cuDOB && !/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(cuDOB[2])){
+         modifiedDOB = cuDOB[2].replaceAll(/\.\-/g,"/");
+         modifiedDOB = modifiedDOB.replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+      }
+
+      // 3. Check w/the label, but not delimiters
+      if(cuDOB == null){
+         cuDOB = delimitedText.match(/(DOB|Date of Birth|Birth Date)[^\dA-Z](\d{6,8})/i);
+         
+         if(cuDOB != null){ // grab the first two #'s, check for a 0
+            modifiedDOB = cuDOB[2];
+
+
+            // ["02281977", "2281977", "281977", "02081977", "2081977","0281977", "12311977"].forEach((inputVal, idx) => {
+            //    // for testing below
+            //    var ans = ["02281977", "02281977", "02081977", "02081977", "02081977","02081977", "12311977"];
+            //    /* ---- */
+            //    modifiedDOB = inputVal;
+
+            // Hopefully they zero padded their MM and DD. But if not...
+            if(modifiedDOB.length == 6) {
+               modifiedDOB = "0"+modifiedDOB.slice(0,1)+"0"+modifiedDOB.slice(1,2)+modifiedDOB.slice(-4);
+            }
+            if(modifiedDOB.length == 7) {
+               if(/^[01]\d+/.test(modifiedDOB)) {
+                  // if month starts w/a 0 or 1, missing 0 on day
+                  console.log("yo", modifiedDOB.slice(0,2), modifiedDOB.slice(2));
+                  modifiedDOB = modifiedDOB.slice(0,2)+"0"+modifiedDOB.slice(2);
+               } else {
+                  // if month DOES NOT start w/a 0 or 1, missing 0 on month
+                  modifiedDOB = "0" + modifiedDOB;
+               }
+            }
+
+            //    console.log(inputVal, "> modifiedDOB > ", modifiedDOB == ans[idx], "\t", modifiedDOB);
+            // });
+
+            modifiedDOB = modifiedDOB.replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+         }
+      }
+
+      // return modifiedDOB if it exists, and if not, make sure cuDOB exists before accessing it
+      return (modifiedDOB != undefined ? modifiedDOB : (cuDOB != null ? cuDOB[2] : ""));
+   }
+
+   /* Function getGenderFromDelimitedText
+      Parses delimitedText to get Sex*/
+   function getGenderFromDelimitedText(delimitedText) {
+      var cuGender = delimitedText.match(/(sex|gender)\|(male|female|m|f)/i);
+      if(cuGender == null) {
+         cuGender = delimitedText.match(/(sex|gender)?\|(male|female|m|f)\|/i);
+      }
+
+      return cuGender != null ? cuGender[2] : "";
+   }
+
+   /* Function getStateFromDelimitedText
+      Parses delimitedText to get a State abbreviation */
+   function getStateFromDelimitedText(delimitedText) {
+      var stateAbbrList = allowedStatesDB.getAbbrs(),
+          stateNameList = allowedStatesDB.getNames(),
+       // cuState = delimitedText.match(/(Most recent )?(state|State|ST)\|([A-Z^ID][A-Z^DR])\|/);
+          cuState, stateFound, stateAbbrRegex;
+      /* 
+         Test w/state abbr, case sensitive, w/non-alphanum surrounding. State optional
+         Test w/state name, not case sensitive, w/non-alphanum surrounding. State optional
+         Test w/state abbr, not case sensitive, w/non-alphanum surrounding. State optional
+      */ 
+
+      // TODO: Get the state, if labeled, despite county
+
+      cuState = delimitedText.match(new RegExp("("+stateNameList.join("|")+")([^A-Z0-9]([^C]|$))","i"));
+      if(cuState != null) {
+         cuState = stateNameToAbbrDB.getAbbr(cuState[1]);
+      } else {
+         // Name didn't work, try for an abbreviation
+         stateAbbrRegex = new RegExp("(Most recent )?(state|State|ST|STATE)?( of| OF)?([^A-Za-z0-9])("+stateAbbrList.join("|")+")[^A-Za-z0-9]");
+         cuState = delimitedText.match(stateAbbrRegex);
+
+         if(cuState == null) {
+            //again, but this time state is optional, and case is not considered
+            stateAbbrRegex = new RegExp("(Most recent )?(state|ST)?( of)?([^A-Z0-9])("+stateAbbrList.join("|")+")[^A-Z0-9]","i");
+            cuState = delimitedText.match(stateAbbrRegex);
+         }
+
+         if(cuState != null && typeof cuState != "string") {
+            cuState = cuState[5];
+         }
+      }
+
+      return (cuState || "").toUpperCase();
+   }
+
+   /* Function getMBIFromDelimitedText
+      Parses delimitedText to get MBI*/
+   function getMBIFromDelimitedText(delimitedText) {
+      var mbi,
+          mbiRegex = /[0-9][AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y]{2}[0-9]{2}/i;
+
+      mbi = delimitedText.match(mbiRegex);
+
+      return mbi != null ? mbi[0] : "";
+   }
+
+   /* Function getMcdIdFromDelimitedText
+      Parses delimitedText to get McdId*/
+   function getMcdIdFromDelimitedText(delimitedText, state="", ...excludeData) {
+      var stateInfo, mcdIdRegex, cuMcdId=null, excludeDataFiltered, moddedDelimited,  
+          mcdIdHasLetters = ["AZ", "CA", "CO", "HI", "IA", "NC", "ND", "NY", "OR", "TN", "WA"].contains(state);
+
+          // TODO: If Mcd id is 9 digits, TC is picking it up. Or Lead ID. Hm.
+      excludeDataFiltered = excludeData.filter((val) => {
+          return val != "" && val != undefined;
+      });
+      moddedDelimited = delimitedText.replaceAll(new RegExp(excludeDataFiltered.join("|"),"g"),"");
+      // moddedDelimited = delimitedText;
+
+      // 1. Try w/Mcd format
+      // if it has letters, it is more trustworthy as a regex, unlikely to grab a number it shouldn't
+      if(mcdIdHasLetters) {
+         stateInfo = stateDB.getStateInfo(state);
+         mcdIdRegex = new RegExp("((MCD|Medicaid)( Number| #| id( #)?)?|MCN)(\\|| +)#?("+stateInfo.format+")(\\|| +)","i");
+         cuMcdId = moddedDelimited.match(mcdIdRegex);
+
+         // 1.5 Try w/o Mcd id label
+         if(cuMcdId == null) {
+            mcdIdRegex = new RegExp("((MCD|Medicaid)( Number| #| id( #)?)?|MCN)?(\\|| +)#?("+stateInfo.format+")(\\|| +)","i");
+            cuMcdId = moddedDelimited.match(mcdIdRegex);
+         }
+
+      }
+
+      // 2. Try w/Mcd id label
+      if(cuMcdId == null) {
+         cuMcdId = moddedDelimited.match(/((MCD|Medicaid|MDE)( Number| #| id( #)?)?|MCN)(\|| +)#?([A-Z0-9]{3}[0-9]+[A-Z0-9]{3})(\|| +)/i);
+      }
+
+      // 3. Try w/Mcd id-like thing w/o label. A major wildcard. Not sure what it'll pick up
+      if(cuMcdId == null) {
+         // TODO: Need to figure out how this can be ok. It's grabbing random numbers that don't work
+         // cuMcdId = moddedDelimited.match(/((MCD|Medicaid|MDE)( Number| #| id( #)?)?|MCN)?(\|| +)#?([A-Z0-9]{3}[0-9]+[A-Z0-9]{3})(\|| +)/i);
+      }
+
+      return cuMcdId != null ? cuMcdId[6] : "";
+   }
+
+   /* Function getSSNFromDelimitedText
+      Parses delimitedText to get SSN*/
+   function getSSNFromDelimitedText(delimitedText, cuLeadId="") {
+      var cuSSN, moddedDelimited;
+
+      // TODO: ADD ss#### to pickup
+      moddedDelimited = delimitedText.replace(cuLeadId,""); // .replace(mcdId,""); // commented out b/c fires before Mcd id obtained
+      cuSSN = moddedDelimited.match(/(SSN|SSI|SS#|SSN#|SS)(\|| +)?(\d{3}-\d{2}-\d{4}|\d{3} \d{2} \d{4}|\d{9})[^A-Z0-9]/i);
+      if(cuSSN == null) {
+         cuSSN = moddedDelimited.match(/(SSN|SSI|SS#|SSN#)?(\|| +|[^A-Z0-9])(\d{3}-\d{2}-\d{4}|\d{3} \d{2} \d{4}|\d{9})[^A-Z0-9]/i);
+      }
+
+      return cuSSN != null ? cuSSN[3] : "";
+   }
+
+   /* Function getCuNameFromDelimitedText
+      Parses delimitedText to get Name.
+      We know these will fail: #2, #10 */
+   function getCuNameFromDelimitedText(delimitedText, ...excludeData) { // Can pass in 
+      var cuName, moddedDelimited, cuFirst, cuLast, firstReplace, 
+          excludeDataFiltered, excludeDataJoined, keywordsJoined,
+          keywords = [  // selected list of keywords to remove prior to processing. Pulls from getDelimitedText
+            "lead id",
+            "Transfer Code",
+            "Date of Birth|Birth Date|DOB",
+            "(Most recent )?state( of)?",
+            "Most recent County",
+            "MBI Number",
+            "(MCD|Medicaid)( Number| id| level)?"];
+      
+      // build the parser regex
+      excludeDataFiltered = excludeData.filter((val) => {
+          return val != "";
+      });
+      excludeDataJoined = excludeDataFiltered.length > 0 ? "|"+excludeDataFiltered.join("|") : "";
+      keywordsJoined = "[^A-Z0-9]("+keywords.join("|")+excludeDataJoined+")[^A-Z0-9]";
+
+      /* LEAD ID keeps cropping up, b/c it's sometimes next to something else, 
+         which means the regex skips the second term. Ex: |state|lead id| */
+      firstReplace = delimitedText.replaceAll(new RegExp(keywordsJoined,"ig"),"|");
+      moddedDelimited = firstReplace.replaceAll(new RegExp(keywordsJoined,"ig"),"|");
+
+      // GO FROM MORE SPECIFIC TO LESS SPECIFIC
+         // TODO: Try w/middle initial first, then something else
+      // 1. Cu name w/middle names/initial and a label
+      cuName = moddedDelimited.match(/((Customer )?name)(\|)([a-z]+ ([a-z]+|[a-z]\.?) [a-z]+( [a-z]+)?)/i);
+
+      // 2. Cu name w/middle names/initial and optional label 
+      if(cuName == null) {
+         cuName = moddedDelimited.match(/((Customer )?name)?(\|)([a-z]+ ([a-z]+|[a-z]\.?) [a-z]+( [a-z]+)?)/i);
+      }
+
+      // 3. Cu name w/optional middle names/initial and label 
+      if(cuName == null) {
+         cuName = moddedDelimited.match(/((Customer )?name)(\|)([a-z]+ ([a-z]+ |[a-z]\.? )?[a-z]+( [a-z]+)?)/i);
+      }
+
+      // 4. Cu has first/last name label
+      if(cuName == null) {
+
+            // TODO: Fix this, so that it's looking for a single first, w/an initial, and a last that's maybe two
+
+         cuName = moddedDelimited.match(/((First|Last)(\|| )?name)(\|| +)([a-z]+( [a-z]+)?)/gi);
+         if(cuName != null && cuName.length == 2) {
+            cuFirst = cuName[0].match(/name\|(.*)/i)[1];
+            cuLast  = cuName[1].match(/name\|(.*)/i)[1];
+            cuName = [,,,,cuFirst+" "+cuLast]; // b/c it needs to match everything else
+         }
+      }
+
+      // 5. Cu has optional name label
+      if(cuName == null) {
+         cuName = moddedDelimited.match(/((Customer )?name)?(\|| +)([a-z]+ ([a-z]+|[a-z]\.? )?[a-z]+( [a-z]+)?)/i);
+      }
+
+      return cuName != null ? cuName[4] : "";
+   }
+
+   /* Function getFromDelimitedText
+      Parses delimitedText to getF*/
+   function getFromDelimitedText(delimitedText) {
+   }
+
+
+   /* Function interpretClipboard
+      Gets the clipboard and pulls out the particular data in it: First name, DOB, SSN, etc
+      Returns an object that contains that info */
+   function interpretClipboard(clipText) {
+
+      var delimitedText = getDelimitedText(clipText),
+          cuName, cuDOB, cuSSN, cuSex, cuState, cuLeadId, transferCode, cuMcdId, cuMBI, output;
+
+      cuState = getStateFromDelimitedText(delimitedText);
+      cuLeadId = getLeadIdFromDelimitedText(delimitedText);
+      transferCode = getTransferCodeFromDelimitedText(delimitedText);
+      refNumber = getRefNumFromDelimitedText(delimitedText);
+      cuDOB = getDOBFromDelimitedText(delimitedText);
+      cuSex = getGenderFromDelimitedText(delimitedText);
+      cuSSN = getSSNFromDelimitedText(delimitedText, cuLeadId);
+      cuMcdId = getMcdIdFromDelimitedText(delimitedText, cuState, cuLeadId) //, transferCode, refNumber); // TC may be formatted diff....
+      cuName = getCuNameFromDelimitedText(delimitedText, cuState);
+      cuMBI = getMBIFromDelimitedText(delimitedText);
+
+      if(cuName != "") {
+         // get rid of the middle initial, then split the name into parts
+         // this makes it easier to deal w/names w/4 parts. i.e. 'MARLYN G COBAR RODENAS'
+         tempString = cuName.replace(/ [a-z]\.? /i," ").split(" ");
+         firstName = tempString[0];
+         lastName = tempString[1] + (tempString[2] != undefined ? " " + tempString[2] : "");
+      } else {
+         firstName = "";
+         lastName = "";
+      }
+
+      output = {
+               "leadId": cuLeadId,
+         "transferCode": transferCode,
+            "refNumber": refNumber,
+             "fullName": cuName,
+            "firstName": firstName,
+             "lastName": lastName,
+                  "dob": cuDOB,
+                  "ssn": cuSSN,
+                  "sex": cuSex,
+                "state": cuState,
+                  "mbi": cuMBI,
+                "mcdId": cuMcdId,
+           "agentEmail": getRequesterEmail()
+      }
+
+      if(showOutpout) {
+         console.log(JSON.stringify(output))
+      }
+
+      return output;
+   }
+
+   /*** BO ELEMENT ***/
+
+   /* Function insertBOOpenerEl
+      Inserts the notification square for when the user pushes the copy button*/
+   function insertBOOpenerEl() {
+      var elCss = `
+            .bo-opener {
+               height: 20px;
+               width: 20px;
+               padding-left: 3px;
+               padding-top: 2px;
+
+               display: flex;
+               margin: 13px 20px;
+               flex-shrink: 0;
+               -webkit-box-align: center;
+               align-items: center;
+               order: 1;
+
+               font-family: Arial,Helvetica,sans-serif;
+               font-size: 11px;
+               color: #2B2B2B;
+               font-weight: bold;
+               text-align: center;
+
+               background: #ffa13f;
+               background: linear-gradient(#ffa94c, #ff7f12);
+               border-top: 1px solid #d46d10;
+               border-bottom: 1px solid #ca5d00;
+               border-radius: 5px;
+               filter: brightness(60%);
+            }
+            .bo-opener:hover {
+               filter: brightness(100%);
+            }
+            .bo-opener.opened {
+               background: lawngreen;
+               /* add a checkmark -- same color as bg? */
+            }
+            .bo-opener-transition {
+               transition: background 1s linear(0 0%, -0 83.09%, 1 100%);
+            }
+            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/     
+            /* need to add the color, then the transition, then remove the color */
+            `,
+         domEl = $("<div>BO</div>"),
+         afterEl = getByDataTestId("nav-bar-app-nav-item").parent();
+
+      addCssEl(elCss);
+
+      domEl.addClass("bo-opener");
+      domEl.on("click", ()=>openBoTab(getLeadId()));
+
+      $(domEl).insertAfter(afterEl);
+   }
+
+   /* Function removeBOOpenedClass
+      Removes the 'opened' class from the BO Opener element */
+   removeBOOpenedClass = debounce(() => {
+      $(".bo-opener").removeClass("opened");
+   },1500);
+
+   /* Function addTransitionClass
+      Adds back the 'bo-opener-transition' class to the 
+      BO Opener element, so that it transitions off */
+   addBOTransitionClass = debounce(() => {
+      $(".bo-opener").addClass("bo-opener-transition");
+   },1000);
+
+   /* Function successfulBOOpen
+      Debounces the transition fn's so the notifier has a green that fades after a bit*/
+   function successfulBOOpen() {
+      var notifierEl = $(".bo-opener");
+
+      notifierEl.removeClass("bo-opener-transition");
+      notifierEl.addClass("opened");
+
+      addBOTransitionClass();
+      removeBOOpenedClass();
+   }
+
+   /* Function removeBOOpenerEl
+      Removes the notification square for when the user pushes the copy button*/
+   function removeBOOpenerEl() {
+      $(".bo-opener").remove();
+   }
+
+   /*** NOTIFICATION ELEMENT ***/
+
+   /* Function insertNotificationEl
+      Inserts the notification square for when the user pushes the copy button*/
+   function insertNotificationEl() {
+      var elCss = `
+            .copy-notifier {
+               height: 20px;
+               width: 20px;
+               display: flex;
+               margin: 13px 20px;
+               flex-shrink: 0;
+               -webkit-box-align: center;
+               align-items: center;
+               order: 1;
+               background: #9aafb1;
+               border-radius: 5px;
+            }
+            .copied {
+               background: lawngreen;
+               /* add a checkmark -- same color as bg? */
+            }
+            .copy-notifier-transition {
+               transition: background .75s linear(0 0%, -0 83.09%, 1 100%);
+            }
+            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/     
+            /* need to add the color, then the transition, then remove the color */
+            `,
+         domEl = $('<div></div>'),
+         afterEl = getByDataTestId("nav-bar-app-nav-item").parent();
+
+      addCssEl(elCss);
+
+      domEl.addClass("copy-notifier");
+      domEl.on("click",copyTicketInfo);
+
+      $(domEl).insertAfter(afterEl);
+   }
+
+   /* Function removeCopiedClass
+      Removes the 'copied' class from the notification element */
+   removeCopiedClass = debounce(() => {
+      $(".copy-notifier").removeClass("copied");
+   },300);
+
+   /* Function addTransitionClass
+      Adds back the 'copy-notifier-transition' class to the 
+      notification element, so that it transitions off */
+   addTransitionClass = debounce(() => {
+      $(".copy-notifier").addClass("copy-notifier-transition");
+   },300);
+
+   /* Function flashNotificationEl
+      Debounces the transition fn's so the notifier has a green that fades after a bit*/
+   function flashNotificationEl() {
+      var notifierEl = $(".copy-notifier");
+
+      notifierEl.removeClass("copy-notifier-transition");
+      notifierEl.addClass("copied");
+
+      addTransitionClass();
+      removeCopiedClass();
+   }
+
+   /* Function removeNotificationEl
+      Removes the notification square for when the user pushes the copy button*/
+   function removeNotificationEl() {
+      $(".copy-notifier").remove();
+   }
+
+
+/*** EMD: PASTE INTO CHAT TICKET INFO ***/
+
+   /* Function fillOutChatForm
+      Puts the data in the sidebar form */
+   function fillOutChatForm(copiedText) {
+      var data = getObjFromCopiedText(copiedText),
+          trackingNum = "";
+
+      if(typeof data !== "object") {
+         return;
+      }
+
+      if(data.leadId != "")       { trackingNum = data.leadId       } else 
+      if(data.refNumber != "")    { trackingNum = data.refNumber    } else
+      if(data.transferCode != "") { trackingNum = data.transferCode }  
+
+      if(trackingNum != "") {
+         setTicketFormFieldVal("Lead ID", trackingNum.replaceAll(/ |[A-Z]/gi,""));
+      }
+      if(data.state  != "") {
+         setTicketFormFieldVal("State", data.state);
+      }
+      if(data.agentEmail != "") {
+         setTicketFormFieldVal("Email Address", data.agentEmail);
+      }
+
+      scrollChatFieldsIntoView();
+   }
+
+
+   /* Function scrollChatFieldsIntoView
+      Scrolls the Emdeon fields into view */
+   function scrollChatFieldsIntoView() {
+      var fieldContainer = $('.ember-view.property_box.ticket_properties');
+
+      if(fieldContainer.length != 0) { fieldContainer[0].scrollIntoView(); }
+   }
+
+
+
+/*** PI : PASTE INTO PREVENTABLE ISSUE INFO ***/
+
+   /* Function fillOutPIForm
+      Puts the data in the sidebar form */
+   function fillOutPIForm(copiedText) {;
+      var data, agentInfo, uid, aorRegion, typeOfSub,
+          activeEl = document.activeElement,
+
+      data = getObjFromCopiedText(copiedText,/ Cu\/Agent Info/.test(copiedText));
+      typeOfSub = getTypeOfSubmission(data);
+
+      closeTranslationBanner();
+
+      console.warn("debugging: fillOutPIForm");
+
+      // SPECIAL PROCESSING
+      setTicketFormFieldVal("Type of Submission", typeOfSub);
+      if(typeOfSub == "GPS Legacy" || typeOfSub == "vConnect Resolve"){
+         setTimeout(()=>{
+            // THIS IS CASE SENSITIVE
+            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency));
+         }, 1000);
+      }
+
+      // NOT NEEDED (probably). This field is usually filled out, anyway
+      // if(getTicketFormFieldVal("Lead ID or Phone Number") == "")
+      //    setTicketFormFieldVal("Lead ID or Phone Number", getLeadId());
+
+      setTimeout(()=>{
+         if(getTicketFormFieldVal("Lead ID") == "")
+            setTicketFormFieldVal("Lead ID", data.leadId || getLeadId());
+      }, 900);
+
+      // AOR 
+      if(data["T3 Agent"] != "-" && typeof data["T3 Agent"] != "undefined") {
+         agentInfo = data["T3 Agent"].split(" / ");
+      } else {
+         agentInfo = data["T2 Agent"].split(" / ");
+      }
+      aorName = agentInfo[0];
+      uid = agentInfo[1];
+      aorRegion = agentInfo[2];
+
+      setTicketFormFieldVal("Date of Submission", data["Sub Date"]);
+      setTicketFormFieldVal("AOR (Name only)", aorName);
+      setTicketFormFieldVal("UltiPro ID (Agent)", uid);
+      setTicketFormFieldVal("Agent NPN", data["Agent NPN"]);
+      setTicketFormFieldVal("Captive Region", aorRegion == "Ntnl" ? "National" : aorRegion);
+      setTicketFormFieldVal("Carrier", data.carrier || getPICarrierFromPlanName(data["Plan Name"]));
+
+      setTimeout(()=>activeEl.focus(),125);
+      scrollChatFieldsIntoView();
+   }
+
+   /* Function scrollChatFieldsIntoView
+      Scrolls the Emdeon fields into view */
+   function scrollChatFieldsIntoView() {
+      var fieldContainer = $('.ember-view.property_box.ticket_properties');
+
+      if(fieldContainer.length != 0) { fieldContainer[0].scrollIntoView(); }
+   }
+
+
+
+/*** RFI: SELECT HM EMAIL INFO ***/
+
+   /* Function constructHumEmailInfo
+      Formats cu info to the HM Email format
+
+      OUTPUT:
+      Reason   Lead ID  Sub_Date Agent_SAN   Client_Name DOB   ZIP   MBI
+      */
+   function constructHumEmailInfo() {
+      //If not an RFI w/a cu el
+      var cuInfo = getTicketInfoEl(),
+          isCarePlusPlan = false;
+
+      if(cuInfo == undefined || isDevotedRFI() || !isRFI()) {
+         return;
+      }
+
+      if(!isCarrierPlan(cuInfo, "Humana")) {
+         if(!isCarrierPlan(cuInfo, "Care")){ // CarePlus
+            return "Not a Humana Plan";
+         } else {
+            isCarePlusPlan = true;
+         }
+      }
+
+      parsedCuInfo = getCuInfoAsObj();
+
+      var finalString =
+         parsedCuInfo["Reason"] + '\t' +
+         parsedCuInfo["Lead ID"] + '\t' +
+         parsedCuInfo["Sub Date"] + '\t' +
+         parsedCuInfo["Agent Name"] + '\t' +
+         parsedCuInfo["Agent Writing #"] + '\t' +
+         (parsedCuInfo["Cust Name"] || parsedCuInfo["Cu Name"])+ '\t' +
+         parsedCuInfo["DOB"] + '\t' +
+         parsedCuInfo["Cust Addr"].slice(-5) + '\t' +
+         parsedCuInfo["Medicare ID"] + 
+         (isCarePlusPlan ? "\tThis is a CarePlus Plan" : "");
+
+      return finalString;
+   }
+
+   /* Function selectHumEmailInfo
+      Copies cu info and formats it to the HM Email format
+      */
+   function selectHumEmailInfo(evt) {
+      // CTRL + SHIFT + H // (h for "Humana")
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on: selectHumEmailInfo");
+         }
+
+         copyStringToClipboard(constructHumEmailInfo());
+         return;
+      }
+   }
+
+
+/*** RFI: AUTO-COLLECT HM EMAIL INFO ***/
+
+   /*** GEN: WALK A VIEW ***/
+   /* Function getNextBtnOnCurrTicket
+
+      */
+   function getNextBtnOnCurrTicket() {
+      var  visibleHeader;
+
+      // there should only be one
+      visibleHeader = $(".ember-view.has-play").filter((idx, el)=>{
+         return $(el).attr("style").search("hidden") == -1;
+      });
+
+      if(visibleHeader.length == 0) {
+         return undefined;
+      } else if(visibleHeader.length > 1) {
+         console.error("!!! Multiple visible headers found");
+      }
+
+      return visibleHeader.find(".pane.right").find("button");
+   }
+
+   /* Function getActiveWorkspace
+      Returns the activeWorkspace element (one that does not have a hidden/disp:none style).
+      The workspace contains all the elements in a tab, but not the tab itself.
+      */
+   function getActiveWorkspace() {
+      var activeWorkspace = $("#main_panes > .ember-view.workspace").filter((idx, el)=>{
+         return $(el).attr("style").search(/(hidden)|(: none)/) == -1;
+      });
+      return activeWorkspace;
+   }
+
+   /* Function hasViewEnded
+
+      */
+   function hasViewEnded() {
+      // check for next button
+   }
+
+   /* Function repeaterFn
+
+      */
+   function repeaterFn() {
+      // check for next button
+   }
+
+
+ outerThingy = "";
+
+   /* Function walkAView
+      TODO: Figure out how to tell when a tab has fully loaded
+         hints: ticket-panes-grid. Seems to stay in place, just get replaced by stuff. > mutaObs on attr?
+                data-test-id="column-3" => Usually the longest to load
+      */
+   function walkAView(fnToRun) {
+      console.warn("Starting walk");
+      if(outerThingy.disconnect) outerThingy.disconnect();
+            //TODO: IN PROGRESS
+      var workspacesMutationObs, mutatorFn,
+          nextBtn = getNextBtnOnCurrTicket(),
+          activeWkspc = getActiveWorkspace(),
+          ticketBody = activeWkspc.find(".ticket-panes-grid>div>div"),
+          workspaceTabs = getByDataTestId("header-tablist");
+
+
+      // get
+      // nextBtn.closest(".workspace.has-play")
+
+      if(nextBtn == undefined) {
+         console.warn(">> !! Could not walkAView. Next button not defined");
+         return false;
+      }
+
+      nextBtn.attr("id","current_next_button");
+
+      console.warn("in it", nextBtn);
+
+      /* This fn is essentially the loop. When a change is made (next button clicked, so 
+          tab els change), it alters the structure of the tabs. Once the tabs are changed, 
+          this fires the passed-in function, and clicks the next button, waiting for there 
+          to be a change again.       */ 
+       // function mutatorFn(mutaRecord, mutaObs) {
+       //    /* There are two mutations of the workspaces when you move 
+       //       to the next ticket in a view. Each has two mutations:
+ 
+       //       A) First:
+       //          1. remove old tab (add nothing)
+       //          2. add placeholder tab (remove nothing)
+ 
+       //       B) Second: 
+       //          1. remove placeholder tab (add nothing)
+       //          2. add new tab (remove nothing)
+       //    */
+       //    console.warn(">> mutaRecord",mutaRecord);
+ 
+       //    if(mutaRecord.length == 1){
+       //       // If mutaRecord only contains one mutation, then a temp tab wasn't added.
+       //       // A temp tab is only added when there's a new tab to replace it.
+       //       console.log("all done");
+       //       mutaObs.disconnect();
+       //       return;
+       //    }
+ 
+       //    if(mutaRecord[1].addedNodes.length > 0){
+       //       console.log("adding nodes");
+       //       // B2: Added new tab. Header/nextBtn can now be found
+       //       if($(mutaRecord[1].addedNodes).find("[data-test-id='header-tab-title']").length != 0){
+       //          console.log("added new tab", mutaRecord[1]); 
+       //             // need to make sure the new tab is fully loaded.
+       //                // ? setTimeout? Messy. >> could have issues...don't like it
+       //                // ? MutaObs w/a debounced fn? really messy. 
+       //                // x Listener? but what if element doesn't exist >> there is no "rendered" event, 
+       //          /* 
+       //          promise for when ticket finishes loading
+       //          fnToRun();
+       //          */
+ 
+       //          var thing2 = getByDataTestId("omnipanel-pane-wrapper-customer-context",getActiveWorkspace());
+       //          var debouncedThingy = (mutaList, obs) => {
+       //             // passInFn()                  // 
+       //             // disconnect()
+       //          };
+ 
+       //          // debounce(debouncedThingy,150); << put this in as the fn to run
+ 
+       //          addMutationObs(thing2,debouncedThingy,{childList:true,subtree:true});
+ 
+       //          nextBtn.click();
+       //       }
+       //    }
+       // }
+ 
+       // outerThingy = workspacesMutationObs = addManagedMutationObs(workspaceTabs, mutatorFn, {childList: true})
+
+
+      /**** TAKE 2: USING RIGHTMOST omnipanel ****/
+
+      // TODO: Figure out why this isn't working. It won't move to the next ticket
+         // it's also firing more than once
+
+      // var rightOmnipanelWrapper = getByDataTestId("omnipanel-pane-wrapper-customer-context",getActiveWorkspace());
+      // var debouncedUserFn = debounce(() => {
+      //    fnToRun();
+      //    setTimeout(()=> nextBtn.click(),500); /// PROBLEM! This is asynch. If the fn takes more than 500ms, it will move before it's ready
+      // },1500);
+
+      // var wrapperObs = addManagedMutationObs(rightOmnipanelWrapper,debouncedUserFn,{childList:true,subtree:true});
+
+
+      // // gets the loop started
+      // if(nextBtn.length > 0) {
+      //    nextBtn.click();
+      // } else {
+      //    if(workspacesMutationObs.disconnect){
+      //       workspacesMutationObs.disconnect();
+      //    }
+      //    if(wrapperObs.disconnect){
+      //       wrapperObs.disconnect();
+      //    }
+      //    console.warn(">> Could not find Next button");
+      // }
+
+      // TODO: Figure out how to tell when the end has been reached.
+         // active tabs: $("[aria-label='Active workspaces']").children().length
+         // active tabs children only get up to 6--5 tabs + 1, b/c then it puts it in "more"
+         // deleting a tab removes its instance from the list
+         // if you delete a tab, it's replaced by one from "more", so the # of active tabs doesn't go down
+         // clicking "next" also removes its entry from the list
+         // Next button is unique to the ticket/view
+
+
+      /**** TAKE 3: USING RIGHTMOST omnipanel ****/
+       // Pseudocode: (it's a while loop)
+         // create the userFn
+         // call the walkAView w/user fn
+      var moddedUserFn = (...rest) => {
+         fnToRun.call(this, rest);
+         nextBtn.click();
+      }
+
+         // 1. wait for (next) ticket to load
+            // are we on first ticket > skip stuff, do user stuff
+            // are we on middle ticket > do stuff, do user stuff
+            // are we past last ticket > close it out
+
+         // 2. run user fn (we assume that the ticket that is active is the target view)
+         // 3. when user fn done, hit next button
+      moddedUserFn();
+
+         // 4. Go to step 1
+
+      var rightOmnipanelWrapper = getByDataTestId("omnipanel-pane-wrapper-customer-context",getActiveWorkspace());
+
+      var wrapperObs = addManagedMutationObs(rightOmnipanelWrapper,moddedUserFn,{childList:true,subtree:true}); // TODO: pass nextBtn via params?
+
+      // gets the loop started
+      if(nextBtn.length > 0) {
+         nextBtn.click();
+      } else {
+         if(workspacesMutationObs.disconnect){
+            workspacesMutationObs.disconnect();
+         }
+         if(wrapperObs.disconnect){
+            wrapperObs.disconnect();
+         }
+         console.warn(">> Could not find Next button");
+      }
+
+   }
+
+
+   ///// CONVENIENCE FUNCTIONS /////
+
+   /* Function autoCollectHMEmailInfo
+      Runs through the view starting from a specific ticket and 
+      appends the HM info into a single pasteable thing.
+      */
+   function autoCollectHMEmailInfo() {
+
+
+
+   }
+
+
+/*** RFI: SELECT UHC EMAIL INFO ***/
+
+   /* Function constructUHCEmailInfo
+      Formats cu info to the UHC Email format
+
+      OUTPUT:
+      Agent Name  Party ID Writing ID  Tax ID   Policy Eff Date   Plan Name   Member First Member Last  DOB  MBI  Mem ID   Addr  Mult Mem in HH  Inquiry Issue  UHC Response   Lead ID
+      */
+   function constructUHCEmailInfo() {
+      //If not an RFI w/a cu el
+      var parsedCuInfo, firstCommentText, cuName, effDate, effDateParse, tempDate, writingNum, writingNumParse,
+          partyId, partyIdParse,
+          cuInfo = getTicketInfoEl(),
+          isCarePlusPlan = false;
+
+      if(cuInfo == undefined || isDevotedRFI() || !isRegularRFI()) {
+         return;
+      }
+
+      console.warn("debugging");
+
+      if(!isCarrierPlan(cuInfo, "UHC")) {
+         return "Not a United Plan";
+      }
+
+      parsedCuInfo = getCuInfoAsObj();
+      cuName = partifyName(parsedCuInfo["Cust Name"] || parsedCuInfo["Cu Name"]);
+      firstCommentText = getFirstCommentElText();
+
+      // first comment usually doesn't have the right info, so we have to do magic
+      effDateParse = firstCommentText.match(/(Eff Date: )([\d-]+)/);
+      if(effDateParse != null || effDateParse[2] == "1900-01-00") {
+         // get it from cu info comment
+         if(parsedCuInfo.effectiveDate != undefined) {
+            effDate = parsedCuInfo.effectiveDate
+         } else {
+            tempDate = new Date(parsedCuInfo["Sub Date"]);
+            tempDate.setMonth(tempDate.getMonth()+1);
+            tempDate.setDate(1);
+            effDate = tempDate.toLocaleString('en-us',{month:'numeric',day:'numeric',year:'numeric'});
+         }
+      } else {
+         effDate = effDateParse[2];
+      }
+
+      //first comment sometimes biffs it on Writing #'s
+      writingNumParse = firstCommentText.match(/(Writing Number\/SAN ?: )(\d+)/);
+      if(writingNumParse[2] == "0") {
+         writingNum = parsedCuInfo['Agent Writing #'];
+      } else {
+         writingNum = writingNumParse[2];
+      }
+      partyIdParse = firstCommentText.match(/(Party ID: )(\d+)/);
+      if(partyIdParse[2] == "0" || partyIdParse[2] == parsedCuInfo.npn) {
+         partyId = parsedCuInfo.partyId || parsedCuInfo['Agent NPN/Party ID'].split(' / ')[2];
+      } else {
+         partyId = partyIdParse[2];
+      }
+
+      var finalString =
+         parsedCuInfo["Agent Name"] + '\t' +           // Agent Name  
+         partyId + '\t' +                              // Party ID
+         writingNum + '\t' +                           // Writing ID
+         '\t' +                                        // Tax ID
+         effDate + '\t' +                              // Policy Eff Date
+         parsedCuInfo["Plan Name"]+ '\t' +             // Plan Name
+         cuName.first + '\t' +                         // Member First
+         cuName.last + '\t' +                          // Member Last
+         parsedCuInfo["DOB"] + '\t' +                  // DOB
+         parsedCuInfo["Medicare ID"] + '\t' +          // MBI
+         '\t' +                                        // Mem ID
+         parsedCuInfo["Cust Addr"].slice(-5) + '\t' +  // Addr
+         'No\t' +                                      // Mult Mem in HH
+         'Enrollment Status\t' +                       // Inquiry Issue
+         '\t' +                                        // UHC Response
+         parsedCuInfo["Lead ID"] + '\t';               // Lead ID
+
+      return finalString;
+   }
+
+   /* Function selectUHCEmailInfo
+      Copies cu info and formats it to the UHC Email format
+      */
+   function selectUHCEmailInfo(evt) {
+      // CTRL + SHIFT + U // (u for "UHC")
+      if (evt.ctrlKey && evt.shiftKey && !evt.altKey && evt.which == 85) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on: selectUHCEmailInfo");
+         }
+
+         copyStringToClipboard(constructUHCEmailInfo());
+         return;
+      }
+   }
+
+
+/*** RFI: SELECT UHC CHAT INFO ***/
+
+   /* Function constructUHCChatInfo
+      Formats app info into the best option for UHC chat
+
+      OUTPUT:
+      Member Name  
+      DOB  
+      MBI  
+      Eff Date
+
+      Agent Name  
+      Party ID 
+      Writing ID  
+      */
+   function constructUHCChatInfo() {
+      //If not an RFI w/a cu el
+      var parsedCuInfo, firstCommentText, cuName,
+          cuInfo = getTicketInfoEl(),
+          isCarePlusPlan = false;
+
+      if(cuInfo == undefined) {
+         return "Could not get customer info";
+      }
+
+      console.warn("debugging constructUHCChatInfo");
+
+      if(!isCarrierPlan(cuInfo, "UHC")) {
+         return "Not a United Plan";
+      }
+
+      parsedCuInfo = getCuInfoAsObj();
+      firstCommentText = getFirstCommentElText();
+
+      var finalString =
+         "Agent Name:\t"      + parsedCuInfo["Agent Name"] + '\n' +                                 
+         "Party ID: \t"       + parsedCuInfo.partyId + '\n' +                 
+         "Writing Number: \t" + parsedCuInfo["Agent Writing #"] + '\n' +     
+         // firstCommentText.match(/(Eff Date: )([\d-]+)/)[2] + '\n' +     
+                                '\n' +  
+         "Cu Name: \t"        + parsedCuInfo["Cust Name"] + '\n' +    
+         "DOB:\t"             + parsedCuInfo["DOB"] + '\n' +          
+         "Medicare ID:\t"     + parsedCuInfo["Medicare ID"];          
+
+      return finalString;
+   }
+
+   /* Function selectUHCChatInfo
+      Copies cu info and formats it to the UHC Email format
+      */
+   function selectUHCChatInfo(evt) {
+      // CTRL + SHIFT + ALT + U // (u for "UHC")
+      if (evt.ctrlKey && evt.shiftKey && evt.altKey && evt.which == 85) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on: selectUHCChatInfo");
+         }
+
+         copyStringToClipboard(constructUHCChatInfo());
+         return;
+      }
+   }
+
+
+/*** RFI: SELECT DNE INFO ***/
+
+   /* Function selectDNEInfo
+      Get's the info needed for a DNE from the page.
+      Also formats it into a tabbed format and copies for pasting into a spreadsheet */
+   function selectDNEInfo(evt) {
+      // CTRL + SHIFT + E // (e for "engage")
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
+         if(zd.mydebug.isDB()) {
+            console.warn(">> debug on");
+         }
+
+         var commentEl = $(getFirstCommentEl()),
+             agentNameData = commentEl.children().html();
+         if(isDevotedRFI(commentEl)) {
+            agentNameData = agentNameData.replaceAll(/\<\/?(t|b)[rdba](ody|ble)?( rowspan=\"\d\")?\>/g,"!").split(/!+/g)[1];
+         }
+
+         var finalString =
+            getCuName()+"\t"+
+            getLeadId()+"\t"+
+            agentNameData;
+
+         // TODO: get inner HTML, and if Dev, get agent Name
+
+
+         copyStringToClipboard(finalString);
+
+         return;
+      }
+   }
+
+
+/*** RFI: COPY RFI INFO ***/
+
+
+/*** RFI: PASTE INTO RFI INFO ***/
+
+   /* Function fillOutRfiForm
+      Puts the data in the sidebar form */
+   function fillOutRfiForm(copiedText="") {
+      var data = getObjFromCopiedText(copiedText),
+          activeEl = document.activeElement,
+          typeOfSub = getTypeOfSubmission(data);
+
+      closeTranslationBanner();
+
+      // SPECIAL PROCESSING
+      setTicketFormFieldVal("Type of Submission", typeOfSub);
+      if(typeOfSub == "GPS Legacy"){
+         // data.agency = data["Agent GH Info"];
+         // data["Agent GH Info"] = "X / X / X / X"
+
+         setTimeout(()=>{
+            // THIS IS CASE SENSITIVE
+            console.warn("Setting Agency as:",agencyInterpreter(data.agency));
+            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency));
+         }, 925);
+      }
+
+      agentGHInfo = (data["Agent GH Info"] || "").split(" / ");
+
+      // FORM ASSIGNMENT
+         //SPECIALS:
+         if(isCSNP()) {
+            setTicketFormFieldVal("Responsible Party", "Member");
+            setTicketFormFieldVal("Select if RFI Denial ", "No");
+         }
+
+         setTimeout(()=>{
+            if(getTicketFormFieldVal("Lead ID") == "")
+               setTicketFormFieldVal("Lead ID", getLeadId() || data.leadId || data["Lead ID"] || data["Lead Id"]);
+         }, 900);
+
+
+      setTicketFormFieldVal("RFI Carrier", getRFICarrierFromPlanName(data['Plan Name']));
+         /* Aetna   AllWell   Anthem   CarePlus   Cigna   Devoted   Highmark   Humana
+            Kaiser  Simply    United   WellCare   Zing   */
+      if(data["SEP on App"] != "-") {
+         setTicketFormFieldVal("SEP Used", data["SEP on App"]);
+      } else if(getTicketFormFieldVal("SEP Used") == "-"){
+         setTicketFormFieldVal("SEP Used", "Other SEP");
+      }
+      setTicketFormFieldVal("Due Date", formatDateForZDForm(data["Apx Due Date"]));
+      setTicketFormFieldVal("AOR", data["Agent Name"]);
+      setTicketFormFieldVal("UltiPro ID", agentGHInfo[0]);
+      setTicketFormFieldVal("Agent NPN", data["Agent NPN/Party ID"].split(" / ")[0]);
+      setTicketFormFieldVal("Program Manager", agentGHInfo[1]);
+      setTicketFormFieldVal("Manager Name", agentGHInfo[2]);
+      setTicketFormFieldVal("Captive Region", agentGHInfo[3] == "Ntnl" || agentGHInfo[3] == "X" ? "National" : agentGHInfo[3]);
+
+      console.log("==>> activeEl", activeEl);
+      setTimeout(()=>{ activeEl.focus() },980);
+      scrollChatFieldsIntoView();
+   }
+
+
+
+/*** T2F: COPY FEEDBACK INFO ***/
+
+   /* Function getT3FeebackInfo
+      Gets all the data needed for the form */
+   function getT3FeebackInfo() {
+      var conclusionComment, returnString,
+          firstCommentString = processT3FeedbackComment(getFirstCommentEl()).replaceAll("\t\n","\t-\n");
+
+      conclusionComment = getActiveTabEl().getTicketEl().find("div.zd-comment:contains('Conclusion')");
+      if(conclusionComment.length != 0) {
+         // TODO: Fix this. It's picking up the whole comment when no conclusion exists
+         commentText = conclusionComment.last().html().split("<br>");
+         if(commentText){
+            foundedStatus = commentText[1].split("|")[0];
+            feedbackNote = commentText[1].split("|")[1] || "None";
+         } else {
+            foundedStatus = "-";
+            feedbackNote = "None";
+         }
+      }
+
+      returnString = firstCommentString +"\n"+
+         "Founded:\t"+foundedStatus+"\n"+
+         "Feedback Note:\t"+feedbackNote;
+
+      return  returnString;
+   }
+
+/*** T2F: PASTE INTO FEEDBACK INFO ***/
+
+   /* Function fillOutT2FeedbackForm
+      Puts the data in the sidebar form */
+   function fillOutT2FeedbackForm(copiedText) {
+      var data, conclusionComment, foundedStatus, feedbackNote,
+          agentTypeDDTopEl, fillT2Form,
+          trackingNum = "";
+          console.warn("yo");
+
+      data = getObjFromCopiedText(copiedText, /T2 Feedback/.test(copiedText));
+
+      if(copiedText.slice(3,14) != "T2 Feedback") {
+         console.warn("Tried to fill T2 form, but data is not T2 data", data);
+         return;
+      }
+
+      // SPECIAL PROCESSING
+      t2AgentData = data["Adv. (T2) Agent"].split(/  +|\t+/);
+
+         // if(getTicketFormFieldVal("Lead ID") == "")
+         //    setTicketFormFieldVal("Lead ID", getLeadId());
+
+      conclusionComment = getActiveTabEl().getTicketEl().find("div.zd-comment:contains('Conclusion')");
+      if(conclusionComment.length != 0) {
+         commentText = conclusionComment.last().html().split("<br>");
+         foundedStatus = commentText[1].split(" | ")[0];
+         feedbackNote = commentText[1].split(" | ")[1] || "None";
+      } else {
+         foundedStatus = "-";
+         feedbackNote = "None";
+      }
+
+      // FORM ASSIGNMENT
+      agentTypeDDTopEl = getTicketFormFieldTopEl("Are you submitting feedback for");
+      addManagedMutationObs(agentTypeDDTopEl, fillT2Form,{childList: true, subtree:true});
+
+      fillT2Form = () => setTimeout(() => {
+      // fillT2Form = () => {
+         setTicketFormFieldVal("Transfer Reference Num", data["Transf Ref #"]);
+         setTicketFormFieldVal("Captive Agent Name", t2AgentData[0]);  // Both here b/c doing both doesn't
+         setTicketFormFieldVal("vConnect Agent Name", t2AgentData[0]); // have any adverse affect.
+         setTicketFormFieldVal("UltiProID (Captive Agent)", t2AgentData[1]);
+         // setTicketFormFieldVal("Select Feedback Coaching", "Not sure how to handle this... it's tiered");
+         setTicketFormFieldVal("Is this feedback founded", foundedStatus.toProper());
+         setTicketFormFieldVal("TeleCare/T3 Agent Name", data["Res. (T3) Agent"]);
+         setTicketFormFieldVal("select Case Management support agent", "Stephen S");
+         setTimeout(() => setTicketFormFieldVal("Date Coaching sent", formatDateForZDForm(new Date().toString())),400);
+         setTicketFormFieldVal("context and detailed notes", feedbackNote);
+      },100);
+      // };
+
+      if(data["Sales Agent Type"] != undefined) {
+         setTicketFormFieldVal("Are you submitting feedback for a T2/T3 Agent", data["Sales Agent Type"],fillT2Form);
+      }
+
+      scrollChatFieldsIntoView();
+   }
+
+
+   /* Function scrollChatFieldsIntoView
+      Scrolls the Emdeon fields into view */
+   function scrollChatFieldsIntoView() {
+      var fieldContainer = $('.ember-view.property_box.ticket_properties');
+
+      if(fieldContainer.length != 0) { fieldContainer[0].scrollIntoView(); }
+   }
+
+
+/*************
+* LOGIC
+**************/
+if(typeof zd == "undefined") {
+   window.zd = {
+      ranSetup: false
+   };
+}
+if(zd.ranSetup != true) {
+   setUpKeyboardShortcuts();
+
+   zd.ranSetup = true;
+   zd.unload = unload;
+   zd.alreadyPresent = alreadyPresent;
+   evt = { // For debugging/testing
+       ctrlKey:true,
+       shiftKey:true,
+       which:70
+   }
+   zd.mydebug = mydebug;
+
+   insertNotificationEl();
+   insertBOOpenerEl();
+
+   console.log(">> Inserted ZD logic");
+} else {
+   zd.alreadyPresent();
+}
+
+
+stopExec=false;
+showPreDelimit=true;
+showPostDelimit=true;
+showClipText=false;
+showOutpout=false;
+
+function quiet() {
+   showPreDelimit = false;
+   showPostDelimit = false;
+   showClipText = false;
+   showOutpout = false;
+}
+function unquiet() {
+   showPreDelimit = true;
+   showPostDelimit = true;
+}
+
+function startTesting() {
+   showClipText = true;
+   showOutpout=true;
+}
