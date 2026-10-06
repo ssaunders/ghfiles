@@ -1,0 +1,1611 @@
+//~~~~ CRM CUSTOMIZATION ~~~~//
+
+// TODO:
+
+	// 1  working on
+      // TODO: Figure out the iframe issue (Think like MARx, have CRM be assigned in both frames)
+
+      // AUTONAV
+		// TODO: Test AutoNav / Stepper
+      // TODO: Need to handle the iFrame
+      // TODO: Figure out how I want to run it. Not on first insert?
+      /* Notes:
+         Skip autonav if already logged in
+         insert "auto login" button where it has the "continue"
+         each step is going to require a mutationObs;
+      */
+
+	// 2 priority
+      // TODO: Reskin Comm info to put the icon at the top next to the name, rather than taking up a whole 40 px on the left
+      // TODO: Have Comm highlight as red "App Submitted" Calls
+
+	// 3 backlog
+		// TODO: Add the auto-formatters for fields (when lose focus, setField)
+		// TODO: Write shortcut logic fn
+			// TODO:
+		// TODO: Figure out why jq = window.$ works, when just $ doesn't
+      // TODO:
+      // TODO:
+      // TODO:
+      // TODO:
+
+/** DONE **/
+
+   /**** Post Version Release ****/
+      // TODO: Add Ctrl + Shift + V shortcut
+		// TODO: Add the getters/setters for fields
+		// TODO: Add logic to get $ in multiple ways, and to show which one is needed to use
+		// TODO: Change the placeholders in the file for the crm, CRM,
+      // TODO: Figure out what kind of jquery/$ it uses
+      // TODO: Figure out how to allow zip to be handled
+      // TODO: Make sure it inserts into page correctly
+      // TODO: Add the getters for buttons
+      // TODO: Fix too tall CSS
+      // TODO: When you search, make it click the search button
+      // DROP: When you search, and there's only one result, go ahead and open it XXX (too much facilitation)
+
+
+/*************
+* FUNCTIONS
+**************/
+
+// MAIN
+/*** LIBRARY ***/
+   /* Whitespace magic:
+      // 4 to 3
+      ^((   ) )((   ) )?((   ) )?((   ) )?([^ *])
+      $2$4$6$8$9
+
+      // 3 to 4
+      // Trickier, b/c you're adding stuff. Must do each layer manually
+      // Dup the (   ), add " $X+1"
+      ^(   )(   )([^ ])
+      $1 $2 $3
+
+      Careful, though 3 x 4 = 12
+   */
+
+   /*  Function alreadyPresent
+      alerts that the code already exists */
+   function alreadyPresent() {
+      console.warn(">> CRM Code already present");
+   }
+
+  /// DEBUG ///
+   mydebug = {
+      isDebugging: false,
+      isDB: function () {
+         return this.isDebugging;
+      },
+      startDB: function() {
+         this.isDebugging = true;
+      },
+      endDB: function() {
+         this.isDebugging = false;
+      },
+      warn: function(fnName) {
+         console.warn("hit function "+fnName);
+      }
+   };
+
+   mockEvt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      altKey: false,
+      which:70
+   }
+
+  /// CLIPBOARD ///
+
+   /* Function copyStringToClipboard
+      Copies a string to the computer clipboard */
+   function copyStringToClipboard(stringToCopy, printResult) {
+      if(stringToCopy == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      return navigator.clipboard.writeText(stringToCopy)
+         .then(() => {
+            console.log('>> Content copied to clipboard');
+            if(printResult) {
+               console.log("Copied: ", data);
+            }
+         },(a,b,c,d) => {
+            //TODO: handle if a.message.contains "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+            console.error('>> Failed to copy');
+         });
+   }
+
+   /*  Function copyElToClipboard
+      Copies the content of an el to the computer clipboard */
+   function copyElToClipboard(htmlEl, doc=document) {
+      if(htmlEl == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
+      }
+
+      var range = doc.createRange();
+      var sel = doc.getSelection();
+
+      try {
+         sel.removeAllRanges();
+         range.selectNodeContents(htmlEl);
+         sel.addRange(range);
+         doc.execCommand("Copy");
+      } catch (error) {
+         console.warn(error);
+      }
+   }
+
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+
+  /// ELEMENT ADDERS ///
+
+   //TODO: Decide what to do here. Should I throw an error if not added?
+   // have a return val? Need to indicate if it wasn't added
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc=document) {
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc=document) {
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+  /// MUTATION OBS ///
+
+   mutatorArray = [];
+
+   /* Function addManagedMutationObs
+      Adds a mutation observer to targetEl. Returns the observer.
+      The fn passed in will receive these arguments:
+      mutationList - the list of changes.
+      observer - The observer instance.
+      https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
+      See addMutationObs for details on options.
+      */
+   function addManagedMutationObs(targetEl, fn, options) {
+      var mutaObs = addMutationObs(targetEl, fn, options);
+
+      mutaObs.target = targetEl;
+      mutaObs.managedId = Math.round(Math.random()*9000+1000);
+      mutaObs.managedDisconnect = () => {unloadManagedMutator(mutaObs.managedId)};
+      mutatorArray.push(mutaObs);
+
+      return mutaObs;
+   }
+
+   /* Function unloadManagedMutator
+      Removes the specific mutation observer from mutatorArray */
+   function unloadManagedMutator(managedId) {
+      var idx = mutatorArray.findIndex((mutaObs) => {
+         if(mutaObs.managedId == managedId) {
+         return true;
+         }
+      });
+
+      if (idx == -1) {
+         console.warn("Tried to delete a managed observer that didn't exist:", managedId);
+         return false;
+      }
+
+      mutatorArray[idx].disconnect();
+
+      mutatorArray = mutatorArray.toSplice(idx,1);
+
+      return true;
+   }
+
+   /* Function unloadAllManagedMutators
+      Removes the keyboard listeners from the page and undoes everything in runSetup */
+   function unloadAllManagedMutators() {
+      mutatorArray.map((muta) => {
+         muta.disconnect();
+      });
+      mutatorArray = [];
+   }
+
+   /* Function addMutationObs
+    * Adds a mutation observer to targetEl. Returns the observer.
+    * The fn passed in will receive these arguments:
+    *   mutationList - the list of changes.
+    *   observer - The observer instance.
+    *   https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+    *
+    *   OPTIONS DETAILS:
+    *   subtree / Optional / default: false
+    *       true = monitors the entire subtree target. Any other options will also apply to the subtree.
+    *
+    *   childList / Optional / default: false
+    *       true = monitor the target node for the addition/removal of child nodes
+    *
+    *   attributes / Optional / default: false, unless attributeFilter/attributeOldValue is true
+    *       true = watch for changes to the value of attributes on the node or nodes being monitored.
+    *
+    *   attributeFilter / Optional / default: false
+    *       array of attribute names to be monitored. If this isn't included, any attribute change causes mutation notifications.
+    *
+    *   attributeOldValue / Optional / default: false
+    *       true = records the prev value of any attribute that changes
+    *
+    *   characterData / Optional / default: false, unless characterDataOldValue is true
+    *       true = monitor the specified target node for changes to the character data contained within the node or nodes.
+    *
+    *   characterDataOldValue / Optional / default: false
+    *       true = record the prev value of a node's text whenever the text changes on nodes being monitored.
+    */
+   function addMutationObs(targetEl, fn, options = {childList:true}) {
+      if(typeof fn != "function") {
+         fn = () => console.log("ran mutationObserver for ",targetEl);
+      }
+      if(typeof options != "object") {
+         options = {childList:true, subtree:true};
+      }
+      if(targetEl.val) { // strip out the jQuery object
+         targetEl = targetEl[0];
+      }
+
+      var mutationObs = new MutationObserver(fn);
+      mutationObs.observe(targetEl, options);
+
+      return mutationObs;
+   }
+
+  /// UTILITY ///
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. Doesn't currently work*/
+   function listenToAllEvents(el) { // limitScroll/Mouse/Key, userFn
+      var eventFilter;
+      // Options: animation*, on*, mouse*, pointer*, transistion*, click, blur, dblclick, scroll*
+      // eventFilter = /^on(key|mouse)/     // just for onkey* or onmouse*
+      eventFilter = /^on/                // gets all events
+      Object.keys(el).forEach(key => {
+          if (eventFilter.test(key)) {
+              el.addEventListener(key.slice(2), event => {
+                  console.log(event);
+              });
+          }
+      });
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging.
+      eventFilter is ....
+      { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
+      "mouse"
+      // Options: animation*, on*, mouse*, pointer*, transition*, click, blur, dblclick, scroll*
+      */
+   function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
+      var eventTypes, regexString, filterToUse;
+
+         eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
+      // Figure out if it's a string event name, a regex, or an obj
+      if(typeof eventFilter == "string") {
+         filterToUse = eventFilter;
+      } else if(typeof eventFilter == "object") {
+         if(eventFilter.test == undefined) {
+            eventTypes =
+               eventFilter.mouse      ? "|mouse" : "" +
+               eventFilter.click      ? "|click" : "" +
+               eventFilter.pointer    ? "|pointer" : "" +
+               eventFilter.animation  ? "|animation" : "" +
+               eventFilter.transition ? "|transition" : "" +
+               eventFilter.key        ? "|key" : "";
+            regexString = eventFilter.exclude ? "^on(?!.*("+eventTypes.slice(1)+").*$" : "^on.*("+eventTypes.slice(1)+").*$"
+            filterToUse = new RegExp(regexString);
+         } else { // eventFilter is a regex
+            filterToUse = eventFilter
+         }
+      } else {
+         console.warn("Failed to listen to events. Could not recognize filter");
+      }
+
+      for (var key in el) {
+         if (key.search(filterToUse) === 0) {
+            console.log("added to ",key)
+            el.addEventListener(key.slice(2), fn)
+         }
+      }
+
+      return {
+         removeListeners: () => {
+            for (var key in el) {
+               if (key.search(filterToUse) === 0) {
+                  console.log("removed from",key)
+                  el.removeEventListener(key.slice(2), fn)
+               }
+            }
+         }
+      }
+   }
+
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   function getCurrentTimestamp() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+   }
+
+   /* Function debounce
+       Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait);
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log("logging: "+Math.round(Math.random()*1000),a,b,c);
+   }
+
+   /* Function isPastingFromMARx
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMARx(colonList){
+      return /^Claim Number:\t +.*\r?\nMBI /.test(colonList);
+   }
+
+   /* Function isPastingFromMP
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMP(colonList){
+      return /^Personal Info\r?\nMBI /.test(colonList);
+   }
+
+   /* Function setNativeValue
+      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
+      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
+   function setNativeValue(element, value) {
+      if(element.get != undefined) {
+         element = element.get(0);
+      }
+
+      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+      const prototype = Object.getPrototypeOf(element);
+      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+      if (valueSetter && valueSetter !== prototypeValueSetter) {
+         prototypeValueSetter.call(element, value);
+      } else {
+         valueSetter.call(element, value);
+      }
+   }
+
+  /// DATA MANIPULATION ///
+
+   /** Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+      Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+      With delimiters of " ",/,-, or .
+      Can handle yyyymmdd if it has a delimiter
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day
+    */
+   function standardizeFullDateString(fullDate) {
+      if(typeof fullDate != "string") {
+         return fullDate;
+      }
+
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry, yearHolder;
+
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         partsAry = moddedDate.split("/");
+         yearHolder = partsAry.shift();
+         partsAry.push(yearHolder);
+      } else { // MONTH FIRST
+
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   function convertColonListToJsonObj(colonList, hasHeader=false) {
+      var logStuff = false,
+          pastedFromMARx = isPastingFromMARx(colonList),
+          pastedFromMP = isPastingFromMP(colonList),
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          // listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Handle the MARx Address issue
+      if(pastedFromMARx) {
+         infoAry[13]+=infoAry[14];
+         infoAry.splice(14,1);
+      }
+
+      // Handle the MP Address issue
+      if(pastedFromMP) {
+         infoAry[12]+=infoAry[13];
+         infoAry.splice(13,1);
+      }
+
+      // Skip the header
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+         returnObj[infoAry[iter]]=infoAry[iter+1];
+         if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+         }
+      }
+      return returnObj;
+   }
+
+   /**
+    * Function getObjFromCopiedText
+    * Also calls standardizeCuInfo, which is specific to cu info,
+    * but I'm including it b/c it's simpler than knowing you have
+    * to always pair the two fn's.
+    * CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+    */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+      var data, standardInfo;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){  // first comment in an RFI // still? It now has new lines
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+      }
+
+      standardInfo =standardizeCuInfo(data);
+      return siteSpecificStandardize(standardInfo);
+   }
+
+   /**
+    *  @Function standardizeCuInfo
+    *  Takes cu input from wherever I have copied it, in whatever format,
+    *  and standardizes the data names.
+    */
+   function standardizeCuInfo(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, cuName, namePartsFirst, namePartsSecond, typeOfSub, npnPartyIdParts;
+
+      // ADDRESS INFO
+      var custAddress = cuInfoObj["Cust Addr"] || cuInfoObj.address || cuInfoObj.Address || "";
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      }
+      if(custAddress == "" || custAddress == "no address given" || custAddress == undefined) {
+         newCuInfoObj.zip = "";
+      } else {
+         newCuInfoObj.zip = custAddress.match(/(\d{5})(-\d+)?$/)[1];
+      }
+
+      // CU INFO
+      newCuInfoObj.leadId = cuInfoObj["Lead ID"] || cuInfoObj["Lead Id"] || cuInfoObj["Lead id"]
+                         || cuInfoObj["lead id"] || cuInfoObj["lead_id"] || cuInfoObj["leadId"]
+                         || cuInfoObj["leadid"]  || cuInfoObj["LeadID"]  || cuInfoObj["LeadId"];
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+      newCuInfoObj.phoneNum = cuInfoObj.phone || cuInfoObj.Phone || cuInfoObj["Phone Number"] || cuInfoObj["Phone Num"] || "";
+      newCuInfoObj.email = cuInfoObj.email || cuInfoObj.Email || cuInfoObj["Email Address"] || cuInfoObj["email address"] || "";
+
+      // NAME (cuInfoObj.Name is to get it from MARx )
+      newCuInfoObj.fullName = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "")
+                  .replace(/ [JS]r\.?| (I+|IV)/,"")   // get rid of Jr, etc
+                  .replace(/ [A-Z]\.? /," ");         // remove middle initials
+      nameParts = newCuInfoObj.fullName.match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+      // AGENT INFO
+      if(/\//.test(cuInfoObj["Agent NPN/Party ID"])) {
+         npnPartyIdParts = cuInfoObj["Agent NPN/Party ID"].split(" / ");
+         newCuInfoObj.npn = npnPartyIdParts[0];
+         newCuInfoObj.partyId = npnPartyIdParts[1];
+      } else {
+         newCuInfoObj.npn = cuInfoObj["Agent NPN"];
+      }
+
+     return newCuInfoObj;
+   }
+
+   /**
+    * Function createColonList
+    * Takes an arbitrary number of parameters as sequential key-value pairs
+    * and returns a string where each pair is formatted as "key: \t value",
+    * separated by a newline.
+    *
+    * @param {...any} args - Sequential key-value arguments (e.g., 'Name', 'Alice', 'Age', 30).
+    * @returns {string} A single formatted string.
+    */
+   function createColonList(...args) {
+     const pairs = [];
+
+     // Iterate through the arguments two at a time (key and value)
+     for (let iter = 0; iter < args.length; iter += 2) {
+       const key = args[iter];
+       const value = args[iter + 1];
+
+       // Check if we have both a key and a value for this pair
+       if (key !== undefined && value !== undefined) {
+         // Create the formatted string for the pair: key: \t value
+         pairs.push(`${key}:\t${value}`);
+       } else if (key !== undefined) {
+         // TODO: Handle an odd number of arguments by adding the last key alone
+         console.warn(`Missing value for key: ${key}`);
+       }
+     }
+
+     // Join all the formatted pairs with a newline character
+     return pairs.join('\n');
+   }
+
+
+/*** UTILITY ***/
+
+  /*** PAGE SETUP ***/
+
+	/* Function setUpKeyboardShortcuts
+	   Sets up the keyboard listeners to the page */
+	function setUpKeyboardShortcuts() {
+      document.addEventListener("keyup", crmCuInfoCopy);            // CTRL + SHIFT + X    // X b/c convenient
+      document.addEventListener("keyup", pasteInSearchInfo);        // CTRL + SHIFT + V    // V b/c that's how it is
+
+		console.warn(">> set up shortcuts");
+	}
+
+   /* Function removeKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function removeKeyboardShortcuts() {
+      document.removeEventListener("keyup", crmCuInfoCopy);
+      document.removeEventListener("keyup", pasteInSearchInfo);
+      console.log(">> removed shortcuts");
+   }
+	/* Function unload
+	   Removes the keyboard listeners from the page */
+	function unload() {
+		// unloadManagedMutators();
+		removeKeyboardShortcuts();
+
+      esf("#custom_css").remove();
+
+		crm.ranSetup = false;
+	}
+
+  /*** 2 SCH: GETTERS & SETTERS ***/
+
+   /** FIELD TYPE SETTERS
+
+   /* Function setInputField
+      Sets the value of an input field */
+   function setInputField(input, val) {
+      var evtConfig = {
+         bubbles: true,
+         cancelBubble: false,
+         cancelable: false,
+         composed: true,
+         currentTarget: null,
+         data: val,
+         dataTransfer: null,
+         defaultPrevented: false,
+         inputType: "insertText",
+         srcElement: input,
+         target: input,
+         type: "input"
+      }
+
+      if(input != undefined && val != undefined) {
+         input.value = val;
+         input.dispatchEvent(new Event('input',evtConfig));
+         return true;
+      } else {
+         return false;
+      }
+   }
+
+   /* Function setDDField
+      Sets a DD field, with a certain value*/
+   function setDDField(input, val) {
+
+   }
+
+   /** 2 SCH: FIELDS **/
+
+   // CUSTOMER ID //
+   /* Function getCustomerIdField */
+   function getCustomerIdField() {
+      return esf('#customer-id');
+   }
+
+   /* Function setCustomerIdField */
+   function setCustomerIdField(val="") {
+      if(val == "" || val == null) return false;
+
+      var field = getCustomerIdField();
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   // FIRST NAME //
+   /* Function getFirstNameField */
+   function getFirstNameField() {
+      return esf('#first-name');
+   }
+
+   /* Function setFirstNameField */
+   function setFirstNameField(val="") {
+      if(val == "" || val == null) return false;
+
+      var field = getFirstNameField();
+
+      // PUT VALIDATION AND VAL MANIP HERE
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   // LAST NAME //
+   /* Function getLastNameField */
+   function getLastNameField() {
+      return esf('#last-name');
+   }
+
+   /* Function setLastNameField */
+   function setLastNameField(val="") {
+      if(val == "" || val == null) return false;
+
+      var field = getLastNameField();
+
+      // PUT VALIDATION AND VAL MANIP HERE
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   // PHONE NUMBER //
+   /* Function getPhoneNumberField */
+   function getPhoneNumberField() {
+      return esf('#phone-number');
+   }
+
+   /* Function setPhoneNumberField */
+   function setPhoneNumberField(val="") {
+      if(val == "" || val == null) return false;
+
+      var field = getPhoneNumberField();
+
+      // PUT VALIDATION AND VAL MANIP HERE
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   // DOB //
+   /* Function getDobField */
+   function getDobField() {
+      return esf('[inputid="date-of-birth"] input');
+   }
+
+   /* Function setDobField */
+   function setDobField(val="") {
+      if(val == "" || val == null) return false;
+
+      if(!isAdvSearchOpen()) {
+         toggleAdvSearch();
+      }
+
+      var field = getDobField(),
+          moddedVal = val.replace(/(\d+)-(\d+)-(\d+)/,"$2$3$1");
+          // moddedVal = standardizeFullDateString(val);
+
+      setInputField(field,moddedVal);
+      return field.value == val;
+   }
+
+   // ZIP CODE //
+   /* Function getZipField */
+   function getZipField() {
+      return esf('#zip-code');
+   }
+
+   /* Function setZipField */
+   function setZipField(val="") {
+      if(val == "" || val == null) return false;
+
+      if(!isAdvSearchOpen()) {
+         toggleAdvSearch();
+      }
+
+      var field = getZipField();
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   // LEAD ID //
+   /* Function getLeadIdField */
+   function getLeadIdField() {
+      return esf('#lead-id');
+   }
+
+   /* Function setLeadIdField */
+   function setLeadIdField(val="") {
+      if(val == "" || val == null) return false;
+
+      if(!isAdvSearchOpen()) {
+         toggleAdvSearch();
+      }
+
+      var field = getLeadIdField();
+
+      // PUT VALIDATION AND VAL MANIP HERE
+
+      setInputField(field,val);
+      return field.value == val;
+   }
+
+   /** BUTTONS & CLICKABLES **/
+
+   // SEARCH BTN //
+   /* Function getSearchButton */
+   function getSearchButton() {
+      return esf("p-button[label='Search'] button");
+   }
+
+   // ADVANCED SEARCH HIDE/SHOW //
+   /* Function getAdvSearchButton */
+   function getAdvSearchButton() {
+      return esf("form button[type='button']");
+   }
+
+   /* Function isAdvSearchOpen
+      Returns true if the bottom section is open */
+   function isAdvSearchOpen(){
+      var searchForm = esf(".page-content form");
+      if(searchForm != null){
+         return searchForm.children[1].childElementCount > 1;
+      }
+      return false;
+   }
+   /* Function toggleAdvSearch
+      Toggles the Advanced search section*/
+   function toggleAdvSearch(){
+      getAdvSearchButton().click();
+   }
+
+   // RESET BUTTON //
+   /* Function getResetSearchButton */
+   function getResetSearchButton() {
+      return esf("button[type='reset']");
+   }
+
+
+   /** 2 SCH: CHECKERS **/
+
+   function checkGetters() {
+      // fields
+      console.log("getCustomerIdField", getCustomerIdField());
+      console.log("getFirstNameField", getFirstNameField());
+      console.log("getLastNameField", getLastNameField());
+      console.log("getPhoneNumberField", getPhoneNumberField());
+      console.log("getDobField", getDobField());
+      console.log("getZipField", getZipField());
+      console.log("getLeadIdField", getLeadIdField());
+      // buttons
+      console.log("getSearchButton", getSearchButton());
+      console.log("getResetSearchButton", getResetSearchButton());
+      console.log("getAdvSearchButton", getAdvSearchButton());
+   }
+
+   mydebug.setTestingString = "ok";
+   mydebug.setTestingNumber = 123456789;
+   mydebug.setTestingDate = "04-14-2025";
+   mydebug.setTestingPhoneAllNumbs = "8478675309";
+   mydebug.setTestingPhoneAllNumbsAnd1 = "18478675309";
+   mydebug.setTestingPhoneWDashes = "847-867-5309";
+   mydebug.setTestingPhoneWDParens = "(847) 867-5309";
+   mydebug.setTestingPhoneWDDashesAnd1 = "1 847-867-5309";
+   mydebug.setTestingPhoneWDParensAnd1 = "1 (847) 867-5309";
+   mydebug.setTestingPhoneWDDashesPlusAnd1 = "+1 847-867-5309";
+   mydebug.setTestingPhoneWDParensPlusAnd1 = "+1 (847) 867-5309";
+
+   function checkSetters() {
+      console.log("setCustomerIdField", setCustomerIdField(mydebug.setTestingString));
+      console.log("setFirstNameField", setFirstNameField(mydebug.setTestingString));
+      console.log("setLastNameField", setLastNameField(mydebug.setTestingString));
+      console.log("setPhoneNumberField", setPhoneNumberField(mydebug.setTestingPhoneAllNumbs));
+      console.log("setDobField", setDobField(mydebug.setTestingDate));
+      console.log("setZipField", setZipField(mydebug.setTestingNumber));
+      console.log("setLeadIdField", setLeadIdField(mydebug.setTestingNumber));
+   }
+
+  /*** 3 MEM: GETTERS ONLY ***/
+
+   // MEMBER NAME //
+   /* Function getCustomerName */
+   function getCustomerName() {
+      var el = esf("[label='Name'] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText.trim();
+   }
+
+   // DOB //
+   /* Function getDob */
+   function getDob() {
+      var el = esf("[label='Date of Birth'] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText;
+   }
+
+   // CUSTOMER ID //
+   /* Function getCustomerId */
+   function getCustomerId() {
+      var el = esf("[label='Customer ID'] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText;
+   }
+
+   // ZIP //
+   /* Function getZip */
+   function getZip() {
+      var el = esf("[label='ZIP'] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText;
+   }
+
+   // PHONE NUMBER //
+   /* Function getPhoneNumber */
+   function getPhoneNumber() {
+      var el = esf("[label='Phone Number'] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText.replaceAll("-","");
+   }
+
+   // ADDRESS //
+   /** Function getAddress
+    *  Requires the current page to be "Personal Info"
+    */
+   function getAddress() {
+      var spans = $$("[label='Residence Address'] span"),
+          address;
+
+      if(spans.length == 0) return "";
+
+      spans.shift(); // get rid of the first item
+      return spans[0].innerText + ", " + spans[1].innerText + " " + spans[2].innerText;
+   }
+
+   // MBI //
+   /** Function getMbi
+    *  Requires the current page to be "Personal Info"
+    */
+   function getMbi() {
+      var tabName = getActiveTabName(),
+          el, mbi;
+      if(tabName == "Personal Info") {
+         mbi = esf("[label='MBI'] div").innerText;
+      } else if(tabName == "Product Info") {
+         el = esf("[label='MBI Number:']");
+
+         if(el == null) return "";
+
+         mbi = el.innerText.split(": ")[1];
+      }
+
+      return mbi
+   }
+
+   // GENDER //
+   /** Function getGender
+    *  GENDER IS NOT DISPLAYED CURRENTLY
+    */
+   function getGender() {
+      var el = esf("[label=''] p");
+
+      if(el == null) return "";
+
+      return el.nextSibling.innerText;
+   }
+
+   // PRODUCT INFO PAGE //
+
+   // AOR //
+   /** Function getAor
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getAor() {
+      var els = $$("[label='Agent of Record'] div div");
+
+      if(els.length == 0) return "";
+
+      return els[1].innerText.replace(/ \d+/,"");
+   }
+
+   // PLAN NAME //
+   /** Function getPlanName
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getPlanName() {
+      var el = esf("[label='Plan Name:']");
+
+      if(el == null) return "";
+
+      return el.innerText.split(": ")[1];
+   }
+
+   // PLAN ID //
+   /** Function getPlanID
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getPlanID() {
+      var el = esf("[label='Plan ID:']");
+
+      if(el == null) return "";
+
+      return el.innerText.split(": ")[1];
+   }
+
+   // SEP //
+   /** Function getSep
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getSep() {
+      var el = esf("[label='SEP code:']");
+
+      if(el == null) return "";
+
+      return el.innerText.split(": ")[1];
+   }
+
+   // SUBMISSION DATE //
+   /** Function getSubDate
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getSubDate() {
+      var els = $$("[label='Enrollment Date:'] div div"),
+          dateText, dateObj;
+
+      if(els.length == 0) return "";
+
+      dateText = els[1].innerText;
+      dateObj = new Date(dateText);
+
+      return dateObj.toLocaleString().split(",")[0];
+   }
+
+   // EFFECTIVE DATE //
+   /** Function getEffDate
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function getEffDate() {
+      var els = $$("[label='Requested Effective Date:'] div div"),
+          dateText, dateObj;
+
+      if(els.length == 0) return "";
+
+      dateText = els[1].innerText;
+      dateObj = new Date(dateText);
+
+      return dateObj.toLocaleString().split(",")[0];
+   }
+
+   function checkInfoGetters() {
+      // fields
+      console.log("(Top) getCustomerName", getCustomerName());
+      console.log("(Top) getDob", getDob());
+      console.log("(Top) getCustomerId", getCustomerId());
+      console.log("(Top) getZip", getZip());
+      console.log("(Top) getPhoneNumber", getPhoneNumber());
+      console.log("(Per) getAddress", getAddress());
+      console.log("(Per/Prd) getMbi", getMbi());
+      console.log("( - ) getGender", getGender());
+      console.log("(Prd) getAor", getAor());
+      console.log("(Prd) getPlanName", getPlanName());
+      console.log("(Prd) getPlanID", getPlanID());
+      console.log("(Prd) getSep", getSep());
+      console.log("(Prd) getSubDate", getSubDate());
+      console.log("(Prd) getEffDate", getEffDate());
+   }
+
+   function checkSetters() {
+      console.log("setFnName", setFnName());
+   }
+
+
+   /** Function openFirstProductApp
+    *  Gets the Product Applications el, then the first application, then clicks it
+    *  Requires the current page to be "Product Info", and the
+    *  "Product Applications" section to have a selection.
+    */
+   function openFirstProductApp() {
+      var els = $$("[data-testid='product-applications-list'] a");
+
+      if(els.length == 0) {
+         console.warn(">> Failed to open first Product Application")
+         return "";
+      }
+
+      els[0].click();
+
+      return true;
+   }
+
+  /*** GENERAL ***/
+   /**
+    * Function siteSpecificStandardize
+    * Called by getObjFromCopiedText. This is intended to allow for modfying *incoming*
+    * copied info to be standardized per site
+    */
+   function siteSpecificStandardize(standardInfo){
+      return standardInfo;
+   }
+
+   /* Function getActiveTabName */
+   function getActiveTabName(){
+      return esf("app-navigation-tabs .bg-brand-alt-50").innerText;
+   }
+
+   /* Function setActiveTab
+      Navs in the page to a tab with the given name, or returns false if such a tab isn't found*/
+   function setActiveTab(tabName=""){
+      if(tabName == "") return false;
+      if(getActiveTabName() === tabName) return true;
+
+      var tabBar = $$("app-navigation-tabs a"),
+          clickedTab = false;
+
+      tabBar.forEach((el, num, ary) => {
+         if(el.innerText == tabName) {
+            el.click();
+            clickedTab = true;
+         }
+      });
+
+      return clickedTab;
+   }
+
+
+/*** 1 FV9: AUTONAV ***/
+
+   /* Function getCurrStepNum
+      Searches for specific elements on the DOM to decide the current step the nave is at. */
+   function getCurrStepNum() {
+
+      if ( $("#sfli_login_btn") != null) {
+         return 1;
+      } else if ( $("#sfli-connect_station_btn") != null) {
+         return 2;
+      } else if ( $("#sfli-confirm-softphone-setup") != null) {
+         return 3;
+      } else if ( $("#sfli-connect_station_btn") != null) {
+         return 2;
+      } else {
+
+      }
+
+      console.warn("returned 0");
+      return 0;
+   }
+
+   /* Function autoNav
+      Autonav not working right now, b/c iframe has different root url
+   */
+   function autoNav(){
+
+      // adding the same listener mult times won't cause it to fire mult times
+      switch(getCurrStepNum()) {
+         default:
+            console.warn('Failed AutoNav');
+            break;
+         case 1:
+               $("#sfli_login_btn").click();
+               // add event listener
+               break;
+         case 2:
+               $("#sfli-connect_station_btn").click();
+               // add event listener
+               break;
+         case 3:
+               $("#sfli-connect_station_btn").click();
+               // add event listener
+               break;
+         case 4:
+            break;
+         case 5: //we have arrived, run the usual stuff, stop auto-nav
+            if(typeof crm == "undefined" || !crm.ranSetup) {
+               setup();
+            }
+            break;
+      }
+   }
+
+
+/*** 2 SCH: PASTE IN SEARCH ***/
+
+   /* Function pasteInSearchInfo
+      Takes the info in the clipboard and pastes it into the correct fields */
+   function pasteInSearchInfo(evt) {
+      // CTRL + SHIFT + V // V b/c it's paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         console.log(">> ran pasteInSearchInfo");
+         navigator.clipboard
+         .readText()
+         .then((clipText) => {
+               // if (!isAdvSearchOpen()) {
+               //    toggleAdvSearch();
+               // }
+
+               var cuInfoObj = getObjFromCopiedText(clipText),
+                   fillSuccessful;
+
+               clearForm();
+               fillSuccessful = fillFields(cuInfoObj);
+               // Sometimes fill is not successful, but it still submits
+               // that is b/c the Adv Search needs to open first, b/c the
+               // fields don't exist unless it's open. In that case, a
+               // setTimeout fn will submit the form.
+               if(fillSuccessful) {
+                  setTimeout(() => {
+                     submitIfComplete();
+                  }, 50);
+               }
+         });
+      }
+   }
+
+   /* Function clearForm
+      Clears the form using the reset button */
+   function clearForm(){
+      getResetSearchButton().click();
+   }
+
+   /* Function fillFields
+      Fills the search fields */
+   function fillFields(data){
+      console.warn("fillFields data:",data);
+      var fillSuccessful = false;
+
+      fillSuccessful = setCustomerIdField(data.custId) && fillSuccessful;
+      if(data.firstName) {
+         fillSuccessful = setFirstNameField(data.firstName) && fillSuccessful;
+      }
+      if(data.lastName) {
+         fillSuccessful = setLastNameField(data.lastName) && fillSuccessful;
+      }
+      fillSuccessful = setPhoneNumberField(data.phone) && fillSuccessful;
+
+      if(!isAdvSearchOpen() && (data.zip || data.dob || data.leadId)) {
+         toggleAdvSearch();
+         setTimeout(() => {
+            setDobField(data.dob);
+            if(data.zip) {
+               setZipField(data.zip);
+            }
+            setLeadIdField(data.leadId);
+            submitIfComplete();
+         },50);
+      } else {
+         fillSuccessful = true;
+         fillSuccessful = setDobField(data.dob) && fillSuccessful;
+         if(data.zip) {
+         fillSuccessful = setZipField(data.zip) && fillSuccessful;
+         }
+         fillSuccessful = setLeadIdField(data.leadId) && fillSuccessful;
+      }
+
+
+      return fillSuccessful;
+   }
+
+   /* Function submitIfComplete
+      Activates the search, if the criteria are met.
+      1a. First, Last, Phone
+      1b. First, Last, Zip
+      2.  Lead ID
+      3.  Customer Id
+      4.
+   */
+   function submitIfComplete(){
+      var btn;
+      console.warn("Submitting form");
+      btn = getSearchButton()
+      btn.click();
+   }
+
+
+/*** 3 MEM: COPY MEMBER INFO ***/
+
+   badGlobalStringChangeThisPlease = "";
+
+    /*  Function crmCuInfoCopy
+        Copies the info from the CRM page */
+    function crmCuInfoCopy(evt) {
+        // CTRL + SHIFT + X // x b/c it's like copy
+        if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
+            if(crm.mydebug.isDB()) {
+                console.warn("debug on");
+            }
+
+            if(evt.altKey) {
+               copyMemberInfoForMSCall();
+               setTimeout(() => {
+                  copyStringToClipboard(badGlobalStringChangeThisPlease);
+               }, 2100)
+            } else {
+               copyMemberInfoLikeBO();
+               setTimeout(() => {
+                  copyStringToClipboard(badGlobalStringChangeThisPlease);
+               }, 2100)
+            }
+
+        }
+    }
+
+   /* Function copyMemberInfoLikeBO
+      Copies the member's info from the Profile Search page */
+   function copyMemberInfoLikeBO(){
+      var colonList,
+          address="", aor="", planName="", planId="", subDate="", effDate="",mbi="", sep = "";
+
+
+      // setActiveTab('name')
+      //    .then(getPersonalInfo)
+      //    .then((data) => {
+      //       // add the personal info to the obj,
+      //       setActiveTab("name2")
+      //          .then(() => {
+      //             return openFirstProductApp();
+      //          })
+      //          .then(() => {
+      //             bob3 = new Promise()
+      //          })
+      //       resolve();
+      //    })
+
+      function getPersonalInfo() {
+         console.log(getActiveTabName());
+         mbi = getMbi();
+         address = getAddress();
+      }
+      function getProductInfo() {
+         console.log(getActiveTabName());
+         aor = getAor();
+         planName = getPlanName();
+         planId = getPlanID();
+         subDate = getSubDate();
+         effDate = getEffDate();
+      }
+
+      // TODO: Make this start on whatever tab it is on
+
+      // address="", aor="", planName="", planId="", subDate="", effDate="",mbi="";
+      setActiveTab("Personal Info")
+      setTimeout(() => {
+         getPersonalInfo();
+         setActiveTab("Product Info");
+
+         setTimeout(() => {
+            openFirstProductApp();
+
+            setTimeout(() => {
+               getProductInfo();
+               badGlobalStringChangeThisPlease = createColonList(
+                  "Customer ID", getCustomerId(),
+                  "Cu Name", getCustomerName(),
+                  "T2 Agent", aor,
+                  "T3 Agent", "-",
+                  "Plan", planName + " " + planId,
+                  "SEP", sep,
+                  "Sub Date", subDate,
+                  "Eff Date", effDate,
+                  "Alt Address", address,
+                  "Phone Number", getPhoneNumber());
+            },50);
+
+         },750);
+
+      },750);
+
+      // function test() {
+      //    console.log([address, aor, planName, planId, subDate, effDate,mbi].join("|"));
+      // }
+
+
+
+      return colonList;
+   }
+
+   /* Function copyMemberInfoForMSCall
+      Copies the member's info from the Profile Search page */
+   function copyMemberInfoForMSCall(){
+      var colonList,
+          address="", aor="", planName="", planId="", subDate="", effDate="",mbi="", sep = "";
+
+
+      // setActiveTab('name')
+      //    .then(getPersonalInfo)
+      //    .then((data) => {
+      //       // add the personal info to the obj,
+      //       setActiveTab("name2")
+      //          .then(() => {
+      //             return openFirstProductApp();
+      //          })
+      //          .then(() => {
+      //             bob3 = new Promise()
+      //          })
+      //       resolve();
+      //    })
+
+      function getPersonalInfo() {
+         console.log(getActiveTabName());
+         mbi = getMbi();
+         address = getAddress();
+      }
+
+      function getProductInfo() {
+         console.log(getActiveTabName());
+         aor = getAor();
+         planName = getPlanName();
+         planId = getPlanID();
+         subDate = getSubDate();
+         effDate = getEffDate();
+      }
+
+      // TODO: Make this start on whatever tab it is on
+
+      // address="", aor="", planName="", planId="", subDate="", effDate="",mbi="";
+      setActiveTab("Personal Info")
+      setTimeout(() => {
+         getPersonalInfo();
+         setActiveTab("Product Info");
+
+         setTimeout(() => {
+            openFirstProductApp();
+
+            setTimeout(() => {
+               getProductInfo();
+               badGlobalStringChangeThisPlease = createColonList(
+                  "Cust Name", getCustomerName(),
+                  "  Cust Id", getCustomerId(),
+                  "  Lead Id", "",
+                  "   ST/Zip", address.match(/[A-Z][A-Z] \d+/)[0],
+                  "      DOB", getDob(),
+                  "    Phone", getPhoneNumber(),
+                  "      MBI", mbi);
+            },50);
+
+         },750);
+
+      },10);
+
+      // function test() {
+      //    console.log([address, aor, planName, planId, subDate, effDate,mbi].join("|"));
+      // }
+
+      return colonList;
+   }
+
+/*** 4 GEN: CSS MODIFICATIONS ***/
+
+   /* Function addCustomCSS */
+   function addCustomCSS(){
+      var cssBody,
+          cssEl = esf("#custom_css"),
+          cssText = `
+         .py-6  { padding-block: calc(var(--spacing) * 3); }
+         .py-10 { padding-block: calc(var(--spacing) * 5); }
+         .px-14 { padding-inline: calc(var(--spacing) * 7); }
+         .page-content form div.flex.justify-between.gap-4.px-8.py-6 { padding-top: 2px; }
+          `
+
+      if(cssEl != null) {
+         cssEl.remove();
+      }
+
+      cssBody = addCssEl(cssText); // TODO: add the doc? What if i'm in the iframe?
+      cssBody.id = "custom_css";
+   }
+
+/*************
+* LOGIC
+**************/
+// Set up
+
+   /*  Function restoreConsoleLog
+      MARx for some reason removes the console.log functionality.
+      Not used now, just in case I need this in the future.
+      https://stackoverflow.com/questions/7089443/restoring-console-log */
+   function restoreConsoleLog(doc=document) {
+      var iframe = doc.createElement('iframe');
+      iframe.style.display = 'none';
+      doc.body.appendChild(iframe);
+      window.console = iframe.contentWindow.console;
+      // with Chrome 60+ don't remove the child node
+      // iframe.parentNode.removeChild(iframe);
+
+      console.log("if you can see this, console.log reinstated");
+   }
+
+
+   // autoNav();  /* // << Starts here
+   setup(); /**/
+
+   // have to do this for some weird reason
+   $$ = $$;
+
+   function setup() {
+
+   	//** PAGE LOGIC **//
+   	if(typeof crm == "undefined") {
+   		window.crm = {
+   			ranSetup: false
+   		};
+
+        //reinstating the log, b/c they killed it
+        if(console.log.toString() != 'function log() { [native code] }') {
+            restoreConsoleLog();
+            //TODO: Add the one for the iframe, too
+        }
+
+         // USE THESE IF JQUERY IS NOT AN OPTION
+         // qs = (expr) => document.querySelector(expr);
+         // qsAll = (expr) => document.querySelectorAll(expr);
+         // getElByID = (expr) => document.getElementById(expr);
+   	}
+   	if(crm.ranSetup != true) {
+         // Element Search Function. B/c it's not JQ
+         window.esf = window.$;
+
+   		setUpKeyboardShortcuts();
+
+         // addManagedMutationObs();
+         addCustomCSS();
+
+         // autonav ? Unless the approach requires a page refresh, then just click/click/click
+
+   		crm.ranSetup = true;
+   		crm.unload = unload;
+   		crm.alreadyPresent = alreadyPresent;
+   		crm.mydebug = mydebug;
+
+         console.log(">> Inserted crm logic");
+   	} else {
+   		crm.alreadyPresent();
+   	}
+
+   }
