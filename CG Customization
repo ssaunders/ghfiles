@@ -1,0 +1,1194 @@
+//~~~~ CIGNA CUSTOMIZATION ~~~~//
+
+// TODO: 
+
+   // 1  working on
+      // TODO: Investigate why DOB wouldn't drop in, when MBI wasn't there
+      // TODO: Write shortcut logic fn
+         // TODO: 
+         // TODO: Make "Can do Mcd lookup" fn
+         // TODO: Make it auto-submit Mcd lookup
+         // TODO: Make it have a mutator or timeout? Prefer mutator
+         // TODO: If MBI is identical, change DOB?, do mcd submit
+      // TODO: 
+
+   // 2 priority
+      // TODO: Test AutoNav
+      // TODO: Have it indicate that it's copying. Maybe put a "Copying..." up top. Or a color indicator or hourglass. Insert on a .then(), end on a .finally? 
+
+   // 3 backlog
+      // TODO: Have the window scroll down to Mcd
+      // TODO: 
+      // TODO: 
+
+/** DONE **/
+      // TODO: Write shortcut logic fn
+         // TODO: Make it auto-submit MBI lookup
+      // TODO: Make sure it inserts into page correctly
+      // TODO: Figure out what kind of jquery/cgjq it uses
+      // TODO: Detail the features I want to add here
+      // TODO: Add the getters/setters for the 4 fields
+         // MBI
+         // DOB
+         // MCD ID
+         // SSN
+      // TODO: Add Ctrl + Shift + V shortcut
+
+   /**** Post Version Release ****/
+      // TODO: Change the placeholders in the file for the cg, CIGNA, 
+
+
+/*************
+* FUNCTIONS
+**************/
+
+/*** LIBRARY ***/
+   /* Whitespace magic:
+      // 4 to 3
+      ^((   ) )((   ) )?((   ) )?((   ) )?([^ *])
+      $2$4$6$8$9
+
+      // 3 to 4
+      // Trickier, b/c you're adding stuff. Must do each layer manually
+      // Dup the (   ), add " $X+1"
+      ^(   )(   )([^ ])
+      $1 $2 $3
+      
+      Careful, though 3 x 4 = 12
+   */
+
+   /*  Function alreadyPresent
+      alerts that the code already exists */
+   function alreadyPresent() {
+      console.warn(">> CG Code already present");
+   }
+
+  /// DEBUG ///
+   mydebug = {
+      isDebugging: false,
+      isDB: function () {
+         return this.isDebugging;
+      },
+      startDB: function() {
+         this.isDebugging = true;
+      },
+      endDB: function() {
+         this.isDebugging = false;
+      },
+      warn: function(fnName) {
+         console.warn("hit function "+fnName);
+      }
+   };
+
+   mockEvt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
+  /// CLIPBOARD ///
+
+   /* Function copyStringToClipboard
+      Copies a string to the computer clipboard */
+   function copyStringToClipboard(stringToCopy, printResult) {
+      if(stringToCopy == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      return navigator.clipboard.writeText(stringToCopy)
+         .then(() => {
+            console.log('>> Content copied to clipboard');
+            if(printResult) {
+               console.log("Copied: ", data);
+            }
+         },(a,b,c,d) => {
+            //TODO: handle if a.message.contains "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+            console.error('>> Failed to copy');
+         });
+   }
+
+   /*  Function copyElToClipboard
+      Copies the content of an el to the computer clipboard */
+   function copyElToClipboard(htmlEl, doc=document) {
+      if(htmlEl == null) {
+         console.warn(">> Nothing to copy");
+         return;
+      }
+
+      //JQuery Strip
+      if(htmlEl.get != undefined) {
+         htmlEl = htmlEl.get(0);
+      }
+
+      var range = doc.createRange();
+      var sel = doc.getSelection();
+
+      try {
+         sel.removeAllRanges();
+         range.selectNodeContents(htmlEl);
+         sel.addRange(range);
+         doc.execCommand("Copy");
+      } catch (error) {
+         console.warn(error);
+      }
+   }
+
+   /* Function getClipboard
+      Gets the contents of the clipboard, w/o Ctrl + V */
+   function getClipboard(callback,errorCallback) {
+      var promise = navigator.clipboard
+         .readText()
+         .then(callback);
+      if(errorCallback != undefined) {
+         promise.error(errorCallback);
+      }
+
+      return promise;
+   }
+
+  /// ELEMENT ADDERS ///
+
+   //TODO: Decide what to do here. Should I throw an error if not added?
+   // have a return val? Need to indicate if it wasn't added
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc=document) {
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc=document) {
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+  /// MUTATION OBS ///
+
+   mutatorArray = [];
+
+   /* Function addManagedMutationObs
+      Adds a mutation observer to targetEl. Returns the observer.
+      The fn passed in will receive these arguments:
+      mutationList - the list of changes.
+      observer - The observer instance.
+      https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
+      See addMutationObs for details on options.
+      */
+   function addManagedMutationObs(targetEl, fn, options) {
+      var mutaObs = addMutationObs(targetEl, fn, options);
+
+      mutaObs.target = targetEl;
+      mutaObs.managedId = Math.round(Math.random()*9000+1000);
+      mutaObs.managedDisconnect = () => {unloadManagedMutator(mutaObs.managedId)};
+      mutatorArray.push(mutaObs);
+
+      return mutaObs;
+   }
+
+   /* Function unloadManagedMutator
+      Removes the specific mutation observer from mutatorArray */
+   function unloadManagedMutator(managedId) {
+      var idx = mutatorArray.findIndex((mutaObs) => {
+         if(mutaObs.managedId == managedId) {
+         return true;
+         }
+      });
+
+      if (idx == -1) {
+         console.warn("Tried to delete a managed observer that didn't exist:", managedId);
+         return false;
+      }
+
+      mutatorArray[idx].disconnect();
+
+      mutatorArray = mutatorArray.toSplice(idx,1);
+
+      return true;
+   }
+
+   /* Function unloadAllManagedMutators
+      Removes the keyboard listeners from the page and undoes everything in runSetup */
+   function unloadAllManagedMutators() {
+      mutatorArray.map((muta) => {
+         muta.disconnect();
+      });
+      mutatorArray = [];
+   }
+
+   /* Function addMutationObs
+    * Adds a mutation observer to targetEl. Returns the observer. 
+    * The fn passed in will receive these arguments: 
+    *   mutationList - the list of changes.
+    *   observer - The observer instance.
+    *   https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+    *
+    *   OPTIONS DETAILS:
+    *   subtree / Optional / default: false
+    *       true = monitors the entire subtree target. Any other options will also apply to the subtree.
+    *
+    *   childList / Optional / default: false
+    *       true = monitor the target node for the addition/removal of child nodes
+    *
+    *   attributes / Optional / default: false, unless attributeFilter/attributeOldValue is true
+    *       true = watch for changes to the value of attributes on the node or nodes being monitored.
+    *
+    *   attributeFilter / Optional / default: false
+    *       array of attribute names to be monitored. If this isn't included, any attribute change causes mutation notifications.
+    *
+    *   attributeOldValue / Optional / default: false
+    *       true = records the prev value of any attribute that changes
+    *
+    *   characterData / Optional / default: false, unless characterDataOldValue is true
+    *       true = monitor the specified target node for changes to the character data contained within the node or nodes.
+    *
+    *   characterDataOldValue / Optional / default: false
+    *       true = record the prev value of a node's text whenever the text changes on nodes being monitored.
+    */
+   function addMutationObs(targetEl, fn, options = {childList:true}) {
+      if(typeof fn != "function") {
+         fn = () => console.log("ran mutationObserver for ",targetEl);
+      }
+      if(typeof options != "object") {
+         options = {childList:true, subtree:true};
+      }
+      if(targetEl.val) { // strip out the jQuery object
+         targetEl = targetEl[0];
+      }
+
+      var mutationObs = new MutationObserver(fn);
+      mutationObs.observe(targetEl, options);
+
+      return mutationObs;
+   }
+
+  /// UTILITY ///
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. Doesn't currently work*/
+   function listenToAllEvents(el) { // limitScroll/Mouse/Key, userFn
+      var eventFilter;
+      // Options: animation*, on*, mouse*, pointer*, transistion*, click, blur, dblclick, scroll*
+      // eventFilter = /^on(key|mouse)/     // just for onkey* or onmouse*
+      eventFilter = /^on/                // gets all events
+      Object.keys(el).forEach(key => {
+          if (eventFilter.test(key)) {
+              el.addEventListener(key.slice(2), event => {
+                  console.log(event);
+              });
+          }
+      });
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging.
+      eventFilter is ....
+      { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
+      "mouse"
+      // Options: animation*, on*, mouse*, pointer*, transition*, click, blur, dblclick, scroll*
+      */
+   function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
+      var eventTypes, regexString, filterToUse;
+
+         eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
+      // Figure out if it's a string event name, a regex, or an obj
+      if(typeof eventFilter == "string") {
+         filterToUse = eventFilter;
+      } else if(typeof eventFilter == "object") {
+         if(eventFilter.test == undefined) {
+            eventTypes =
+               eventFilter.mouse      ? "|mouse" : "" +
+               eventFilter.click      ? "|click" : "" +
+               eventFilter.pointer    ? "|pointer" : "" +
+               eventFilter.animation  ? "|animation" : "" +
+               eventFilter.transition ? "|transition" : "" +
+               eventFilter.key        ? "|key" : "";
+            regexString = eventFilter.exclude ? "^on(?!.*("+eventTypes.slice(1)+").*$" : "^on.*("+eventTypes.slice(1)+").*$"
+            filterToUse = new RegExp(regexString);
+         } else { // eventFilter is a regex
+            filterToUse = eventFilter
+         }
+      } else {
+         console.warn("Failed to listen to events. Could not recognize filter");
+      }
+
+      for (var key in el) {
+         if (key.search(filterToUse) === 0) {
+            console.log("added to ",key)
+            el.addEventListener(key.slice(2), fn)
+         }
+      }
+
+      return {
+         removeListeners: () => {
+            for (var key in el) {
+               if (key.search(filterToUse) === 0) {
+                  console.log("removed from",key)
+                  el.removeEventListener(key.slice(2), fn)
+               }
+            }
+         }
+      }
+   }
+
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   function getCurrentTimestamp() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
+   }
+
+   /* Function debounce
+       Debounces a fn */
+   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with wait ", wait, " for ",callback.name);
+      let debounceTimer = Date.now();
+
+      if(timing.trailing) {
+         return function debouncedFn() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+               callback.apply(context, args)
+            }, wait);
+         }
+      } else { // leading
+         return function debouncedFn() {
+            const context = this
+            const args = arguments
+            if (Date.now() - debounceTimer > wait) {
+               callback.apply(context, args);
+            }
+            debounceTimer = Date.now();
+         };
+      }
+   }
+
+   /* Function fnLogger
+      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
+   function fnLogger(a,b,c) {
+      console.log("logging: "+Math.round(Math.random()*1000),a,b,c);
+   }
+
+   /* Function isPastingFromMARx
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMARx(colonList){
+      return /^Claim Number:\t +.*\r?\nMBI /.test(colonList);
+   }
+
+   /* Function isPastingFromMP
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMP(colonList){
+      return /^Personal Info\r?\nMBI /.test(colonList);
+   }
+
+   /* Function setNativeValue
+      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
+      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
+   function setNativeValue(element, value) {
+      if(element.get != undefined) {
+         element = element.get(0);
+      }
+
+      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+      const prototype = Object.getPrototypeOf(element);
+      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+      if (valueSetter && valueSetter !== prototypeValueSetter) {
+         prototypeValueSetter.call(element, value);
+      } else {
+         valueSetter.call(element, value);
+      }
+   }
+
+  /// DATA MANIPULATION ///
+
+   /** Function standardizeFullDateString
+    * Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+      Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+      With delimiters of " ",/,-, or .
+      Can handle yyyymmdd if it has a delimiter
+      Defaults to 19xx for a two-digit year (b/c usually used for DOB's)
+      0 pads Month/Day
+      @Returns xx/xx/xxxx
+    */
+   function standardizeFullDateString(fullDate) {
+      if(typeof fullDate != "string" || fullDate == "") {
+         return fullDate;
+      }
+
+      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
+          partsAry, yearHolder;
+
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         // The partsAry match down below puts the month in partsAry[1], so we can 
+         // just tack on the year at the end of the ary.
+         partsAry = moddedDate.split("/");
+         partsAry.push(partsAry[0]);
+      } else { // MONTH FIRST
+
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
+      }
+
+      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
+   }
+
+   /* Function convertColonListToJsonObj
+      Takes a text string, which is a list of info divided by colons,
+      and converts it to a JSON obj. Pass in the list, and true if it
+      has a header, or a string, if you want to check.
+      DOES NOT standardize the keys. */
+   function convertColonListToJsonObj(colonList, hasHeader=false) {
+      var logStuff = false,
+          pastedFromMARx = isPastingFromMARx(colonList),
+          pastedFromMP = isPastingFromMP(colonList),
+          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
+          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
+          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
+          // listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          returnObj = {},
+          iter = 0;
+
+          console.warn("ran convertColonListToJsonObj");
+
+      if(typeof colonList != "string") {
+         console.warn("Could not convert colon list: ", colonList.slice(0,15));
+         return returnObj;
+      }
+
+      // Handle the MARx Address issue
+      if(pastedFromMARx) {
+         infoAry[13]+=infoAry[14];
+         infoAry.splice(14,1);
+      }
+
+      // Handle the MP Address issue
+      if(pastedFromMP) {
+         infoAry[12]+=infoAry[13];
+         infoAry.splice(13,1);
+      }
+
+      // Skip the header
+      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
+         iter++;
+      }
+
+      for (iter; iter < infoAry.length; iter+=2) {
+         returnObj[infoAry[iter]]=infoAry[iter+1];
+         if(logStuff) {
+            console.log(">>",infoAry[iter],infoAry[iter+1]);
+         }
+      }
+      return returnObj;
+   }
+
+   /* Function getObjFromCopiedText
+      Also calls standardizeCuInfo, which is specific to cu info,
+      but I'm including it b/c it's simpler than knowing you have
+      to always pair the two fn's.
+      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+      */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+      var data, standardInfo;
+      try {
+         data = JSON.parse(copiedText);
+      } catch(error) {
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){  // first comment in an RFI // still? It now has new lines
+            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
+         } else if(typeof hasHeaderOrHeaderString == "boolean") {
+            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
+         } else {
+            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
+         }
+      }
+
+      standardInfo =standardizeCuInfo(data);
+      return siteSpecificStandardize(standardInfo);
+   }
+
+   /**
+    *  @Function standardizeCuInfo
+    *  Takes cu input from wherever I have copied it, in whatever format,
+    *  and standardizes the data names.
+    */
+   function standardizeCuInfo(cuInfoObj) {
+      var newCuInfoObj = cuInfoObj, cuName, namePartsFirst, namePartsSecond, typeOfSub, npnPartyIdParts;
+
+      // ADDRESS INFO
+      var custAddress = cuInfoObj["Cust Addr"] || cuInfoObj.address || cuInfoObj.Address || "";
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
+         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
+         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
+      }
+      if(custAddress == "" || custAddress == "no address given" || custAddress == undefined) {
+         newCuInfoObj.zip = "";
+      } else {
+         newCuInfoObj.zip = custAddress.match(/(\d{5})(-\d+)?$/)[1];
+      }
+
+      // CU INFO
+      newCuInfoObj.leadId = cuInfoObj["Lead ID"] || cuInfoObj["Lead Id"] || cuInfoObj["Lead id"] 
+                         || cuInfoObj["lead id"] || cuInfoObj["lead_id"] || cuInfoObj["leadId"]  
+                         || cuInfoObj["leadid"]  || cuInfoObj["LeadID"]  || cuInfoObj["LeadId"];
+      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
+      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
+      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
+      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
+      if(newCuInfoObj.mcdId == "-") {
+         newCuInfoObj.mcdId = "";
+      }
+      newCuInfoObj.phoneNum = cuInfoObj.phone || cuInfoObj.Phone || cuInfoObj["Phone Number"] || cuInfoObj["Phone Num"] || "";
+      newCuInfoObj.email = cuInfoObj.email || cuInfoObj.Email || cuInfoObj["Email Address"] || cuInfoObj["email address"] || "";
+
+      // NAME (cuInfoObj.Name is to get it from MARx )
+      newCuInfoObj.fullName = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "")
+                  .replace(/ [JS]r\.?| (I+|IV)/,"")   // get rid of Jr, etc
+                  .replace(/ [A-Z]\.? /," ");         // remove middle initials
+      nameParts = newCuInfoObj.fullName.match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
+      if(nameParts != null) {
+         namePartsFirst = nameParts[1];
+         namePartsSecond = nameParts[4];
+      }
+      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
+      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
+
+      // AGENT INFO
+      if(/\//.test(cuInfoObj["Agent NPN/Party ID"])) {
+         npnPartyIdParts = cuInfoObj["Agent NPN/Party ID"].split(" / ");
+         newCuInfoObj.npn = npnPartyIdParts[0];
+         newCuInfoObj.partyId = npnPartyIdParts[1];
+      } else {
+         newCuInfoObj.npn = cuInfoObj["Agent NPN"];
+      }
+
+     return newCuInfoObj;
+   }
+
+   /** 
+    * Function createColonList
+    * Takes an arbitrary number of parameters as sequential key-value pairs 
+    * and returns a string where each pair is formatted as "key: \t value", 
+    * separated by a newline.
+    *
+    * @param {...any} args - Sequential key-value arguments (e.g., 'Name', 'Alice', 'Age', 30).
+    * @returns {string} A single formatted string.
+    */
+   function createColonList(...args) {
+      const pairs = [];
+     
+      // Iterate through the arguments two at a time (key and value)
+      for (let iter = 0; iter < args.length; iter += 2) {
+         const key = args[iter];
+         const value = args[iter + 1];
+         
+         if(key == "add_break") {
+            pairs.push("");
+         } else if (key !== undefined && value !== undefined) {
+            // Check if we have both a key and a value for this pair
+  
+            // Create the formatted string for the pair: key: \t value
+            pairs.push(`${key}:\t${value}`);
+         } else if (key !== undefined) {
+            // TODO: Handle an odd number of arguments by adding the last key alone
+            console.warn(`Missing value for key: ${key}`);
+         }
+      }
+     
+      // Join all the formatted pairs with a newline character
+      return pairs.join('\n');
+   }
+
+
+/*** UTILITY ***/
+  /*** PAGE SETUP ***/
+   cgjq = mtjQuery;
+
+   /* Function setUpKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function setUpKeyboardShortcuts() {
+      document.addEventListener("keyup", copyMcPageInfo);            // CTRL + SHIFT + X    // X b/c like copy
+      document.addEventListener("keyup", pasteInSearchInfo);         // CTRL + SHIFT + V    // V b/c paste
+      document.addEventListener("keyup", enrollInfoCopyShortcut);    // CTRL + SHIFT + E    // E b/c enrollment section
+      console.warn(">> set up shortcuts");
+   }
+
+   /* Function removeKeyboardShortcuts
+      Sets up the keyboard listeners to the page */
+   function removeKeyboardShortcuts() {
+      document.removeEventListener("keyup", copyMcPageInfo);
+      document.removeEventListener("keyup", pasteInSearchInfo);
+      document.removeEventListener("keyup", enrollInfoCopyShortcut);
+      console.log(">> removed shortcuts");
+   }
+
+   var mutatorArray = [];
+   /* Function setUpMutators
+      Sets up the mutators on the page */
+   function setUpMutators(val) {
+      mutatorArray.push(setUpAutoCopyMcdID());
+   }
+
+   /* Function removeMutators
+      Remove the mutators on the page */
+   function removeMutators() {
+      mutatorArray.map((muta) => {
+         muta.disconnect();
+      });
+   }
+
+   /* Function unload
+      Removes the keyboard listeners from the page */
+   function unload() {
+      removeKeyboardShortcuts();
+      cg.ranSetup = false;
+   }
+
+   /* Function clearForm
+      Empties the search form */
+   function clearForm(evt) {
+      setDobField("");
+      setMbiField("");
+      setMcdIdField("");
+      setSsnField("");
+   }
+
+  /*** FIELD GETTERS & SETTERS ***/
+
+   /* Function getMbiField */
+   function getMbiField() {
+      return cgjq('#medicareBeneficiaryIdentifier');
+   }
+   /* Function setMbiField */
+   function setMbiField(val="") {
+      var el = getMbiField(),
+          modifiedVal;
+
+      if(val != "") {
+         modifiedVal = val.toUpperCase().replaceAll(/\-| /g,"");
+      }
+
+      el.val(modifiedVal);
+      el[0].dispatchEvent(new Event('input'));
+
+      return getMbiField().val() == modifiedVal;
+   }
+
+   /* Function getDobField */
+   function getDobField() {
+      return cgjq('#medicareDob');
+   }
+   /* Function setDobField */
+   function setDobField(val) {
+      var moddedVal, el = getDobField();
+
+      if(!/(\d\d?[\/\.\-]\d\d?[\/\.\-](\d{4}))/.test(val)){
+         moddedVal = val.replaceAll(/[\.\-]/g,"/")
+                        .replace(/^(\d\d?\/\d\d?\/)(\d\d)$/,"$119$2");
+      } else {
+         moddedVal = val;
+      }
+      moddedVal = standardizeFullDateString(moddedVal);
+
+      el.val(moddedVal);
+      el[0].dispatchEvent(new Event('input'));
+
+      return getDobField().val() == moddedVal;
+   }
+
+   /* Function getMcdIdField */
+   function getMcdIdField() {
+      return cgjq('#medicaidID');
+   }
+   /* Function setMcdIdField */
+   function setMcdIdField(val) {
+      var el = getMcdIdField();
+
+      if(el.length == 0) return false;
+      
+      el.val(val);
+      el[0].dispatchEvent(new Event('input'));
+
+      return getMcdIdField().val() == val;
+   }
+
+   /* Function getSsnField */
+   function getSsnField() {
+      return cgjq('#ssn');
+   }
+   /* Function setSsnField */
+   function setSsnField(val) {
+      var el = getSsnField()
+
+      if(el.length == 0) return false;
+
+      el.val(val);
+      el[0].dispatchEvent(new Event('input'));
+
+      return getSsnField().val() == val;
+   }
+
+   // 2XH3J36KR18 12/11/1950
+   function checkGetters() {
+      console.log("--- top ---")
+      console.log("getMbiField():",getMbiField());
+      console.log("getDobField():",getDobField());
+      console.log("--- bottom ---")
+      console.log("getMcdIdField():",getMcdIdField());
+      console.log("getSsnField():",getSsnField());
+   }
+   function checkSetters() {
+      console.log("--- top ---")
+      console.log("setMbiField(1AC2DE4FG56):",setMbiField("1AC2DE4FG56"));
+      console.log("setMbiField(1AC-2DE-4FG56):",setMbiField("1AC2-DE4-FG56"));
+      console.log("setDobField():",setDobField());
+      console.log("--- bottom ---")
+      console.log("setMcdIdField():",setMcdIdField());
+      console.log("setSsnField():",setSsnField());
+   }
+
+   /*** BUTTON GETTERS ***/
+   /* Function getTopSubmitBtn */
+   function getTopSubmitBtn(evt) {
+      return cgjq("button.medicare-status");
+   }
+
+   /* Function getBottomSubmitBtn */
+   function getBottomSubmitBtn(evt) {
+      return cgjq("button.medicaid-status");
+   }
+
+   /*** DEBOUNCE ***/
+   /* Function debounceFn
+      Debounces a fn */
+   function debounce(func, delay=0, timing={'leading': false,'trailing': true}) {
+      console.log("debounce called with delay ", delay, " for ",func.name);
+      let debounceTimer;
+
+      if(timing.trailing) {
+         return function () {
+             const context = this
+             const args = arguments
+             clearTimeout(debounceTimer)
+             debounceTimer = setTimeout(() => func.apply(context, args), delay)
+         }
+      } else {
+      return function debouncedFn() {
+          const context = this
+          const args = arguments
+          if (Date.now() - debounceTimer > delay) {
+         func.apply(context, args);
+          }
+          debounceTimer = Date.now();
+      };
+      }
+   }
+  
+  /*** CANVAS COPY CONTAINER ***/
+
+   /*  Function addHtml2Canvas
+      Sets up all the load listeners, so that when site loads new cu, logic is re-added */
+   function addHtml2Canvas() {
+      // const jsEl = document.createElement("script");
+      // jsEl.src="https://html2canvas.hertzen.com/dist/html2canvas.js"
+      // jsEl.crossorigin="anonymous";
+
+      // document.childNodes[1].appendChild(jsEl);
+
+      addJsFromURL("https://html2canvas.hertzen.com/dist/html2canvas.js");
+   }
+
+   // ELEMENTS
+
+   /* Function makeCanvasContainer
+      Puts the canvasContainer into the DOM. Returns a ref to it. */
+   function makeCanvasContainer() {
+      const div = document.createElement('div');
+      div.id="canvasContainer";
+      div.style="visibility:hidden; display:none;";
+
+      //inner btn div
+      const btnDiv = document.createElement('div');
+
+      cgjq(div).append(btnDiv);
+      cgjq("cigna-medicare-lookup").append(div)
+
+      return cgjq(div);
+   }
+
+   /* Function getCanvasContainer
+      Returns the canvasContainer. Creates it if it doesn't exist. */
+   function getCanvasContainer() {
+      var canvasContainer = cgjq('#canvasContainer');
+      if(canvasContainer.length == 0) {
+         canvasContainer = makeCanvasContainer();
+      }
+      return canvasContainer;
+   }
+
+   /* Function addBtnToCanvasContainer
+      Adds a button that can be clicked to the canvas
+      the first div holds the buttons */
+   function addBtnToCanvasContainer(btn) {
+      getCanvasContainer().first().append(btn);
+   }
+
+   // COPY FUNCTIONALITY
+
+   /* Function copyCanvasToClipboard
+      This executes in the context of the iframe, where
+      document is the iframe doc. Important, b/c styling issues
+
+      Copies canvas to clipboard */
+   function copyCanvasToClipboard(canvas) {
+      canvas.toBlob(function (blob) {
+         const item = new ClipboardItem({ "image/png": blob });
+         navigator.clipboard.write([item]);
+      })
+   }
+
+   /* Function saveNewCanvas (iframe embedded)
+      This executes in the context of the iframe, where
+      document is the iframe doc. Important, b/c styling issues
+
+      Removes old canvas, saves the new canvas to the DOM */
+   function saveNewCanvas(canvas) {
+      var canvasContainer = getCanvasContainer();
+      //delete old canvas, if it exists
+      if(canvasContainer.children().length > 1) {
+         canvasContainer.remove(canvasContainer.children()[1]);
+      }
+
+      //save new canvas into hidden el
+      canvasContainer.append(canvas);
+
+      return canvas;
+   }
+  
+  /*** DATA MANIPULATION ***/
+   /** 
+    * Function siteSpecificStandardize
+    * Called by getObjFromCopiedText. This is intended to allow for modfying *incoming*
+    * copied info to be standardized per site
+    */
+   function siteSpecificStandardize(standardInfo){
+      return standardInfo;
+   }
+
+  /*** GENERAL ***/
+   /* Function hasCustInfo
+      Tells if the search has a cu pulled up or not */
+   function hasCustInfo(){
+      return cgjq(".medicare-lookup-resultBox.ng-star-inserted").length > 0;
+   }
+
+
+/*** SHORTCUTS ***/
+
+  /*** PASTE SEARCH INFO ***/
+
+   /* Function pasteInSearchInfo
+      Takes the clipboard data and pastes it into the correct fields */
+   function pasteInSearchInfo(evt) {
+      // CTRL + SHIFT + V // V b/c it's paste
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
+         console.log(">> ran pasteInSearchInfo");
+         navigator.clipboard
+         .readText()
+         .then((clipText) => {
+               var fillSuccessful,
+                   cuInfoObj = getObjFromCopiedText(clipText);
+
+               clearForm();
+               fillSuccessful = fillTopFields(cuInfoObj);
+               if(fillSuccessful) submitIfComplete();
+               // TODO: add one-time mutator/listener to catch Mcd
+         });
+      }
+
+   }
+
+   /* Function fillTopFields
+      Adds info from data object provided to the MBI/DOB fields */
+   function fillTopFields(data) {
+      return setMbiField(data.mbi || data.MBI) && setDobField(data.dob);
+   }
+
+   /* Function fillBottomFields
+      Adds info from data object provided to the SSN or Mcd id fields */
+   function fillBottomFields(data) {
+      return setSsnField(data.ssn) || setMcdIdField(data.mcdId);
+   }
+
+   /* Function addListenerForBottomFields
+      Adds info from data object provided to every  */
+   function addListenerForBottomFields() {
+      
+   }
+
+   /*** SUBMIT IF COMPLETE ***/
+
+   /* Function formIsComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function formIsComplete() {
+      var isValid = false,
+          dob = getDobField().val(),
+          mbi = getMbiField().val(),
+          mcdId = getMcdIdField().val(),
+          ssn = getSsnField().val();
+
+      isValid = dob != "" && mbi != "";
+
+      console.log("Auto submit " + (isValid ? "succeeded" : "failed"), "dob", dob != "", "mbi", mbi != "");
+
+      return isValid;
+   }
+
+   /* Function submitIfComplete
+      Checks if all required fields have been filled, and if so, it submits the search */
+   function submitIfComplete() {
+      console.log(">> 1 attempted submit");
+      if(formIsComplete()) {
+         // todo: fix this. Something's weird
+         console.log(">> 2 attempted debounced initiateSearch", debouncedInitiateSearch, "<< fn");
+         debouncedInitiateSearch();
+      }
+   }
+
+   /*** AUTOSUBMIT ***/
+
+      /* Function initiateSearch
+         Triggers the search */
+      debouncedInitiateSearch = debounce(()=> {
+         console.log(">> 3 ran initiateSearch");
+         var submitButton = getTopSubmitBtn();
+         if(submitButton != null) {    
+         submitButton.click();
+         }
+      },3000,{leading:true});
+
+      /* Function initiateSearch
+         Triggers the search */
+      function initiateSearch(evt) {
+         // CTRL + Enter // b/c it's a common submit shortcut
+         if (evt.ctrlKey && evt.which == 13) {
+         console.log("ran initiateSearch");
+         debouncedInitiateSearch();
+         }
+      }
+
+  /*** ENROLLMENT INFO IMAGE COPY ***/  
+   /* 
+      x 1. Create the logic to add it to the page
+      x 2. Test it out
+      3. 
+   */
+
+   /* Function setUpEnrollInfoCopy
+      Adds the canvas container div and copy button to the
+      document. */
+   function setUpEnrollInfoCopy() {
+      // make button to click on, add it to canvasContainer
+      const enrollInfoCopyBtn = document.createElement('button');
+      enrollInfoCopyBtn.type = 'button';
+      enrollInfoCopyBtn.id = 'enrollInfoCopyButton';
+      enrollInfoCopyBtn.onclick = copyEnrollInfo;
+      addBtnToCanvasContainer(enrollInfoCopyBtn);
+   }
+
+   /* Function getEnrollInfoCopyBtn
+      Gets the button we need to click in order to trigger the copy logic */
+   function getEnrollInfoCopyBtn() {
+      return cgjq('#enrollInfoCopyButton');
+   }
+
+   /* Function copyEnrollInfo (iframe embedded)
+      
+   */
+   function copyEnrollInfo() {
+      var medicareSection = cgjq('.medicare-lookup-resultBox');
+      if(medicareSection.length == 0) {
+         console.warn('Could not find Medicare enrollment section');
+         return;
+      }
+
+      var config = {
+         // ignoreElements: function(el){
+         //    if(el.contains(medicareSection.children[2])
+         //          || fourth.contains(el)
+         //          || third.contains(el)
+         //          || second.contains(el)
+         //          || first.contains(el)
+         //          || el.nodeName == 'HEAD'
+         //          || el.nodeName == 'LINK'
+         //          || el.nodeName == 'STYLE') {
+         //          return false;
+         //    } else {
+         //          return true;
+         //    }
+         // }
+      }
+
+      html2canvas(medicareSection[0],config)
+         .then(saveNewCanvas)
+         .then(copyCanvasToClipboard)
+         .catch(function(err) {
+                console.warn("Failed to copy Medicare enrollment info.", err);
+         });
+   }
+
+   /* Function enrollInfoCopyShortcut
+      Refers the event to the function inside of the iframe */
+   function enrollInfoCopyShortcut(evt) {
+      // CTRL + SHIFT + 'E' // 'E' b/c "enrollment section"
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
+         if(cg.mydebug.isDB()) {
+         console.warn("debug on");
+         }
+
+         getEnrollInfoCopyBtn().click();
+      }
+
+   }
+
+   /* Leave for future debugging. Simple way to check what's being rendered
+   html2canvas(temp1).then(function (canvas) {
+   document.body.appendChild(canvas);
+   });
+   */
+
+  /*** COPY MEDICARE PAGE INFO ***/
+   /*  Function getCuInfo
+        Gets the customer's information from the Medicare Page*/
+   function getCuInfo() {
+      var cuDetailsString = cgjq('.details').text(),
+          despacerRegex = /([^ ]+) +(([^ ]+) )? *?([^ ]+)( +MBI:)/,
+          // replace the first one, which is in the cu's name
+          cuData = getObjFromCopiedText("Customer Name: "+cuDetailsString.replace(despacerRegex,'$1 $2$4$5').replaceAll("  ","\n"), false),
+          hasMcd = cgjq(".medicaid-status-value").text();
+
+      finalInfo = createColonList(
+         "Cigna Import", "-",
+         "MBI Number", cuData.mbi,
+         "Name", cuData["Customer Name"],
+         "Birth Date", cuData.dob,
+         "Date of Death", "",
+         "Sex", cuData.sex,
+         "Address", "-",
+         "add_break", "",
+         "Most recent State", cuData.state,
+         "Most recent County", cuData.County,
+         "Medicaid", hasMcd);
+
+      return finalInfo;
+    }
+
+    /*  Function copyMcPageInfo
+        Selects the top part of the MARx page */
+    function copyMcPageInfo(evt) {
+        // CTRL + SHIFT + X // x b/c it's like copy
+        if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
+            if(cg.mydebug.isDB()) {
+                console.warn("debug on");
+            }
+
+            if(hasCustInfo()) {
+               copyStringToClipboard(getCuInfo());
+            } else {
+               console.warn("!! No Customer Info to copy");
+            }
+        }
+    }
+
+/*************
+* LOGIC
+**************/
+var firstBtn = cgjq('.mat-button-wrapper');
+var secondBtn = cgjq('mat-dialog-container');
+if(firstBtn.length != 0 && window.location.href == "https://cignaforbrokers.com/public/login") {
+   //** AUTONAV 1 **//
+   firstBtn.click();
+} else if(secondBtn != null && window.location.href == "https://cignaforbrokers.com/secure/home/login-success-dialog") {
+   //** AUTONAV 2 **//
+   // secondBtn.click();
+   // set timeout and nav to https://app.thinkagent.com/home-tabs/tabs/medicaid-eligibility  ?
+
+   console.log("did stuff")
+   window.location = "https://cignaforbrokers.com/secure/medicare-medicaid-eligibility";
+} else { 
+   //** PAGE LOGIC **//
+   if(typeof cg == "undefined") {
+      window.cg = {
+         ranSetup: false
+      };
+   }
+   if(cg.ranSetup != true) {
+      setUpKeyboardShortcuts();
+
+      cg.ranSetup = true;
+      cg.unload = unload;
+      cg.alreadyPresent = alreadyPresent;
+      cg.mydebug = mydebug;
+
+      // HTML2CANVAS SETUP
+      addHtml2Canvas();
+      setUpEnrollInfoCopy();
+
+   } else {
+      cg.alreadyPresent();
+   }
+}
