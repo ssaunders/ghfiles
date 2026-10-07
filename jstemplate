@@ -11,7 +11,7 @@
 		// TODO: Change the placeholders in the file for the ABBREVIATION, SITE_NAME, 
 		// TODO: Figure out what kind of jquery/$ it uses
 		// TODO: Make sure it inserts into page correctly
-		// TODO: Test AutoNav
+		// TODO: Test AutoNav / Stepper
 		// TODO: Add the getters for buttons
 		// TODO: Add the auto-formatters for fields (when lose focus, setField)
 		// TODO: Add the getters/setters for fields
@@ -32,344 +32,31 @@
    /**** Post Version Release ****/
 
 
-/* Function function_name
-   NOTES_ON_FN */
-function function_name(argument) {
-	// body...
-}
-
-
 /*************
 * FUNCTIONS
 **************/
 
+//ABBREVIATION
 /*** LIBRARY ***/
-
-	/* Function alreadyPresent
-		alerts that the code already exists */
-	function alreadyPresent() {
-		console.warn(">> ABBREVIATION Code already present");
-	}
-
-	/* Function DEBUG FUNCTIONS
-		tests for/starts/stops debug */
-	mydebug = {
-		isDebugging: false,
-		isDB: function () {
-			return this.isDebugging;
-		},
-		startDB: function() {
-			this.isDebugging = true;
-		},
-		endDB: function() {
-			this.isDebugging = false;	
-		}
-	};
-
-	/* Function copyStringToClipboard
-		Copies a string to the computer clipboard */
-	function copyStringToClipboard(string) {
-		if(string == null) {
-			console.warn(">> Nothing to copy");
-			return;
-		}
-
-		navigator.clipboard.writeText(string)
-			.then(() => {
-			  console.log('>> Content copied to clipboard');
-			},() => {
-			  console.error('>> Failed to copy');
-			});
-	}
-
-	/* Function copyElToClipboard
-		Copies the content of an el to the computer clipboard */
-	function copyElToClipboard(htmlEl) {
-		if(htmlEl == null) {
-			console.warn(">> Nothing to copy");
-			return;
-		}
-
-	    var range = document.createRange();
-	    var sel = document.getSelection();
-
-	    sel.removeAllRanges();
-	    range.selectNodeContents(htmlEl);
-		sel.addRange(range);
-		document.execCommand("Copy");
-	}
-
-   /* Function getClipboard
-      Gets the contents of the clipboard, w/o Ctrl + V */
-   function getClipboard(callback,errorCallback) {
-      var promise = navigator.clipboard
-         .readText()
-         .then(callback);
-      if(errorCallback != undefined) {
-         promise.error(errorCallback);
-      }
-
-      return promise;
-   }
-
-   /* Function addCssEl
-      Adds the passed in CSS text to the document body */
-   function addCssEl(cssText, doc=document) {
-      // doc = (doc == null || doc == undefined) ? document : doc;
-
-      const css_el = doc.createElement("style");
-
-      if (cssText!=null) {
-         css_el.textContent = cssText;
-         doc.head.appendChild(css_el);
-      }
-      
-      return css_el;
-   }
-
-   /* Function addJsScript
-      Adds the passed in script text to the document body */
-   function addJsScript(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
-      const js_el = doc.createElement("script");
-
-      if (scriptText!=null) {
-         js_el.textContent = scriptText;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function addJsFromURL
-      Adds the passed in script text to the document body */
-   function addJsFromURL(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
-      const js_el = doc.createElement("script");
-
-      if (url!=null) {
-         js_el.src = url;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-	/* Function getCurrentTimestamp
-		Returns a string of the current timestamp */
-	function getCurrentTimestamp() {
-		return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
-	}
-
-   /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer. 
-      The fn passed in will receive these arguments: */
-   function addMutationObs(targetEl, fn, options) {
-      if(typeof fn != "function") {
-         fn = () => console.log("ran mutationObserver for ",targetEl);
-      }
-      if(typeof options != "object") {
-         options = {childList:true, subtree:true};
-      }
-      if(targetEl.val) { // strip out the jQuery object
-         targetEl = targetEl[0];
-      }
-
-      var mutationObs = new MutationObserver(fn);
-      mutationObs.observe(targetEl, options);
-
-      return mutationObs;
-   }
-
-   String.prototype.toProper = function (txt) {
-      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
-      return properized;
-   }
-
-	evt = { // For debugging/testing
-		ctrlKey:true,
-		shiftKey:true,
-		which:70
-	}
-
-   /* Function debounce
-      Debounces a fn */
-   function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
-      console.log("debounce called with wait ", wait, " for ",callback.name);
-      let debounceTimer = Date.now();
-
-      if(timing.trailing) {
-         return function debouncedFn() {
-            const context = this
-            const args = arguments
-            clearTimeout(debounceTimer)
-            debounceTimer = setTimeout(() => {
-               callback.apply(context, args)
-            }, wait)
-         }
-      } else { // leading
-         return function debouncedFn() {
-            const context = this
-            const args = arguments
-            if (Date.now() - debounceTimer > wait) {
-               callback.apply(context, args);
-            }
-            debounceTimer = Date.now();
-         };
-      }
-   }
-   
-   /* Function fnLogger
-      Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
-   function fnLogger(a,b,c) {
-      console.log(a,b,c);
-   }
-
-   /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
-      Returns xx/xx/xxxx
-      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
-   function standardizeFullDateString(fullDate) {
-      var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
-          partsAry;
-
-      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, not preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
-         // If it has a 2-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
-
-      // Split it into parts, so that you can 0 pad
-      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
-      if(partsAry == null ) {
-         console.warn("~~ full date", fullDate);
-      }
-
-      return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
-   }
-
-   /* Function convertColonListToJsonObj
-      Takes a text string, which is a list of info divided by colons,
-      and converts it to a JSON obj. Pass in the list, and true if it 
-      has a header, or a string, if you want to check.
-      DOES NOT standardize the keys. */
-   function convertColonListToJsonObj(colonList, hasHeader) {
-      var logStuff = false;
-          emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
-          tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
-          infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
-          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
-          returnObj = {},
-          iter = 0;
-
-          console.warn("ran convertColonListToJsonObj");
-
-      if(typeof colonList != "string") {
-         console.warn("Could not convert colon list: ", colonList.slice(0,15));
-         return returnObj;
-      }
-
-      // Skip the header
-      if(hasHeader === true || !/^.*:.*\r?\n/.test(colonList)){ // /\r?\n/.test(listDividers[0])){
-         iter++;
-      }
-
-      for (iter; iter < infoAry.length; iter+=2) {
-        returnObj[infoAry[iter]]=infoAry[iter+1];
-        if(logStuff) {
-            console.log(">>",infoAry[iter],infoAry[iter+1]);
-        }
-      }
-      return returnObj;
-   }
-
-   /* Function firstCommentPreProcessing
-      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
-      */
-   function firstCommentPreProcessing(copiedText="") {
-      var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
-          dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
-      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
-   }
-
-   /* Function getObjFromCopiedText
-      Also calls standardizeCuInfo, which is specific to cu info, 
-      but I'm including it b/c it's simpler than knowing you have 
-      to always pair the two fn's.
-      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
-      */
-   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
-      var data;
-      try {
-         data = JSON.parse(copiedText);
-      } catch(error) {
-         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
-            data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
-         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
-            data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
-         } else {
-            data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
-         }
-      }
-
-      return standardizeCuInfo(data);
-   }
-
-   /* Function standardizeCuInfo
-      Takes cu input from wherever I have copied it, in whatever format,
-      and standardizes the data names.
-      */
-   function standardizeCuInfo(cuInfoObj) {
-      var newCuInfoObj = cuInfoObj, namePartsFirst, namePartsSecond;
-
-      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
-      if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
-         stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
-         newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
-      } 
-      newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
-      newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
-      newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
-      newCuInfoObj.mcdId = (cuInfoObj.mcdId || cuInfoObj["Medicaid ID"] || "").split(" / ")[0];
-      if(newCuInfoObj.mcdId == "-") {
-         newCuInfoObj.mcdId = "";
-      }
-
-      nameParts = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "").match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
-      if(nameParts != null) {
-         namePartsFirst = nameParts[1];
-         namePartsSecond = nameParts[4];
-      }
-      newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
-      newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
-
-     return newCuInfoObj;
-   }
-
+   //COPY FROM LIBRARY FILE
 
 /*** UTILITY ***/
+
+  /*** PAGE SETUP ***/
 
 	/* Function setUpKeyboardShortcuts
 	   Sets up the keyboard listeners to the page */
 	function setUpKeyboardShortcuts() {
-		document.addEventListener("keyup", exampleFn);
+      document.addEventListener("keyup", exampleFn1);        // CTRL + SHIFT + X    // X b/c convenient
+      document.addEventListener("keyup", exampleFn2);        // CTRL + SHIFT + V    // V b/c that's how it is
 		console.warn(">> set up shortcuts");
 	}
 
    /* Function removeKeyboardShortcuts
       Sets up the keyboard listeners to the page */
    function removeKeyboardShortcuts() {
-      document.removeEventListener("keyup", exampleFn);
+      document.removeEventListener("keyup", exampleFn1);
+      document.removeEventListener("keyup", exampleFn2);
       console.log(">> removed shortcuts");
    }
 	/* Function unload
@@ -380,6 +67,104 @@ function function_name(argument) {
 
 		ABBREVIATION.ranSetup = false;
 	}
+
+  /*** GETTERS & SETTERS ***/
+   
+   /** FIELD TYPE SETTERS
+
+   /* Function setInputField
+      Sets the value of an input field */
+   function setInputField(input, val) {
+      var evtConfig = {
+         bubbles: true,
+         cancelBubble: false,
+         cancelable: false,
+         composed: true,
+         currentTarget: null,
+         data: val,
+         dataTransfer: null,
+         defaultPrevented: false,
+         inputType: "insertText",
+         srcElement: input,
+         target: input,
+         type: "input"
+      }
+
+      if(input.get != undefined) {
+         input = input.get(0);
+      }
+
+      setNativeValue(input, val);
+
+      input.dispatchEvent(new Event('input',evtConfig));
+   }
+
+   /* Function setDDField
+      Sets a DD field, with a certain value*/
+   function setDDField(input, val) {
+
+   }
+
+   /** FIELDS **/
+
+   /** BUTTONS & CLICKABLES **/
+
+   /** CHECKERS **/
+  
+   /*** DATA MANIPULATION ***/
+
+   /** 
+    * Function siteSpecificStandardize
+    * Called by getObjFromCopiedText. This is intended to allow for modfying *incoming*
+    * copied info to be standardized per site
+    */
+   function siteSpecificStandardize(standardInfo){
+      return standardInfo;
+   }
+
+/*** AUTONAV ***/
+
+    /* Function getCurrStepNum
+        Searches for specific elements on the DOM to decide the current step the nave is at. */
+    function getCurrStepNum() {
+
+        if ( /* logic to decide if we're on step 1 */ ) {
+            return 1;
+        } else if ( /* logic to decide if we're on step 1 */ ) {
+            return 2;
+        } else {
+
+        }
+
+        console.warn("returned 0");
+        return 0;
+    }
+
+    /* Function autoNav
+
+    */
+    function autoNav(){
+        
+        // adding the same listener mult times won't cause it to fire mult times
+        switch(getCurrStepNum()) {
+            default:
+                console.warn('Failed AutoNav');
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5: //we have arrived, run the usual stuff, stop auto-nav
+                if(typeof ABBREVIATION == "undefined" || !ABBREVIATION.ranSetup) {
+                    setup();
+                }
+                break;
+        }
+    }
 
 
 /*** FEATURE NAME ***/
@@ -408,8 +193,24 @@ function function_name(argument) {
 /*************
 * LOGIC
 **************/
+// autoNav() // If the page requires multiple steps, w/o a page refresh
 
-var firstBtn = $('');
+// Set up
+
+   /* Function restoreConsoleLog
+      MARx for some reason removes the console.log functionality.
+      Not used now, just in case I need this in the future.
+      https://stackoverflow.com/questions/7089443/restoring-console-log */
+   function restoreConsoleLog(doc=document) {
+      var iframe = doc.createElement('iframe');
+      iframe.style.display = 'none';
+      doc.body.appendChild(iframe);
+      window.console = iframe.contentWindow.console;
+      // with Chrome 60+ don't remove the child node
+      // iframe.parentNode.removeChild(iframe);
+   }
+
+var firstBtn = $('');   // if the approach requires a page refresh, then just click/click/click
 var secondBtn = $('');
 if(firstBtn.length != 0) {		
 	//** AUTONAV 1 **//
@@ -424,9 +225,15 @@ if(firstBtn.length != 0) {
 		window.ABBREVIATION = {
 			ranSetup: false
 		};
+      // USE THESE IF JQUERY IS NOT AN OPTION
+      // qs = (expr) => document.querySelector(expr);
+      // qsAll = (expr) => document.querySelectorAll(expr);
+      // getElByID = (expr) => document.getElementById(expr);
 	}
 	if(ABBREVIATION.ranSetup != true) {
 		setUpKeyboardShortcuts();
+
+      // addManagedMutationObs();
 
 		ABBREVIATION.ranSetup = true;
 		ABBREVIATION.unload = unload;
