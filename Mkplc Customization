@@ -1,13 +1,13 @@
 //~~~~ MARKETPLACE CUSTOMIZATION ~~~~//
 
-// TODO: 
+// TODO:
    /**  1  WORKING ON **
    // TODO: make data-testid="universal-navigation-view-profile" be aria-disabled=false
    // TODO: make it so that "MBI DATA" is automatically clicked after Ctrl + V'ing things
-   // TODO: make it so that a space is not able to be input into the MBI field
    // TODO: BUG Make it so that this lead gets the Medicaid info right: 140449595
    // TODO: Make a "jump to plan" link in "current plan" option
    // TODO: Make a "add to comparison" link in "current plan" option
+   // TODO: Add "Jump to plan" option at top
 
    /**  2  PRIORITY   **
    // TODO: Make stepper for part 2 of marketplace. Or....can I manipulate the URL to jump to the end?
@@ -66,6 +66,14 @@ function function_name(argument) {
       }
    };
 
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
+  /// CLIPBOARD ///
+
    /* Function copyStringToClipboard
       Copies a string to the computer clipboard */
    function copyStringToClipboard(string, printResult) {
@@ -120,51 +128,6 @@ function function_name(argument) {
       return promise;
    }
 
-   /* Function addCssEl
-      Adds the passed in CSS text to the document body */
-   function addCssEl(cssText, doc=document) {
-      // doc = (doc == null || doc == undefined) ? document : doc;
-
-      const css_el = doc.createElement("style");
-
-      if (cssText!=null) {
-         css_el.textContent = cssText;
-         doc.head.appendChild(css_el);
-      }
-      
-      return css_el;
-   }
-
-   /* Function addJsScript
-      Adds the passed in script text to the document body */
-   function addJsScript(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
-      const js_el = doc.createElement("script");
-
-      if (scriptText!=null) {
-         js_el.textContent = scriptText;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function addJsFromURL
-      Adds the passed in script text to the document body */
-   function addJsFromURL(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
-      const js_el = doc.createElement("script");
-
-      if (url!=null) {
-         js_el.src = url;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
    /* Function getCurrentTimestamp
       Returns a string of the current timestamp */
    function getCurrentTimestamp() {
@@ -194,12 +157,6 @@ function function_name(argument) {
    String.prototype.toProper = function (txt) {
       var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
       return properized;
-   }
-
-   evt = { // For debugging/testing
-      ctrlKey:true,
-      shiftKey:true,
-      which:70
    }
 
    /* Function debounce
@@ -235,32 +192,48 @@ function function_name(argument) {
       console.log(a,b,c);
    }
 
-   /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+   /** Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+      Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+      With delimiters of " ",/,-, or .
+      Can handle yyyymmdd if it has a delimiter
       Returns xx/xx/xxxx
-      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day
+    */
    function standardizeFullDateString(fullDate) {
+      if(typeof fullDate != "string") {
+         return fullDate;
+      }
+
       var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
-          partsAry;
+          partsAry, yearHolder;
 
-      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, not preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
-         // If it has a 2-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         partsAry = moddedDate.split("/");
+         yearHolder = partsAry.shift();
+         partsAry.push(yearHolder);
+      } else { // MONTH FIRST
 
-      // Split it into parts, so that you can 0 pad
-      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
-      if(partsAry == null ) {
-         console.warn("~~ full date", fullDate);
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
       }
 
       return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
@@ -268,7 +241,7 @@ function function_name(argument) {
 
    /* Function convertColonListToJsonObj
       Takes a text string, which is a list of info divided by colons,
-      and converts it to a JSON obj. Pass in the list, and true if it 
+      and converts it to a JSON obj. Pass in the list, and true if it
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
    function convertColonListToJsonObj(colonList, hasHeader) {
@@ -311,8 +284,8 @@ function function_name(argument) {
    }
 
    /* Function getObjFromCopiedText
-      Also calls standardizeCuInfo, which is specific to cu info, 
-      but I'm including it b/c it's simpler than knowing you have 
+      Also calls standardizeCuInfo, which is specific to cu info,
+      but I'm including it b/c it's simpler than knowing you have
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
@@ -344,7 +317,7 @@ function function_name(argument) {
       if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
          stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
          newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
-      } 
+      }
       newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
       newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
       newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
@@ -362,6 +335,51 @@ function function_name(argument) {
       newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
 
      return newCuInfoObj;
+   }
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
    }
 
 
@@ -421,7 +439,7 @@ function function_name(argument) {
    }
 
 
-   /* Function openMARxSidebar 
+   /* Function openMARxSidebar
       You don't need to test if it's open, b/c the opening link only opens*/
    function openMARxSidebar() {
       openProfileSidebar();
@@ -433,7 +451,7 @@ function function_name(argument) {
       k.click();
    }
 
-   /* Function openMARxSidebarEdit 
+   /* Function openMARxSidebarEdit
       You don't need to test if it's open, b/c the opening link only opens*/
    function openMARxSidebarEdit() {
       openProfileSidebar();
@@ -470,18 +488,18 @@ function function_name(argument) {
       }
    }
 
-   
+
 /*** AUTONAV ***/
 
    /* Function getElToListenTo
-      Removes the autonav logic when we have arrived, to prevent 
+      Removes the autonav logic when we have arrived, to prevent
       issues when reloading */
    function getElToListenTo() {
       return qs('[aria-disabled="false"]');
    }
 
    /* Function removeAutoNavMutObsv
-      Removes the autonav logic when we have arrived, to prevent 
+      Removes the autonav logic when we have arrived, to prevent
       issues when reloading */
    function removeAutoNavMutObsv() {
       console.log(">> removed autonav");
@@ -490,10 +508,10 @@ function function_name(argument) {
 
    /* Function addAutoNavMutObsv
       Adds the autonav logic when.
-      Calling this fn multiple times isn't an issue, 
-      as it won't cause multiple runs, since the signature 
+      Calling this fn multiple times isn't an issue,
+      as it won't cause multiple runs, since the signature
       is the same. */
-   function addAutoNavMutObsv() {      
+   function addAutoNavMutObsv() {
       var el = getElToListenTo()
       var obsv = new MutationObserver(() => console.log(">> something happened 2"));
       obsv.observe(el, {childList:true});
@@ -533,37 +551,37 @@ function function_name(argument) {
    function autoNavSetup(){
       var el = getElToListenTo()
       var obsv = new MutationObserver(autoNav);
-      obsv.observe(el, {childList:true});    
+      obsv.observe(el, {childList:true});
    }
 
    /* Function autoNav
-      Navigates from wherever you are in the "get to MARx" process to the next step in MARX. 
-      Utilizes "Load" even to decide where to go. 
+      Navigates from wherever you are in the "get to MARx" process to the next step in MARX.
+      Utilizes "Load" even to decide where to go.
       Executed in context of main frame AND in context iframe.
       Uses '$' when in main frame, uses iFrameJqry when in iframe.
    */
    function autoNav(){
       // adding the same listener mult times won't cause it to fire mult times
       switch(getCurrStepNum()) {
-         default: 
+         default:
             console.warn('!! Failed AutoNav');
             break;
          // THESE ARE FOR THE "REPEAT CALLER" SECTION, WHEN NO LEAD ID EXIST FOR THE CU
          // EACH STEP IS ITS OWN PAGE
-         case 1: 
+         case 1:
             console.log("++ AutoNav: Step 1");
             getElByID('section.agenda.guidance.button.submit').click();
             break;
-         case 2: 
+         case 2:
             console.log("++ AutoNav: Step 2");
             getByDataTestId("medicare-disclaimer-section-submitButton").click();
             break;
-         case 3: 
+         case 3:
             console.log("++ AutoNav: Step 3");
             //Permission to Call Back
             getByDataTestId("permission-to-call-back-button-yes").click();
             break;
-         case 4: 
+         case 4:
             console.log("++ AutoNav: Step 4");
             getByDataTestId("scope-of-appointment-section-submitButton").click();
             break;
@@ -682,7 +700,7 @@ function function_name(argument) {
           threeDays = 3 * 24 * 60 * 60 * 1000,
           closeSidebarAtEnd = !isMARxSidebarOpen(),
           cuDataEl = getByDataTestId("personalInfo-subsection");
-      
+
       openMARxSidebar();
 
       // Last Refreshed check. Don't refresh on the same day
@@ -696,7 +714,7 @@ function function_name(argument) {
          }
          return;
       } else {
-         console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));         
+         console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));
       }
 
       getByDataTestId("mbiResultsModal-refreshMbi").click();
@@ -778,14 +796,14 @@ function function_name(argument) {
             cuAddressParts = cuAddressEl.innerHTML.split(/<br>|\r?\n/);
             console.log(cuAddressParts);
             if(cuAddressParts.length == 3) {
-               cuAddress = cuAddressParts[0] + " " + cuAddressParts[1] + "\n" +
+               cuAddress = cuAddressParts[0] + " " + cuAddressParts[1] + "\n" +     // NEEDED, B/C IT MIMICS MARX COPY...BUT CAUSES ISSUES W/
                            cuAddressParts[2];
             } else {
                cuAddress = cuAddressParts[0] + "\n" +
                            cuAddressParts[1];
             }
 
-             marxLikeString = 
+             marxLikeString =
                header + "\n" +
                "MBI Number:\t" + cuDataObj.mbi + "\n" +
                "Name:\t" + cuDataObj.Name + "\n" +
@@ -795,7 +813,7 @@ function function_name(argument) {
                "Address:\t" + cuAddress + "\n" +
                "Most recent State:\t" + cuDataObj.State + "\n" +
                "Most recent County:\t" + cuDataObj.County + "\n" +
-               "Medicaid:\t" + copyMedicaidInfoFromSideBar(); 
+               "Medicaid:\t" + copyMedicaidInfoFromSideBar();
                      // canwork? where would show need Mcd...?>> TODO: Put a "isDNSP()" here to blank this out if not applicable
 
          copyStringToClipboard(marxLikeString.replaceAll(/  +/g,""));
@@ -835,7 +853,7 @@ function function_name(argument) {
          navigator.clipboard
             .readText()
             .then((clipText) => {
-               var cuInfoObj = getObjFromCopiedText(clipText), 
+               var cuInfoObj = getObjFromCopiedText(clipText),
                    fillSuccessful;
 
                // refreshMARxData(cuInfoObj);
@@ -869,7 +887,7 @@ function function_name(argument) {
           threeDays = 3 * 24 * 60 * 60 * 1000,
           closeSidebarAtEnd = !isMARxSidebarOpen(),
           cuDataEl = getByDataTestId("personalInfo-subsection");
-      
+
       openMARxSidebar();
 
       // Last Refreshed check. Don't refresh on the same day
@@ -883,7 +901,7 @@ function function_name(argument) {
       //    }
       //    return;
       // } else {
-      //    console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));         
+      //    console.log(">> Doing refresh. Refreshed on",dateRefreshed.toString().slice(0,15));
       // }
 
       getByDataTestId("mbiResultsModal-refreshMbi").click();
@@ -900,13 +918,13 @@ function function_name(argument) {
       }
 
       if(data.dob != "" && data.dob != undefined) {
-         setDOBField(data.dob);         
+         setDOBField(data.dob);
       }
-      
+
       if(data.mbi != "" && data.mbi != undefined) {
          setMBIField(data.mbi);
       }
-      
+
       return lookupFormIsComplete();
    }
 
@@ -986,7 +1004,7 @@ function function_name(argument) {
    debouncedInitiateSearch = debounce(()=> {
       console.log(">> 3 ran initiateSearch");
       var submitButton = getSubmitBtn();
-      if(submitButton != null) {    
+      if(submitButton != null) {
          submitButton.click();
       }
    },3000,{leading:true});
@@ -1010,7 +1028,7 @@ function function_name(argument) {
         return mpjq('#enrollInfoCopyButton');
     }
 
-    /* Function makeCanvasContainer 
+    /* Function makeCanvasContainer
         Puts the canvasContainer into the DOM. Returns a ref to it. */
     function makeCanvasContainer() {
         const div = document.createElement('div');
@@ -1033,7 +1051,7 @@ function function_name(argument) {
     }
 
     /* Function getCanvasContainer
-        Returns the canvasContainer. Cerates it if it doesn't exist. 
+        Returns the canvasContainer. Cerates it if it doesn't exist.
         Can execute inside iframe context, or main window context */
     function getCanvasContainer() {
         // handle working in two different contexts
@@ -1048,7 +1066,7 @@ function function_name(argument) {
     function copyCanvasToClipboard(canvas) {
       canvas.toBlob(function (blob) {
          const item = new ClipboardItem({ "image/png": blob });
-         navigator.clipboard.write([item]); 
+         navigator.clipboard.write([item]);
       });
     }
 
@@ -1089,7 +1107,7 @@ function function_name(argument) {
 
       var config = {
          // ignoreElements: function(el){
-         //     if(el.contains(enrollmentInfoEl.children[2]) 
+         //     if(el.contains(enrollmentInfoEl.children[2])
          //         || fourth.contains(el)
          //         || third.contains(el)
          //         || second.contains(el)
@@ -1173,11 +1191,11 @@ if(location.href.includes("broker")){ // set up so it's easy to open MP
       }
 
       /*** Add AutoNav Functionality ***/
-      // need to add the listener upon code insert to page, 
+      // need to add the listener upon code insert to page,
       // so it starts the loop for the navigation.
       // autoNav();
 
-      console.log("ran setup");
+      console.log(">> Inserted MARx Logic");
    }
 
    if(typeof mpjq == "undefined") {
