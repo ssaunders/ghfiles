@@ -1,6 +1,6 @@
 //~~~~ CHC CUSTOMIZATION ~~~~//
 
-/* TODO: 
+/* TODO:
    // TODO: Make Library fn's an inserting JS script
    // TODO: Make the Tester script work as an inserting JS script
    // TODO: Make all the files an inserting script
@@ -13,7 +13,7 @@
       ~~ SEARCH PAGE ~~
    /**  1  WORKING ON **
    // TODO: Have an indicator for what info the cu object has stored. Top right
-   // TODO: Make a "persistant search" > I.E, it searches until it gets a response. 
+   // TODO: Make a "persistant search" > I.E, it searches until it gets a response.
       // TODO: Make the toggle btn
       // TODO: Have it make a sound when it actually lands
       // TODO: Search twice, b/c it doesn't pop up a window when that happens
@@ -44,9 +44,9 @@
       ~~ RESULTS PAGE ~~
    /**  1  WORKING ON **
    // TODO: this one didn't scroll down: https://gohealth.zendesk.com/agent/tickets/17853320
-   // TODO: Make sure the highlighter works for the new states: 
+   // TODO: Make sure the highlighter works for the new states:
          /* Need to check: DE, IA, KS, LA, MI, NV, PA, SC
-            CHECKED: 
+            CHECKED:
                MI - MA-M, but it was the second Plan covg
                OK - Missed S.L.M.B. Should that be a keyword?
                IA - tricky. no real consistency?
@@ -70,7 +70,7 @@
    // TODO: shortcut to gather info into a single copy/pastable
    // TODO: try to figure out a way to have it persist through refreshes (if added to main CHC);
    // TODO: Have a word highlighter that people can type in, that highlights on page
-   
+
    // TODO: Problem states: TN? AZ-4 digit code, but no clear flag on where it is, no label
    // FL QMB+/FBDE - IN SLMB/+, QMB+, FBDE - GA QMB+/FBDE - AR FBDE/QMB+/slmb - GA QMB+
    // TODO: Highlight what Search Options are usable by the data copied
@@ -142,7 +142,7 @@
    // TODO: add notes section that tracks important info (like FBDE upper, LTC waiver)
    // TODO: figure out what to do if the address isn't there to verify (AZ, OH)
    // TODO: select payer
-   // TODO: 
+   // TODO:
 
 // function main() {
 
@@ -154,15 +154,15 @@
    /*** ALLOWED STATES DB ***/
    allowedStatesDB = {
       _DB: {   // OR, ME, NE, RI, HI not functional yet
-         allowedStates: ["AL", "AR", "AZ", "CA", "CT", "DE", "FL", "GA", "IA", 
-                         "IL", "IN", "KS", "KY", "LA", "MI", "MO", "MS", "NC", 
-                         "NJ", "NV", "NY", "OH", "OK", "PA", "SC", "TN", "TX", 
+         allowedStates: ["AL", "AR", "AZ", "CA", "CT", "DE", "FL", "GA", "IA",
+                         "IL", "IN", "KS", "KY", "LA", "MI", "MO", "MS", "NC",
+                         "NJ", "NV", "NY", "OH", "OK", "PA", "SC", "TN", "TX",
                          "WA", "WI"]
       },
       isStateAllowed: function(state) {
          state = stateNameToAbbrDB.getAbbr(state);
          return this._getDB().includes(state);
-      }, 
+      },
       _getDB: function() {return this._DB.allowedStates}
    }
 
@@ -191,25 +191,25 @@
             "AZ":SEARCH_OPT_NAME_DOB,
             "CA":-1,
             "CT":SEARCH_OPT_SSN_NAME_DOB,
-            "DE":SEARCH_OPT_NAME_DOB, 
+            "DE":SEARCH_OPT_NAME_DOB,
             "FL":SEARCH_OPT_NAME_DOB_GENDER,
             "GA":SEARCH_OPT_NAME_DOB_GENDER,
             "IA":SEARCH_OPT_NAME_DOB,
             "IL":SEARCH_OPT_NAME_DOB,
             "IN":SEARCH_OPT_NAME_DOB,
-            "KS":SEARCH_OPT_NAME_DOB, 
+            "KS":SEARCH_OPT_NAME_DOB,
             "KY":SEARCH_OPT_NAME_DOB_GENDER,
-            "LA":SEARCH_OPT_NAME_DOB, 
-            "MI":SEARCH_OPT_NAME_DOB, 
+            "LA":SEARCH_OPT_NAME_DOB,
+            "MI":SEARCH_OPT_NAME_DOB,
             "MO":SEARCH_OPT_NAME_DOB,
             "MS":SEARCH_OPT_NAME_DOB,
             "NC":SEARCH_OPT_NAME_DOB,
             "NJ":SEARCH_OPT_NAME_DOB,
-            "NV":SEARCH_OPT_NAME_DOB, 
+            "NV":SEARCH_OPT_NAME_DOB,
             "NY":SEARCH_OPT_MEM_ID,
             "OH":SEARCH_OPT_NAME_DOB,
             "OK":SEARCH_OPT_NAME_DOB,
-            "PA":SEARCH_OPT_NAME_DOB, 
+            "PA":SEARCH_OPT_NAME_DOB,
             "SC":SEARCH_OPT_NAME_DOB,
             "TN":SEARCH_OPT_NAME_DOB,
             "TX":SEARCH_OPT_NAME_DOB,
@@ -219,7 +219,7 @@
       },
       getPreference: function(state) {
          return this._getDB()[state];
-      }, 
+      },
       _getDB: function() {return this._DB.searchOptionValue}
    }
 
@@ -260,7 +260,7 @@
       },
       getSiteFieldValue: function(state) {
          return this._getDB()[state];
-      }, 
+      },
       _getDB: function() {return this._DB.stateValue}
    }
 
@@ -336,7 +336,7 @@
          }
 
          return stateAbbr;
-      }, 
+      },
       isStateAbbr: function(abbr) {
          return typeof abbr == "string" && this._stateAbbrListRegex.test(abbr);
       },
@@ -912,7 +912,7 @@
          }
       },
       isValidMcdNum: function(stateAbbr,mcdNum) {
-         var tester, 
+         var tester,
              verifiedAbbr = stateNameToAbbrDB.getAbbr(stateAbbr),
              state = this._getDB()[verifiedAbbr];
 
@@ -937,7 +937,7 @@
       getStateInfo: function(stateAbbr) {
          var verifiedAbbr = stateNameToAbbrDB.getAbbr(stateAbbr);
          return this._getDB()[verifiedAbbr];
-      }, 
+      },
       _getDB: function() {return this._DB.stateInfo}
    }
 
@@ -965,9 +965,20 @@
          this.isDebugging = true;
       },
       endDB: function() {
-         this.isDebugging = false;  
+         this.isDebugging = false;
+      },
+      warn: function(fnName) {
+        console.warn("hit function "+fnName);
       }
    };
+
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
+  /// CLIPBOARD ///
 
    /* Function copyStringToClipboard
       Copies a string to the computer clipboard */
@@ -1021,62 +1032,10 @@
       return promise;
    }
 
-   //TODO: Decide what to do here. Should I throw an error if not added?
-   // have a return val? Need to indicate if it wasn't added
-
-   /* Function addCssEl
-      Adds the passed in CSS text to the document body */
-   function addCssEl(cssText, doc=document) {
-      // doc = (doc == null || doc == undefined) ? document : doc;
-
-      const css_el = doc.createElement("style");
-
-      if (cssText!=null) {
-         css_el.textContent = cssText;
-         doc.head.appendChild(css_el);
-      }
-      
-      return css_el;
-   }
-
-   /* Function addJsScript
-      Adds the passed in script text to the document body */
-   function addJsScript(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
-      const js_el = doc.createElement("script");
-
-      if (scriptText!=null) {
-         js_el.textContent = scriptText;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function addJsFromURL
-      Adds the passed in script text to the document body */
-   function addJsFromURL(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
-      const js_el = doc.createElement("script");
-
-      if (url!=null) {
-         js_el.src = url;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function getCurrentTimestamp
-      Returns a string of the current timestamp */
-   function getCurrentTimestamp() {
-      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
-   }
+  /// MUTATION OBS ///
 
    /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer. 
+      Adds a mutation observer to targetEl. Returns the observer.
       The fn passed in will receive these arguments: */
    function addMutationObs(targetEl, fn, options) {
       if(typeof fn != "function") {
@@ -1093,6 +1052,13 @@
       mutationObs.observe(targetEl, options);
 
       return mutationObs;
+   }
+
+  /// UTILITY ///
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
    }
 
    /* Function listenToAllEvents
@@ -1112,7 +1078,7 @@
    }
 
    /* Function listenToAllEvents
-      Listens to all the events on an el. For debugging. 
+      Listens to all the events on an el. For debugging.
       eventFilter is ....
       { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
       "mouse"
@@ -1120,7 +1086,7 @@
       */
    function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
       var eventTypes, regexString, filterToUse;
-         
+
          eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
       // Figure out if it's a string event name, a regex, or an obj
       if(typeof eventFilter == "string") {
@@ -1162,15 +1128,10 @@
       }
    }
 
-   String.prototype.toProper = function (txt) {
-      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
-      return properized;
-   }
-
-   evt = { // For debugging/testing
-      ctrlKey:true,
-      shiftKey:true,
-      which:70
+   /* Function getCurrentTimestamp
+      Returns a string of the current timestamp */
+   function getCurrentTimestamp() {
+      return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
    }
 
    /* Function debounce
@@ -1206,23 +1167,25 @@
       console.log(a,b,c);
    }
 
+  /// DATA MANIPULATION ///
+
    /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
       Returns xx/xx/xxxx
       Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
    /* Possible formats: */
       tstAry = [
-    /* std:            */  "01/01/1954" , "01.01.1954" , "01-01-1954" , "01 1 1954" , "01011954" ,  
-    /* No 0-pad day    */  "01/1/1954"  , "01.1.1954"  , "01-1-1954"  , "01 1 1954" , "0111954"  ,  
+    /* std:            */  "01/01/1954" , "01.01.1954" , "01-01-1954" , "01 1 1954" , "01011954" ,
+    /* No 0-pad day    */  "01/1/1954"  , "01.1.1954"  , "01-1-1954"  , "01 1 1954" , "0111954"  ,
     /* No 0-pad mon    */  "1/01/1954"  , "1.01.1954"  , "1-01-1954"  , "1 01 1954" , "1011954"  ,
     /* No 0-pad day/Mon*/  "1/1/1954"   , "1.1.1954"   , "1-1-1954"   , "1 1 1954"  , "111954"   ,
 
     // 2-char year
-    /* std:            */  "01/01/54"   ,  "01.01.54"  ,  "01-01-54"  ,  "01 1 54"  ,  "010154" ,       
-    /* No 0-pad day    */  "01/1/54"    ,  "01.1.54"   ,  "01-1-54"   ,  "01 1 54"  ,  "01154"  , 
-    /* No 0-pad mon    */  "1/01/54"    ,  "1.01.54"   ,  "1-01-54"   ,  "1 01 54"  ,  "10154"  , 
+    /* std:            */  "01/01/54"   ,  "01.01.54"  ,  "01-01-54"  ,  "01 1 54"  ,  "010154" ,
+    /* No 0-pad day    */  "01/1/54"    ,  "01.1.54"   ,  "01-1-54"   ,  "01 1 54"  ,  "01154"  ,
+    /* No 0-pad mon    */  "1/01/54"    ,  "1.01.54"   ,  "1-01-54"   ,  "1 01 54"  ,  "10154"  ,
     /* No 0-pad day/Mon*/  "1/1/54"     ,  "1.1.54"    ,  "1-1-54"    ,  "1 1 54"   ,  "1154"   ,
-               
+
     // Messy
       "1/11954" ,     "11/1954" ,    "11/54" ,      "1/154" ,
       "1.11954" ,     "11.1954" ,    "11.54" ,      "1.154" ,
@@ -1244,7 +1207,7 @@
          // 4 yr vs 2 yr date
          // month vs day is full
 
-      // 
+      //
       tstAry.forEach((a) => {b = standardizeFullDateString(a); if(b!="01/01/1954"){console.log(b=="01/01/1954",a," > ",b,)}});
 
    function randDate() {
@@ -1252,8 +1215,8 @@
           pads = ["0",""],
           yearPrefixes = ["19","20",""],
 
-          month = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2), 
-          day = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2), 
+          month = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2),
+          day = (pads[Math.floor(Math.random()*pads.length)] + Math.floor(Math.random()*12+1)).slice(-2),
           delimiterOne = delimters[Math.floor(Math.random()*delimters.length)],
           delimiterTwo = delimters[Math.floor(Math.random()*delimters.length)],
           yearPrefix = yearPrefixes[Math.floor(Math.random()*yearPrefixes.length)]
@@ -1266,32 +1229,48 @@
       console.log(">> randDt: ",randDt," -> ",standardizeFullDateString(randDt));
    }
 
+   /** Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+      Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+      With delimiters of " ",/,-, or .
+      Can handle yyyymmdd if it has a delimiter
+      Returns xx/xx/xxxx
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day
+    */
    function standardizeFullDateString(fullDate) {
       if(typeof fullDate != "string") {
          return fullDate;
       }
 
       var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
-          partsAry;
+          partsAry, yearHolder;
 
-      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, not preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
-         // If it has a 2-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         partsAry = moddedDate.split("/");
+         yearHolder = partsAry.shift();
+         partsAry.push(yearHolder);
+      } else { // MONTH FIRST
 
-      // Split it into parts, so that you can 0 pad
-      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
-      if(partsAry == null ) {
-         console.warn("~~ full date", fullDate);
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
       }
 
       return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
@@ -1299,7 +1278,7 @@
 
    /* Function convertColonListToJsonObj
       Takes a text string, which is a list of info divided by colons,
-      and converts it to a JSON obj. Pass in the list, and true if it 
+      and converts it to a JSON obj. Pass in the list, and true if it
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
    function convertColonListToJsonObj(colonList, hasHeader) {
@@ -1342,8 +1321,8 @@
    }
 
    /* Function getObjFromCopiedText
-      Also calls standardizeCuInfo, which is specific to cu info, 
-      but I'm including it b/c it's simpler than knowing you have 
+      Also calls standardizeCuInfo, which is specific to cu info,
+      but I'm including it b/c it's simpler than knowing you have
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
@@ -1375,7 +1354,7 @@
       if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
          stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
          newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
-      } 
+      }
       newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
       newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
       newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
@@ -1383,7 +1362,7 @@
       if(newCuInfoObj.mcdId == "-") {
          newCuInfoObj.mcdId = "";
       }
-      
+
       nameParts = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "").match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
       if(nameParts != null) {
          namePartsFirst = nameParts[1];
@@ -1396,6 +1375,54 @@
    }
 
 
+   //TODO: Decide what to do here. Should I throw an error if not added?
+   // have a return val? Need to indicate if it wasn't added
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
 /*** UTILITY ***/
   //~~~ GENERAL UTILTY ~~~//
    /* Function unload
@@ -1407,7 +1434,7 @@
    /* Function isSearchPage
       Returns the keywords for the state detected on the page. */
    function isSearchPage() {
-      return (window.top.location.pathname == "/ws_portal/portal.action" 
+      return (window.top.location.pathname == "/ws_portal/portal.action"
          || window.top.location.pathname == "/ws_portal/sentinel_login.action");
    }
 
@@ -1427,7 +1454,7 @@
    }
 
    /* Function addShortcutToSearchPage
-      Since a shortcut has to run on ever iframe, this adds a single debounced fn that all 
+      Since a shortcut has to run on ever iframe, this adds a single debounced fn that all
       frames call. Returns the debounced fn, for use in page cleanup. */
    function addShortcutToSearchPage(fn, delay, options) {
       console.log("added shortcut: ",fn.name);
@@ -1447,7 +1474,7 @@
       var searchInit = addShortcutToSearchPage(initiateSearch, 100, {leading:true});     // CTRL + ENTER       // b/c standard
       var pasteInfo = addShortcutToSearchPage(pasteInSearchInfo, 300, {leading:true});   // CTRL + SHIFT + V   // V b/c paste
       var focusSite = addShortcutToSearchPage(focusSiteEl, 300, {leading:true});         // CTRL + SHIFT + S   // S b/c Site
-      
+
       shortcutFnArray.push({name:"initiateSearch", fn:searchInit});
       shortcutFnArray.push({name:"pasteInSearchInfo", fn:pasteInfo});
       shortcutFnArray.push({name:"focusSiteEl", fn:focusSite});
@@ -1540,7 +1567,7 @@
          getAppFrameDoc().removeEventListener("keyup", debouncedFn);
          getTier1Doc().removeEventListener("keyup", debouncedFn);
          getTier2Doc().removeEventListener("keyup", debouncedFn);
-         getRequestReviewDoc().removeEventListener("keyup", debouncedFn);         
+         getRequestReviewDoc().removeEventListener("keyup", debouncedFn);
       }
    }
 
@@ -1549,12 +1576,12 @@
    function unloadSearchPageListeners() {
       getFieldSite().off('change',onSiteChange);
       getFieldPayer().off('change',onPayerChange);
-      
+
       //iframe re-intiating CHC fn's
       getAppFrame().removeEventListener("load",addChcRefToAppFrame);
       getTier1Frame().removeEventListener("load",addChcRefToTier1Frame);
       getTier2Frame().removeEventListener("load",addChcRefToTier2Frame);
-      getRequestReviewFrame().removeEventListener("load",addChcRefToRequestReviewFrame);     
+      getRequestReviewFrame().removeEventListener("load",addChcRefToRequestReviewFrame);
       //functionality listeners
       getTier1Frame().removeEventListener("load",npiAutoSelect);
       // getTier2Frame().removeEventListener("load",addPersistentSearchBtn);
@@ -1649,14 +1676,14 @@
          return info.keyWords;
       }
 
-      return null;      
+      return null;
    }
 
 
 //// SEARCH PAGE ////
 
    /* Function getThingsStarted
-      Runs if Payer is empty when the CHC object is inserted into the page. 
+      Runs if Payer is empty when the CHC object is inserted into the page.
       JQuery isn't loaded at this time */
    function getThingsStarted() {
       var payerID = getFieldPayer().getSelected();
@@ -1685,9 +1712,9 @@
       main page
          iframe #appFrame
             frameset #minibatch-frameset
-               iframe iframe_tier1 -- control 
+               iframe iframe_tier1 -- control
                iframe iframe_tier2 -- search
-      This means that every interaction with parts of the page has to navigate these iframes. The getters/setters are 
+      This means that every interaction with parts of the page has to navigate these iframes. The getters/setters are
    */
 
 
@@ -1974,7 +2001,7 @@
       var optionToSelect,
           siteField = getFieldSite(),
           verifiedAbbr = stateNameToAbbrDB.getAbbr(stateAbbr),
-          siteFieldValue = siteFieldValueDB.getSiteFieldValue(verifiedAbbr); 
+          siteFieldValue = siteFieldValueDB.getSiteFieldValue(verifiedAbbr);
 
       // don't re-set it if it's already there
       if(siteField.getSelected().text().substr(0,2) == stateAbbr) {
@@ -2017,7 +2044,7 @@
          hideLtcWarning();
       }
 
-      /* we don't have to set the NPI, b/c npiAutoSelect handles it 
+      /* we don't have to set the NPI, b/c npiAutoSelect handles it
          through an observer. The NPI select is recreated each time */
 
       console.log("ran setFieldPayer w ", stateAbbr);
@@ -2047,7 +2074,7 @@
       return selectedLI.length == 0 ? undefined : payerID.innerHTML.substr(2,2);
    }
    /* Function setFieldPayer
-      Sets the payer field. B/c it has some searching behavior, sometimes required to do a settimeout 
+      Sets the payer field. B/c it has some searching behavior, sometimes required to do a settimeout
       so the info is there when we attempt to select it. */
    function setFieldPayer(state) {
       if(state == null || state == "") {
@@ -2085,7 +2112,7 @@
 
                observer.disconnect(); // this makes it one-time
             }
-            payerDDEl = getAppFrameWindow().$("#tier1HackDiv .k-list-scroller");            
+            payerDDEl = getAppFrameWindow().$("#tier1HackDiv .k-list-scroller");
             addMutationObs(payerDDEl,fn,{childList:true, subtree:true});
 
          payerData.search('SK'+state);
@@ -2150,7 +2177,7 @@
    function changeSearchOptionToPreferredOption(delay) {
       console.log("changeSearchOptionToPreferredOption fired w/delay of ", delay);
       if(delay == undefined || delay == 0) {
-         // Setter returns false if not set. This will cut off the 
+         // Setter returns false if not set. This will cut off the
          // first time there is a successful setting.
          setFieldSearchOption(SEARCH_OPT_NAME_DOB) || setFieldSearchOption(SEARCH_OPT_NAME_DOB_GENDER);
       } else {
@@ -2196,8 +2223,8 @@
       console.log("--- top ---")
       console.log("getFieldSite():",getFieldSite());
       console.log("getFieldPayer():",getFieldPayer());
-      console.log("getFieldSearchOption():",getFieldSearchOption());  
-      console.log("getFieldNPI():",getFieldNPI());  
+      console.log("getFieldSearchOption():",getFieldSearchOption());
+      console.log("getFieldNPI():",getFieldNPI());
       console.log("--- bottom ---")
       console.log("getFieldFirstName():",getFieldFirstName());
       console.log("getFieldLastName():",getFieldLastName());
@@ -2263,7 +2290,7 @@
       });
    }
 
-   
+
 /*** TOAST MESSAGE ***/
 
 
@@ -2359,7 +2386,7 @@
       if (evt.ctrlKey && evt.which == 13) {
          console.log("ran initiateSearch");
          var submitButton = getTier2El('#submit-button');
-         if(submitButton != null) {    
+         if(submitButton != null) {
             submitButton.click();
          }
       }
@@ -2389,7 +2416,7 @@
             .then((clipText) => {
                var cuInfoObj = getObjFromCopiedText(clipText,"Cu/Agent Info ");
 
-               if(cuInfoObj.state != "" && cuInfoObj.state != undefined 
+               if(cuInfoObj.state != "" && cuInfoObj.state != undefined
                   && allowedStatesDB.isStateAllowed(cuInfoObj.state)) {
                   // If the state is the same as the site, just paste in the info
                   if(getFieldSite().getSelected().attr('title').substr(6,2) == cuInfoObj.state) {
@@ -2431,29 +2458,29 @@
       if(data.firstName != "" && data.firstName != undefined) {
          setFieldFirstName(data.firstName);
       }
-      
+
       if(data.lastName != "" && data.lastName != undefined) {
          setFieldLastName(data.lastName);
       }
-      
+
       if(data.dob != "" && data.dob != undefined) {
          setFieldDOB(data.dob);
          if(currState == "CA") {
             setFieldCardIssueDate(data.dob);
          }
       }
-      
+
       if(data.ssn != "" && data.ssn != undefined) {
          setFieldSSN(data.ssn.replaceAll(/\-/g,""));
          if(currState == "CA") {
             setFieldMcdId(data.ssn.replaceAll(/\-/g,""));
          }
       }
-      
+
       if(data.mcdId != "" && data.mcdId != undefined) {
          setFieldMcdId(data.mcdId);
       }
-      
+
       if(data.sex != "" && data.sex != undefined) {
          setFieldGender(data.sex);
       }
@@ -2467,7 +2494,7 @@
       Checks if all required fields have been filled, and if so, it submits the search */
    function getAllRequiredFields() {
       var requiredMarkers = getTier2ElAll(".required");
-      
+
       // last element is just the footnote
       // the second to last is probably not needed
    }
@@ -2476,7 +2503,7 @@
       Returns true if all required fields have been filled */
    function formIsComplete() {
       // get the Search Option, then check those particular fields
-         // if(type 1) 
+         // if(type 1)
             // do stuff for all of them
    }
 
@@ -2487,7 +2514,7 @@
 
       // check the Search Option. Only certain Search Options are allowed to be immediately searched.
    }
-   
+
 
 /*** CUSTOMER INFO OBJECT ***/
    customer = {
@@ -2535,7 +2562,7 @@
          this._data.firstName = (data.firstName != "" ? data.firstName : "");
          this._data.lastName  = (data.lastName  != "" ? data.lastName : "");
       },
-   
+
       /* Function clear
          Erases all data in the object */
       clear: function() {
@@ -2549,7 +2576,7 @@
             "mcdId": ""
          }
       },
-   
+
       /* Function get
          Returns the value of the given key*/
       get: function(key) {
@@ -2559,7 +2586,7 @@
 
          return this._data[key];
       },
-      
+
       /* Function fill
          Fills out the available form elements */
       fillFields: function() {
@@ -2603,7 +2630,7 @@
           submitButton = getSubmitButton(),
           cssEl, cssContent;
 
-      if(getSubmitButton() != undefined && getSearchSpinner() == undefined) {   
+      if(getSubmitButton() != undefined && getSearchSpinner() == undefined) {
          // add the counter so it shows up on top
          counterEl.classList.add("search-counter","hidden");
          counterEl.innerHTML = searchCounter;
@@ -2612,7 +2639,7 @@
          spinnerEl.src = "https://media1.tenor.com/m/BPhklqWg14cAAAAC/spinning-spin.gif";
          spinnerEl.classList.add("search-spinner","hidden");
          submitButton.parentElement.prepend(spinnerEl);
-      }  
+      }
 
       if(tier2Doc.getElementById('spinner_css') == null) {
          cssContent = `
@@ -2629,7 +2656,7 @@
             .hidden {
                display: none;
             }`;
-            
+
          cssEl = addCssEl(cssContent, tier2Doc);
          cssEl.id = 'spinner_css';
       }
@@ -2745,7 +2772,7 @@
       // TODO: It searches, then adds a load listener to the results section
       // TODO: once it loads, it checks if there is a not "rejected" entry
          // if no, re-click search
-         // if yes, stop. 
+         // if yes, stop.
             // if active, click the link
       // TODO: ADD A counter that zeros out whenever it is turned off (find something, new search/state
       // TODO: have it auto click the link that works? >> only if it is active
@@ -2759,11 +2786,11 @@
    function getPersistentSearchBtn() {
       return getTier2Doc().getElementsByClassName("persistent-search-btn")[0];
    }
-   
+
    /* Function addPersistentSearchBtn
-      Adds the persistent search el 
-      Has 3 states: 
-         Off     - the logic does not run 
+      Adds the persistent search el
+      Has 3 states:
+         Off     - the logic does not run
          Active  - the logic will run when a search happens, but no current search
          Running - the logic is being used, as there is a current search running */
    function addPersistentSearchBtn() {
@@ -2775,13 +2802,13 @@
 
       // May need to do this as an input....
 
-      if(getPersistentSearchBtn() == undefined) {   
+      if(getPersistentSearchBtn() == undefined) {
          persistentSearchBtn.classList.add("persistent-search-btn","secondary_btn","flip");
          persistentSearchBtn.innerHTML = "⭮";
          persistentSearchBtn.onclick = togglePersistentSearch;
          persistentSearchBtn.type = "button";
          submitButton.after(persistentSearchBtn); // TODO: Set it up *after* the Submit button
-      }  
+      }
 
       if(tier2Doc.getElementById('persistent_search_styling') == null) {
          cssContent = `
@@ -2814,7 +2841,7 @@
                background: #2e8d16;
                border: #2e8d16;
             }`;
-            
+
          cssEl = addCssEl(cssContent, tier2Doc);
          cssEl.id = 'persistent_search_styling';
       }
@@ -2825,7 +2852,7 @@
       Removes the persistent search el and functionality*/
    function removePersistentSearchBtn() {
       var persistentSearchBtn = getPersistentSearchBtn();
-      
+
       if(persistentSearchBtn != undefined) {
          persistentSearchBtn.remove();
       }
@@ -2855,7 +2882,7 @@
       Changes the text shown on the search button*/
    function changePersistentSearchBtnText(val) {
       var persistentSearchBtn = getPersistentSearchBtn();
-      
+
       if(persistentSearchBtn != undefined) {
          persistentSearchBtn.innerHTML = val;
       }
@@ -2864,13 +2891,13 @@
    /* Function setUpPersistentSearch
       Sets up the listener */
    function setUpPersistentSearch(windowObj) {
-      
+
    }
 
    /* Function removePersistentSearch
       Sets up the listener */
    function removePersistentSearch(windowObj) {
-      
+
    }
 
 
@@ -2892,12 +2919,12 @@
           parentEl = tier1Doc.getElementsByClassName("billingProviderRow")[0],
           cssEl, cssContent;
 
-      if(getLtcWarningEl() == undefined) {   
+      if(getLtcWarningEl() == undefined) {
          warning.classList.add("ltc-warning","hidden");
          warning.innerHTML = "State uses LTC waiver";
          warning.id = "ltc_warning";
          parentEl.append(warning);
-      }  
+      }
 
       if(tier1Doc.getElementById('warning_css') == null) {
          cssContent = `
@@ -2912,28 +2939,28 @@
             .hidden {
                display: none;
             }`;
-            
+
          cssEl = addCssEl(cssContent, tier1Doc);
          cssEl.id = 'warning_css';
       }
 
    }
 
-   /* Function hideLtcWarning 
+   /* Function hideLtcWarning
       Removes the LTC warning el */
    function hideLtcWarning () {
       var warning = getLtcWarningEl()
       warning != undefined ? warning.classList.add("hidden") : "";
    }
 
-   /* Function showLtcWarning 
+   /* Function showLtcWarning
       Removes the LTC warning el */
    function showLtcWarning () {
       var warning = getLtcWarningEl()
       warning != undefined ? warning.classList.remove("hidden") : "";
    }
 
-   /* Function removeLtcWarningEl 
+   /* Function removeLtcWarningEl
       Removes the LTC warning el */
    function removeLtcWarningEl () {
       var warning = getLtcWarningEl()
@@ -2964,7 +2991,7 @@
    function fixDOB(evt) {
       setFieldDOB(evt.target.value);
    }
-   
+
 
 //// RESULTS PAGE ////
 
@@ -2972,7 +2999,7 @@
    //TODO: Add toast els
    //TODO: Add toast event
    //TODO: Add toast CSS
-   //TODO: Items to include: version, state notes, Ex Mc #, 
+   //TODO: Items to include: version, state notes, Ex Mc #,
 
    /* Function exampleFn
       DESCRIPTION */
@@ -3002,7 +3029,7 @@
    function getState() {
       var addressTxt, apparentState, matches, addressEl,
           submitterEl = $('#submitter-info caption')[0];
-          
+
       // See if we can get the state from the "Submitter" Section title
       if(submitterEl!=undefined) {
          submitterTxt = submitterEl.innerHTML;
@@ -3038,26 +3065,26 @@
             console.warn("Could not find state");
          }
 
-      } 
+      }
 
       console.log("Got "+apparentState+" for state");
 
       return apparentState;
    }
-   
+
    /* Function wrapInfoInElWithSpan
       Wraps the important info in the element with a span */
    function wrapInfoInElWithSpan() {
       //TODO: create span w/primary or secondary info class
       //TODO: refill element w/data, but added span
    }
-   
+
    /* Function getMbiEl
       Gets the MBI el to highlight. Returns an element  */
    function getMbiEl() {
       // HIC Number#:
       // Other Number:
-      // Group/Policy Number:  
+      // Group/Policy Number:
       var selectedEls=[], mbi;
       var mbiRegex =/[0-9][AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y][0-9AC-HJKMNP-RT-Y][0-9]\-?[AC-HJKMNP-RT-Y]{2}[0-9]{2}/gi;
 
@@ -3075,16 +3102,16 @@
             }
          }
       }
-      
+
       console.log(">>", selectedEls);
       return selectedEls[0];
    }
-   
+
    /* Function getLtcEl
       Gets the LTC el to highlight. Returns an element  */
    function getLtcEl() {
       var selectedEls;
-      
+
       selectedEls = $(".coverage-grid td:contains('Long-Term Care')");
       // if(selectedEls.length==0) {
       //    selectedEls = $("th:contains('')");
@@ -3114,7 +3141,7 @@
           stateInfo = stateDB.getStateInfo(state),
           keyWords = stateInfo.keyWords.split("/");
 
-      /* Debugging examples: 
+      /* Debugging examples:
          GA - Plan Coverage Description: / COE
          KY - memberProgramCode / memberStatusCode
          CA - Primary Aid Code / 2nd Special Aid Code
@@ -3160,13 +3187,13 @@
                   tempEl = selectedEls[0];
                   tempEl.parentNode.classList.add(primaryClassName);
                   highlightedEls.push(tempEl);
-               } 
+               }
 
                if(focusEl != null) {
                   focusEl = tempEl;
                }
 
-               break; 
+               break;
 
             // This group is for keywords that show up as values
             case "-Medicaid":
@@ -3240,11 +3267,11 @@
                selectedEls = $('th:contains("'+keyWord+'")');
                if(selectedEls.length!=0) {
                   if(state == "MI" && selectedEls.length != 1) {
-                     // MI only uses Plan Coverage Description, but sometimes 
+                     // MI only uses Plan Coverage Description, but sometimes
                      // needs it to be the second entry, not the first
                      selectedEls[0].parentNode.classList.add(primaryClassName);
                      highlightedEls.push(tempEl);
-                     
+
                      tempEl = selectedEls[1];
                   } else {
                      tempEl = selectedEls[0];
@@ -3274,19 +3301,19 @@
                }
                break;
 
-            default: 
+            default:
                console.warn("Didn't find keyword "+keyWord);
-            // medicaid 
+            // medicaid
             // 2nd Special Aid Code
-            // Prior Insurance Carrier: 
+            // Prior Insurance Carrier:
          }
 
          // This group is keywords that as values, and show up as the second element, not the first
          switch(keyWord){
             case "RAC=":
-               // this one is weird. It sometimes has a | in the first "Plan", and sometimes doesn't, 
+               // this one is weird. It sometimes has a | in the first "Plan", and sometimes doesn't,
                // so the highlight jumps to the third one
-            case "MCE |": 
+            case "MCE |":
                selectedEls = $('#general-eli-info td:contains("'+keyWord+'")');
 
                if(selectedEls.length>1) {
@@ -3335,7 +3362,7 @@
          el.classList.remove('ltc-highlight');
       });
    }
-   
+
 
 /*** STATE INFO DROP DOWN ***/
    //TODO: make it toast "state detected"
@@ -3351,11 +3378,11 @@
       Copies the medicaid id from the page */
    function getMcdIdFromPage() {
       var el = $('#patient-info tr:contains("Medicaid Recipient ID")');
-      
+
       if(el.length == 0) {
          el = $('#patient-info tr:contains("Member ID")');
       }
-      
+
       if(el.length > 0) {
          copyStringToClipboard(el.children()[1].innerHTML);
       } else {
@@ -3471,5 +3498,5 @@
       }
    }
 // } // END OF MAIN -- an attempt to put all the fn's in the context of the top window
-// 
+//
 // main.apply(window.top);
