@@ -1,6 +1,6 @@
 //~~~~ HUMANA CUSTOMIZATION ~~~~//
 
-// TODO: 
+// TODO:
 
 	// 1  working on
 		// TODO: Add logic to get $ in multiple ways, and to show which one is needed to use
@@ -9,7 +9,7 @@
 	// 2 priority
 
 	// 3 backlog
-		// TODO: Change the placeholders in the file for the HM, HUMANA, 
+		// TODO: Change the placeholders in the file for the HM, HUMANA,
 		// TODO: Figure out what kind of jquery/$ it uses
 		// TODO: Make sure it inserts into page correctly
 		// TODO: Test AutoNav
@@ -22,11 +22,11 @@
 			// D
 		// TODO: Add Ctrl + Shift + V shortcut
 		// TODO: Write shortcut logic fn
-			// TODO: 
+			// TODO:
 		// TODO: Detail the other features I want to add here
-		// TODO: 
-		// TODO: 
-		// TODO: 
+		// TODO:
+		// TODO:
+		// TODO:
 
 /** DONE **/
 
@@ -63,9 +63,15 @@ function function_name(argument) {
 			this.isDebugging = true;
 		},
 		endDB: function() {
-			this.isDebugging = false;	
+			this.isDebugging = false;
 		}
 	};
+
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
 
 	/* Function copyStringToClipboard
 		Copies a string to the computer clipboard */
@@ -113,51 +119,6 @@ function function_name(argument) {
       return promise;
    }
 
-   /* Function addCssEl
-      Adds the passed in CSS text to the document body */
-   function addCssEl(cssText, doc=document) {
-      // doc = (doc == null || doc == undefined) ? document : doc;
-
-      const css_el = doc.createElement("style");
-
-      if (cssText!=null) {
-         css_el.textContent = cssText;
-         doc.head.appendChild(css_el);
-      }
-      
-      return css_el;
-   }
-
-   /* Function addJsScript
-      Adds the passed in script text to the document body */
-   function addJsScript(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
-      const js_el = doc.createElement("script");
-
-      if (scriptText!=null) {
-         js_el.textContent = scriptText;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function addJsFromURL
-      Adds the passed in script text to the document body */
-   function addJsFromURL(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
-      const js_el = doc.createElement("script");
-
-      if (url!=null) {
-         js_el.src = url;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
 	/* Function getCurrentTimestamp
 		Returns a string of the current timestamp */
 	function getCurrentTimestamp() {
@@ -165,7 +126,7 @@ function function_name(argument) {
 	}
 
    /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer. 
+      Adds a mutation observer to targetEl. Returns the observer.
       The fn passed in will receive these arguments: */
    function addMutationObs(targetEl, fn, options) {
       if(typeof fn != "function") {
@@ -188,12 +149,6 @@ function function_name(argument) {
       var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
       return properized;
    }
-
-	evt = { // For debugging/testing
-		ctrlKey:true,
-		shiftKey:true,
-		which:70
-	}
 
    /* Function debounce
       Debounces a fn */
@@ -229,7 +184,7 @@ function function_name(argument) {
    }
 
    /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
       Returns xx/xx/xxxx
       Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
    function standardizeFullDateString(fullDate) {
@@ -248,7 +203,7 @@ function function_name(argument) {
          // If it has a 2-digit year, preceded by a /
          moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
          // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
+      }
 
       // Split it into parts, so that you can 0 pad
       partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
@@ -261,7 +216,7 @@ function function_name(argument) {
 
    /* Function convertColonListToJsonObj
       Takes a text string, which is a list of info divided by colons,
-      and converts it to a JSON obj. Pass in the list, and true if it 
+      and converts it to a JSON obj. Pass in the list, and true if it
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
    function convertColonListToJsonObj(colonList, hasHeader) {
@@ -304,8 +259,8 @@ function function_name(argument) {
    }
 
    /* Function getObjFromCopiedText
-      Also calls standardizeCuInfo, which is specific to cu info, 
-      but I'm including it b/c it's simpler than knowing you have 
+      Also calls standardizeCuInfo, which is specific to cu info,
+      but I'm including it b/c it's simpler than knowing you have
       to always pair the two fn's.
       CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
       */
@@ -337,7 +292,7 @@ function function_name(argument) {
       if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
          stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
          newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
-      } 
+      }
       newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
       newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
       newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
@@ -355,6 +310,51 @@ function function_name(argument) {
       newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
 
      return newCuInfoObj;
+   }
+
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   function addCssEl(cssText, doc=document) {
+      // doc = (doc == null || doc == undefined) ? document : doc;
+
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   function addJsScript(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   function addJsFromURL(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
    }
 
 
@@ -404,6 +404,7 @@ function function_name(argument) {
 
 
 /*** GETTERS & SETTERS ***/
+   
    /* Function setInputField
       Gets the First Name field */
    function setInputField(input, val) {
@@ -565,7 +566,7 @@ function function_name(argument) {
 
          if(state != undefined) {
             if(!stateDB.isValidMcdNum(state, newVal)) {
-               sendMessage("Mcd ID does not match format: \n"+stateDB.getStateInfo(state).mcdIdFormat, 
+               sendMessage("Mcd ID does not match format: \n"+stateDB.getStateInfo(state).mcdIdFormat,
                   MESSAGE_TYPE.WARNING, 4000);
             }
          }
@@ -658,7 +659,7 @@ function function_name(argument) {
    debouncedInitiateSearch = debounce(()=> {
       console.log(">> 3 ran initiateSearch");
       var submitButton = getSubmitBtn();
-      if(submitButton != null) {    
+      if(submitButton != null) {
          submitButton.click();
       }
    },3000,{leading:true});
@@ -708,7 +709,7 @@ function function_name(argument) {
          navigator.clipboard
             .readText()
             .then((clipText) => {
-               var cuInfoObj = getObjFromCopiedText(clipText), 
+               var cuInfoObj = getObjFromCopiedText(clipText),
                    fillSuccessful;
 
                clearForm();
@@ -739,27 +740,27 @@ function function_name(argument) {
       if(data.firstName != "" && data.firstName != undefined) {
          setFirstNameField(data.firstName);
       }
-      
+
       if(data.lastName != "" && data.lastName != undefined) {
          setLastNameField(data.lastName);
       }
-      
-      if(data.dob != "" && data.dob != undefined) { 
+
+      if(data.dob != "" && data.dob != undefined) {
          setDOBField(data.dob);
       }
-      
+
       if(data.sex != "" && data.sex != undefined) {
          setGenderField(data.sex);
       }
-      
+
       if(data.mbi != "" && data.mbi != undefined) {
          setMBIField(data.mbi);
       }
-      
+
       if((data.mcdId != "" || data.ssn != "") && (data.mcdId != undefined || data.ssn != undefined)) {
          setMedicaidIDField(data.mcdId, data.ssn, data.state);
       }
-      
+
       if(data.ssn != "" && data.ssn != undefined) {
          setSSNField(data.ssn.replaceAll(/\-/g,""));
       }
@@ -790,11 +791,11 @@ function function_name(argument) {
          }
       }
 
-      isValid = firstName != "" && lastName != "" && dob != "" && mbi != "" 
-               && (gender != "" && gender   != "Select Gender") 
+      isValid = firstName != "" && lastName != "" && dob != "" && mbi != ""
+               && (gender != "" && gender   != "Select Gender")
                && (state  != "" && state    != "Select State" );
 
-      console.log("Auto submit " + (isValid ? "succeeded" : "failed"), 
+      console.log("Auto submit " + (isValid ? "succeeded" : "failed"),
          "firstName", firstName != "", "lastName", lastName != "", "dob", dob != "", "mbi", mbi != "",
          "gender",   (gender != "" && gender != "Select Gender"),
          "state",    (state  != "" && state  != "Select State" ));
@@ -821,14 +822,14 @@ function function_name(argument) {
 
 var firstBtn = jq('#nothing');
 var secondBtn = jq('#nothing');
-if(firstBtn.length != 0) {		
+if(firstBtn.length != 0) {
 	//** AUTONAV 1 **//
    firstBtn.click();
-} else if(secondBtn.length != 0) {			
+} else if(secondBtn.length != 0) {
 	//** AUTONAV 2 **//
    secondBtn.click();
    // set timeout and nav to https://app.thinkagent.com/home-tabs/tabs/medicaid-eligibility  ?
-} else {	
+} else {
 	//** PAGE LOGIC **//
 	if(typeof hm == "undefined") {
 		window.hm = {
