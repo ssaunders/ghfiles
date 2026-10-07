@@ -1,29 +1,34 @@
-//~~~~ ZD CUSTOMIZATION ~~~~//      
-   /* 
+//~~~~ ZD CUSTOMIZATION ~~~~//
+   /*
       assignee:me form:emedon created>=10hours
    */
-// 
-/* TODO: 
+//
+/* TODO:
 
    /**  1  WORKING ON **
     //~~ GENERAL ~~
-      // TODO: have Ctrl+L / openBoTab open using a phone number
+      // TODO: CRM Enrollment RFI
+      // TODO: have Ctrl+L / openBoTab open using a phone number when no lead Id found
       // TODO: Have a "label" area for ZD, so I know what window is doing what.
       // TODO: fix https://gohealth.zendesk.com/agent/tickets/17930894
       // TODO: Have Phone Numbers remove the - auto
- 
+      // TODO: Work on https://gohealth.zendesk.com/agent/tickets/17894017, copy first comment not pulling vconn 
+      // TODO: Work on https://gohealth.zendesk.com/agent/tickets/17894017, not recognizing Cares RFI's as vconn
+
+      // TODO: add changing the PTC Req to "Yes" so I can get the data in the form, or find another way to get the data
+
     //~~ LEGAL/QA ~~
- 
+
     //~~ PREV ISSUE ~~
-      // TODO: T2F: make fn get 'Conclusion' 
+      // TODO: T2F: make fn get 'Conclusion'
       // TODO: T2F: Add transfer reference # to T2f copy
       // TODO: T2F: T2 UID showed up wrong for OneDigital https://gohealth.zendesk.com/agent/tickets/17866936
       // TODO: T2F: Fix '&' in the copy/paste
- 
+
     //~~ T2 FEEDBACK ~~
       // TODO: T2F: Fix T2F copy, picking up , and -
       // TODO: T2F: fillOutT2Form
-         // TODO: 
+         // TODO:
          /* DTC Carrier*
             Transfer Reference Number*
             Are you submitting feedback for a T2/T3 Agent?
@@ -38,6 +43,22 @@
    /**  2  PRIORITY   **
       // TODO: have all the "get..El" functions return jQuery els, rather than html els << FOR TEP?
       // TODO: Add "Ct + Sh + R" for "Refresh results" in the search section
+      // TODO: Make Ct+Sh+X copy a view or search (extractHtmlTableData)
+      // TODO: Have Ct+Sh+V paste/change the Compliance Ticket's affiliate/Link id/aff id
+      // TODO: Make "isEmpty" on field use on-the-el "val" fn
+      // TODO: Make a "val" field on field when gotten by get TicketFormFieldTopEl
+      // TODO: Make a "type" field on field when gotten by get TicketFormFieldTopEl
+      // TODO: Have the PTC cases get then name of the customer and put it in the side ()
+         Allegation ID: 247951
+         Agent Name: Sravani Upputolla
+         Agent Sub-Channel: CallCenter/eVendor
+         Agency: Gohealth Llc-Call Center
+         Source of Complaint: Grievance & Appeals
+         Plan Type: PPO
+         Member Name: Marian Schroll  <<<<
+         Additional Member:
+         Member State: KS
+         Complaint: Per Com
 
       // TODO: Figure out how to make these work:
       Was it sold by a GH agent?
@@ -45,7 +66,7 @@
          |     Was there a Resolve agent?
          |       Y
          |       |     (GH) Resolve - Anything that goes through resolve (including the other kinds) > will be in MPL, may have resolve notes
-         |       N 
+         |       N
          |             Is the selling agent a sales agent?
          |               Y
          |               |     Captive Legacy - captive sale, not through resolve
@@ -57,9 +78,9 @@
                |     vConnect Resolve - A vconn sale using resolve - is in MPL, may have resolve notes, check bottom of TEP/they're not in teams
                N
                      GPS Legacy - it's only in TEP, did it through marketplace, (can't pull call or look at MP details)
-   
+
       GPS Express - Not active yet (April)
-   
+
       Is the agent in Teams?
          Y
          |   Is there a record in TEP?
@@ -73,13 +94,13 @@
          |         Captive Legacy - direct sale from captive, not through resolve
          N
          GPS Legacy - it's only in TEP, did it through marketplace
-   
+
       GPS Express - Not active yet
-   
+
             Is it only in TEP with no notes? Legacy
             Is it Broker? Captive or Resolve
                Is there Resolve?
-         
+
 
    /**  3  BACKLOG    **
     //~~ EMDEON ~~
@@ -107,6 +128,9 @@
       // TODO: Make view refresher that sends me a notification if certain views have stuff available.
 
 /** DONE **/
+   // TODO: Make a "isEmpty" fn that attaches to the field when it is gotten by get TicketFormFieldTopEl
+	// TODO: Added copy from Compliance Inquiry
+   // TODO: Added Ctrl + Shift + / to open the search box wherever
    // TODO: Added a "BO opening" button on the left side
    // TODO: Finish adding ZD object
    // TODO: Get it unset ZD
@@ -126,7 +150,7 @@
    // TODO: Fix "Cares Form" issues with getTicketFormFieldTopEl. When searching for "Form", it picks up the "cares form", in "Requester"
 
   /**** Post Version Release ****/
-   
+
    // TODO: LIB: Fix colon list converter to take \r\n, too
    // Fixed issue with state not being found next to "County"
    // TODO: isPreventableIssue => Detect when ticket is Prev Issue
@@ -156,7 +180,7 @@
    // TODO: Fixed issue when full name state is at the end of the string
    // TODO: Make an indication that the ZD shortcuts have been pasted in (ZD in a color on the sidebar)
       // TODO: Indicator as green/red, w/a copied/not icon
-   // TODO: Implement McdID for Ct+Sh+X   
+   // TODO: Implement McdID for Ct+Sh+X
    // TODO: Implement First Name/last name
    // TODO: Add a "keyup" event at after inputting text into the form, as an attempt to prevent it from suddenly dissappearing
    // TODO: figure out "in" being picked up as a state. Seperate it?
@@ -540,17 +564,17 @@
    // should include any state chat can handle
    allowedStatesDB = {
       _DB: {   // ADD STATES HERE
-         abbrs: [ 
-            "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "IL", "IN", 
-            "KS", "KY", "LA", "MD", "ME", "MI", "MO", "MS", "NC", "NJ", "NV", "NY", "OH", 
+         abbrs: [
+            "AL", "AR", "AZ", "CA", "CO", "CT", "DE", "FL", "GA", "IA", "IL", "IN",
+            "KS", "KY", "LA", "MD", "ME", "MI", "MO", "MS", "NC", "NJ", "NV", "NY", "OH",
             "OK", "PA", "SC", "SD", "TN", "TX", "WA", "WI", "WV"
          ],
          names: [
-            "Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
-            "Delaware", "Florida", "Georgia", "Iowa", "Illinois", "Indiana", "Kansas", 
-            "Kentucky", "Louisiana", "Maine", "Maryland", "Michigan", "Mississippi", 
-            "Missouri", "Nevada", "New Jersey", "New York", "North Carolina", "Ohio", 
-            "Oklahoma", "Pennsylvania", "South Carolina", "South Dakota", "Tennessee", 
+            "Alabama", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+            "Delaware", "Florida", "Georgia", "Iowa", "Illinois", "Indiana", "Kansas",
+            "Kentucky", "Louisiana", "Maine", "Maryland", "Michigan", "Mississippi",
+            "Missouri", "Nevada", "New Jersey", "New York", "North Carolina", "Ohio",
+            "Oklahoma", "Pennsylvania", "South Carolina", "South Dakota", "Tennessee",
             "Texas", "Washington", "West Virginia", "Wisconsin"
           ],
       },
@@ -560,14 +584,14 @@
          } else {
             return this.getNames().includes(stateNameOrAbbr);
          }
-      }, 
+      },
       getAbbrs: function() {
          return this._DB.abbrs;
       },
       getNames: function() {
          return this._DB.names;
       }
-      
+
    }
 
    /*** STATE NAME TO ABBR DB ***/
@@ -642,7 +666,7 @@
          }
 
          return stateAbbr;
-      }, 
+      },
       isStateAbbr: function(abbr) {
          return typeof abbr == "string" && this._stateAbbrListRegex.test(abbr);
       },
@@ -654,53 +678,103 @@
 * FUNCTIONS
 **************/
 
+// ZD
 /*** LIBRARY ***/
 
-   /* Function alreadyPresent
-      alerts that the code already exists */
+   /*  Function alreadyPresent
+        alerts that the code already exists */
    function alreadyPresent() {
-      console.warn(">> ZD Code already present");
+        console.warn(">> ZD Code already present");
    }
 
-   /* Function DEBUG FUNCTIONS
-      tests for/starts/stops debug */
-   mydebug = {
-      isDebugging: false,
-      isDB: function () {
+  /// DEBUG ///
+    mydebug = {
+       isDebugging: false,
+       isDB: function () {
          return this.isDebugging;
-      },
-      startDB: function() {
+       },
+       startDB: function() {
          this.isDebugging = true;
-      },
-      endDB: function() {
+       },
+       endDB: function() {
          this.isDebugging = false;
-      }
-   };
+       },
+       warn: function(fnName) {
+        console.warn("hit function "+fnName);
+       }
+    };
 
-   //// CLIPBOARD ////
+   mockEvt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
 
-   /* Function copyStringToClipboard
-      Copies a string to the computer clipboard */
-   function copyStringToClipboard(string, printResult) {
-      if(string == null) {
+  /// CLIPBOARD ///
+
+    /*  Function copyStringToClipboard
+        Copies a string to the computer clipboard */
+    function copyStringToClipboard(stringToCopy=null, printResult=false) {
+        if(stringToCopy == null) {
+            console.warn(">> Nothing to copy");
+            return;
+        }
+
+        return navigator.clipboard.writeText(stringToCopy)
+            .then(() => {
+              console.log('>> Content copied to clipboard');
+                if(printResult) {
+                   console.log("Copied: ", data);
+                }
+               return true;
+            },(a,b,c,d) => {
+              //TODO: handle if a.message.contains "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+              console.error('>> Failed to copy');
+            });
+    }
+
+    /*  Function copyArrayToClipboard
+        Copies a maximum 2-D array to the computer clipboard */
+    function copyArrayToClipboard(copyAry=null, printResult=false) {
+      if(copyAry == null) {
          console.warn(">> Nothing to copy");
          return;
       }
 
-      return navigator.clipboard.writeText(string)
-         .then((data) => {
-            console.log('>> Content copied to clipboard');
-            if(printResult) {
-               console.log("Copied: ", data);
+      var is2dArray, stringToCopy;
+
+      is2dArray = copyAry.every(item => Array.isArray(item));
+
+      // Convert Array to String
+      if(is2dArray) {
+         tableText = copyAry.map((el, idx) => {
+            if(Array.isArray(el)) {
+               return el.toString();
+            } else {
+               return el;
             }
-         },() => {
-           console.error('>> Failed to copy');
          });
+         stringToCopy = tableText.join(`\n`);
+      } else {
+         stringToCopy = copyAry.toString();
+      }
+
+      return navigator.clipboard.writeText(stringToCopy)
+            .then(() => {
+              console.log('>> Content copied to clipboard');
+                if(printResult) {
+                   console.log("Copied: ", data);
+                }
+               return true;
+            },(a,b,c,d) => {
+              //TODO: handle if a.message.contains "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+              console.error('>> Failed to copy');
+            });
    }
 
-   /* Function copyElToClipboard
-      Copies the content of an el to the computer clipboard */
-   function copyElToClipboard(htmlEl) {
+    /*  Function copyElToClipboard
+        Copies the content of an el to the computer clipboard */
+    function copyElToClipboard(htmlEl, doc=document) {
       if(htmlEl == null) {
          console.warn(">> Nothing to copy");
          return;
@@ -711,17 +785,18 @@
          htmlEl = htmlEl.get(0);
       }
 
-      var range = document.createRange();
-      var sel = document.getSelection();
+      var range = doc.createRange();
+      var sel = doc.getSelection();
 
       try {
          sel.removeAllRanges();
          range.selectNodeContents(htmlEl);
          sel.addRange(range);
-         document.execCommand("Copy");
-         flashNotificationEl();
+         doc.execCommand("Copy");
+         return true;
       } catch (error) {
-         console.warn()
+         console.warn(error);
+         return false;
       }
    }
 
@@ -737,29 +812,28 @@
 
       return promise;
    }
-   
-   //// ADD ELS ////
+
+  /// ELEMENT ADDERS ///
+
+   //TODO: Decide what to do here. Should I throw an error if not added?
+   // have a return val? Need to indicate if it wasn't added
 
    /* Function addCssEl
       Adds the passed in CSS text to the document body */
    function addCssEl(cssText, doc=document) {
-      // doc = (doc == null || doc == undefined) ? document : doc;
-
       const css_el = doc.createElement("style");
 
       if (cssText!=null) {
          css_el.textContent = cssText;
          doc.head.appendChild(css_el);
       }
-      
+
       return css_el;
    }
 
    /* Function addJsScript
       Adds the passed in script text to the document body */
-   function addJsScript(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
+   function addJsScript(scriptText, doc=document) {
       const js_el = doc.createElement("script");
 
       if (scriptText!=null) {
@@ -772,9 +846,7 @@
 
    /* Function addJsFromURL
       Adds the passed in script text to the document body */
-   function addJsFromURL(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
+   function addJsFromURL(url, doc=document) {
       const js_el = doc.createElement("script");
 
       if (url!=null) {
@@ -784,42 +856,91 @@
 
       return js_el;
    }
-   
-   //// MUTATORS ////
+
+  /// MUTATION OBS ///
 
    mutatorArray = [];
 
    /* Function addManagedMutationObs
       Adds a mutation observer to targetEl. Returns the observer.
-      The fn passed in will receive these arguments: 
-      mutationList - the list of changes.    
-      observer - The observer instance. 
+      The fn passed in will receive these arguments:
+      mutationList - the list of changes.
+      observer - The observer instance.
       https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+
+      See addMutationObs for details on options.
       */
    function addManagedMutationObs(targetEl, fn, options) {
       var mutaObs = addMutationObs(targetEl, fn, options);
+
       mutaObs.target = targetEl;
+      mutaObs.managedId = Math.round(Math.random()*9000+1000);
+      mutaObs.managedDisconnect = () => {unloadManagedMutator(mutaObs.managedId)};
       mutatorArray.push(mutaObs);
+
       return mutaObs;
    }
 
-   /* Function unloadManagedMutators
+   /* Function unloadManagedMutator
+      Removes the specific mutation observer from mutatorArray */
+   function unloadManagedMutator(managedId) {
+      var idx = mutatorArray.findIndex((mutaObs) => {
+         if(mutaObs.managedId == managedId) {
+            return true;
+         }
+      });
+
+      if (idx == -1) {
+         console.warn("Tried to delete a managed observer that didn't exist:", managedId);
+         return false;
+      }
+
+      mutatorArray[idx].disconnect();
+
+      mutatorArray = mutatorArray.toSplice(idx,1);
+
+      return true;
+   }
+
+   /* Function unloadAllManagedMutators
       Removes the keyboard listeners from the page and undoes everything in runSetup */
-   function unloadManagedMutators() {
+   function unloadAllManagedMutators() {
       mutatorArray.map((muta) => {
          muta.disconnect();
       });
       mutatorArray = [];
    }
 
-   /* Function addMutationObs
-      Adds a mutation observer to targetEl. Returns the observer.
-      The fn passed in will receive these arguments: 
-      mutationList - the list of changes.    
-      observer - The observer instance. 
-      https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
-      */
-   function addMutationObs(targetEl, fn, options={childList:true}) {
+   /** Function addMutationObs
+     * Adds a mutation observer to targetEl. Returns the observer. 
+     * The fn passed in will receive these arguments: 
+     *   mutationList - the list of changes.
+     *   observer - The observer instance.
+     *   https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver
+     * 
+     *   OPTIONS DETAILS:
+     *   subtree / Optional / default: false
+     *       true = monitors the entire subtree target. Any other options will also apply to the subtree.
+     * 
+     *   childList / Optional / default: false
+     *       true = monitor the target node for the addition/removal of child nodes
+     * 
+     *   attributes / Optional / default: false, unless attributeFilter/attributeOldValue is true
+     *       true = watch for changes to the value of attributes on the node or nodes being monitored.
+     * 
+     *   attributeFilter / Optional / default: false
+     *       array of attribute names to be monitored. If this isn't included, any attribute change causes mutation notifications.
+     * 
+     *   attributeOldValue / Optional / default: false
+     *       true = records the prev value of any attribute that changes
+     * 
+     *   characterData / Optional / default: false, unless characterDataOldValue is true
+     *       true = monitor the specified target node for changes to the character data contained within the node or nodes.
+     * 
+     *   characterDataOldValue / Optional / default: false
+     *       true = record the prev value of a node's text whenever the text changes on nodes being monitored.
+     */
+   function addMutationObs(targetEl, fn, options = {childList:true}) {
       if(typeof fn != "function") {
          fn = () => console.log("ran mutationObserver for ",targetEl);
       }
@@ -836,7 +957,79 @@
       return mutationObs;
    }
 
-   //// MISC ////
+  /// UTILITY ///
+
+   String.prototype.toProper = function (txt) {
+      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
+      return properized;
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging. Doesn't currently work*/
+   function listenToAllEvents(el) { // limitScroll/Mouse/Key, userFn
+      var eventFilter;
+      // Options: animation*, on*, mouse*, pointer*, transistion*, click, blur, dblclick, scroll*
+      // eventFilter = /^on(key|mouse)/     // just for onkey* or onmouse*
+      eventFilter = /^on/                // gets all events
+      Object.keys(el).forEach(key => {
+          if (eventFilter.test(key)) {
+              el.addEventListener(key.slice(2), event => {
+                  console.log(event);
+              });
+          }
+      });
+   }
+
+   /* Function listenToAllEvents
+      Listens to all the events on an el. For debugging.
+      eventFilter is ....
+      { pointer: true, mouse: false, event: "onMouseIn", eventList: ["mouse", "pointer"], excludeList: ["",""]}
+      "mouse"
+      // Options: animation*, on*, mouse*, pointer*, transition*, click, blur, dblclick, scroll*
+      */
+   function listenToAllEvents(el, eventFilter=/^on/, fn=(a,b,c)=>console.log("Got ",a,b,c)) {
+      var eventTypes, regexString, filterToUse;
+
+         eventFilter = /^on(?!.*(mouse|pointer|animation|transition)).*$/i
+      // Figure out if it's a string event name, a regex, or an obj
+      if(typeof eventFilter == "string") {
+         filterToUse = eventFilter;
+      } else if(typeof eventFilter == "object") {
+         if(eventFilter.test == undefined) {
+            eventTypes =
+               eventFilter.mouse      ? "|mouse" : "" +
+               eventFilter.click      ? "|click" : "" +
+               eventFilter.pointer    ? "|pointer" : "" +
+               eventFilter.animation  ? "|animation" : "" +
+               eventFilter.transition ? "|transition" : "" +
+               eventFilter.key        ? "|key" : "";
+            regexString = eventFilter.exclude ? "^on(?!.*("+eventTypes.slice(1)+").*$" : "^on.*("+eventTypes.slice(1)+").*$"
+            filterToUse = new RegExp(regexString);
+         } else { // eventFilter is a regex
+            filterToUse = eventFilter;
+         }
+      } else {
+         console.warn("Failed to listen to events. Could not recognize filter");
+      }
+
+      for (var key in el) {
+         if (key.search(filterToUse) === 0) {
+            console.log("added to ",key);
+            el.addEventListener(key.slice(2), fn);
+         }
+      }
+
+      return {
+         removeListeners: () => {
+            for (var key in el) {
+               if (key.search(filterToUse) === 0) {
+                  console.log("removed from",key);
+                  el.removeEventListener(key.slice(2), fn);
+               }
+            }
+         }
+      }
+   }
 
    /* Function getCurrentTimestamp
       Returns a string of the current timestamp */
@@ -844,76 +1037,285 @@
       return new Date().toLocaleString('en-us',{hour:'numeric',minute:'numeric',second:'numeric'});
    }
 
-   String.prototype.toProper = function (txt) {
-      var properized = this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()});
-      return properized;
-   }
-
-   evt = { // For debugging/testing
-      ctrlKey:true,
-      shiftKey:true,
-      which:70
-   }
-
    /* Function debounce
-      Debounces a fn */
+       Debounces a fn */
    function debounce(callback, wait=0, timing={'leading': false,'trailing': true}) {
-      console.log("debounce called with wait ", wait, " for ",callback.name);
-      let debounceTimer = Date.now();
+        console.log("debounce called with wait ", wait, " for ",callback.name);
+        let debounceTimer = Date.now();
 
-      if(timing.trailing) {
-         return function debouncedFn() {
-            const context = this
-            const args = arguments
-            clearTimeout(debounceTimer)
-            debounceTimer = setTimeout(() => {
-               callback.apply(context, args)
-            }, wait)
-         }
-      } else { // leading
-         return function debouncedFn() {
-            const context = this
-            const args = arguments
-            if (Date.now() - debounceTimer > wait) {
-               callback.apply(context, args);
+        if(timing.trailing) {
+            return function debouncedFn() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    callback.apply(context, args);
+                }, wait);
             }
-            debounceTimer = Date.now();
-         };
-      }
+        } else { // leading
+            return function debouncedFn() {
+                const context = this;
+                const args = arguments;
+                if (Date.now() - debounceTimer > wait) {
+                    callback.apply(context, args);
+                }
+                debounceTimer = Date.now();
+            };
+        }
    }
+   window.debounce = debounce;
 
    /* Function fnLogger
       Pre-made logger for when I'm trying to figure out what a fn that takes a fn does */
    function fnLogger(a,b,c) {
       console.log("logging: "+Math.round(Math.random()*1000),a,b,c);
    }
+   window.fnLogger = fnLogger;
 
-   /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
-      Returns xx/xx/xxxx
-      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
+   /* Function isPastingFromMARx
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMARx(colonList){
+      return /^Claim Number:\t +.*\r?\nMBI /.test(colonList);
+   }
+
+   /* Function isPastingFromMP
+      Checks if the pasted string coming in is from MARx */
+   function isPastingFromMP(colonList){
+      return /^Personal Info\r?\nMBI /.test(colonList);
+   }
+
+   /* Function setNativeValue
+      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
+      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
+   function setNativeValue(element, value) {
+      if(element.get != undefined) {
+         element = element.get(0);
+      }
+
+      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
+      const prototype = Object.getPrototypeOf(element);
+      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
+
+      if (valueSetter && valueSetter !== prototypeValueSetter) {
+         prototypeValueSetter.call(element, value);
+      } else {
+         valueSetter.call(element, value);
+      }
+   }
+
+   /** Function extractHtmlTableData
+    *  @tableIdOrEl: (rqd) A table element or html id as a string
+    *  @mapper: (opt) The fn that returns the data. 
+    *           If using the CSV format, you have to have the exact characters, case sensitive.
+    *  @returns: 
+    *  src: 
+    */
+   function extractHtmlTableData(tableIdOrEl="", mapper){
+      var myTab, data;
+      // Get the table
+      if(typeof tableIdOrEl == "String") {
+         myTab = document.getElementById(tableId);
+      } else if(tableIdOrEl.nodeName =="TABLE") {
+         myTab = tableIdOrEl;
+      } else {
+         return null;
+      }
+
+      // Get raw values from the table
+      if (myTab) {
+         data = [...myTab.rows]
+                .map((r) => [...r.cells].map((c) => c.innerText)) // TODO: Fix "Friday 4:44pm" on time cols
+                .filter((row, idx, table) => {
+                  // (table[0][0] !== row[0]) >> probably not needed
+                  return row.length != 1;
+                });
+      }
+
+      /* Process the data. There are four options:
+         Needs to handle tables and div's
+
+         1. fn that returns a value. Ex:
+            (x) => ({
+               name: x[0],
+               address: x[1],
+               city: x[2],
+               state: x[3],
+            });
+         2. [0,1,0,1,1,0,1] => use this col or not. Will use the narrowest option between the table or the array. Returns a 2D array
+         3. [1,3,5,7] => use x col in this position. 1-based. Can repeat the col number. Numbers larger or smaller than the tables cols have undefined values. Returns a 2D array
+         4. CSV List of col titles (use a fn to get a numbered list, put into 3)
+      */
+
+      // Map function
+      if(typeof mapper == "function") {
+         return data.map(mapper);         
+      }
+
+      if(Array.isArray(mapper)) {
+         // Column Names
+         if(typeof mapper[0] == "string"){
+            console.warn("Column Names");
+            mapper = getNumberedListFromColNames(data[0], mapper);
+            return filter2DWithNumberedAry(data, mapper);
+
+         // Boolean array (if there's not a true... why are you calling me?)
+         } else if(mapper.includes(true)) {
+            console.warn("Boolean array");
+            return filter2DWithBooleanAry(data, mapper);
+
+         // Number array
+         } else {
+            console.warn("Number array");
+            return filter2DWithNumberedAry(data, mapper);
+         }
+      }
+
+      // Not defined / default
+      return data;
+      
+      // // Call the function and do whatever you want with the data
+      // const data = extractData('myTable', (x) => ({
+      //   name: x[0],
+      //   address: x[1],
+      //   city: x[2],
+      //   state: x[3],
+      // }));
+   }
+   /** Function filter2DWithBooleanAry
+    *  Takes in a 2D array with a header row and a CSV-style string containing the names of the columns
+    *  to match against the header
+    *  @data: A 2D array that may have a header.
+    *  @keys: 
+    *  @returns: A filtered 2D array 
+    */
+   function filter2DWithBooleanAry(data, filterAry){
+      // get the narrowest, of data or filterAry
+      var returnAry = [];
+
+      returnAry = data.map((rowData, rowNum) => {
+         var filteredRow;
+         
+         filteredRow = rowData.reduce((rowAccum, value, idx) => {
+            console.warn(rowAccum, value, idx);
+            if(idx < filterAry.length && filterAry[idx]) {
+               rowAccum.push(value);
+               console.log("added", rowAccum);
+            }
+            return rowAccum;
+         },[]);
+
+         return filteredRow;
+      });
+
+      return returnAry;
+   }
+   /** Function filter2DWithNumberedAry
+    *  Takes in a 2D array with a header row and a CSV-style string containing the names of the columns
+    *  to match against the header
+    *  @data: A 2D array that may have a header.
+    *  @keys: 
+    *  @returns: A 1D array 
+    */
+   function filter2DWithNumberedAry(data, keys){
+      var adjustedKeys = keys.slice(0,data[0].length);
+          returnAry = [];
+
+      // Iterate over data array
+      returnAry = data.map((rowData, rowNum) => {
+         var filteredRow;
+
+         filteredRow = adjustedKeys.map((value, idx) => {
+            console.warn(value, idx);
+            if(value >= 0 && value < rowData.length-1) {
+               console.log(rowData[value]);
+               return rowData[value];
+            } else {
+               console.warn("Got a bad index in a number filter: ",value, adjustedKeys);
+               return "";
+            }
+         });
+
+         return filteredRow;
+      });
+
+      return returnAry;
+   }
+   /** Function getNumberedListFromColNames
+    *  Takes in a 2D array with a header row and a CSV-style string containing the names of the columns
+    *  to match against the header
+    *  @data: A 1D array of strings. It should be the headers of the table being filtered.
+    *  @keys: A 1D array of strings. It should contain the EXACT spelling, case sensitive, of the column header.
+    *  @returns: A 1D array 
+    */
+   function getNumberedListFromColNames(header=[], keys=[]){
+      var insideAry, outsideAry, returnAry;
+
+         returnAry = keys.map((key, idx) => {
+            var pos =  header.indexOf(key);
+            if(pos != -1) {
+               return pos;
+            }
+         });
+      return returnAry;
+   }
+
+   // Call the function and do whatever you want with the data
+   // const data = extractData('myTable', (x) => ({
+   //   name: x[0],
+   //   address: x[1],
+   //   city: x[2],
+   //   state: x[3],
+   // }));
+
+  /// DATA MANIPULATION ///
+
+   /** Function standardizeFullDateString
+     * Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+     * Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+     * With delimiters of " ",/,-, or .
+     * Can handle yyyymmdd if it has a delimiter
+     * 0 pads Month/Day
+     * Defaults to 19xx for a two-digit year (b/c usually used for DOB's)
+     * Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day
+     * @Returns xx/xx/xxxx
+     * Edit on 12/11/25
+     */
    function standardizeFullDateString(fullDate) {
+      if(typeof fullDate != "string"  || fullDate == "") {
+         return fullDate;
+      }
+
       var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
-          partsAry;
+          partsAry, yearHolder;
 
-      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, not preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
-         // If it has a 2-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         // The partsAry match down below puts the month in partsAry[1], so we can 
+         // just tack on the year at the end of the ary.
+         partsAry = moddedDate.split("/");
+         yearHolder = partsAry.shift();
+         partsAry.push(yearHolder);
+      } else { // MONTH FIRST
 
-      // Split it into parts, so that you can 0 pad
-      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
-      if(partsAry == null ) {
-         console.warn("~~ full date", fullDate);
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
       }
 
       return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
@@ -921,15 +1323,17 @@
 
    /* Function convertColonListToJsonObj
       Takes a text string, which is a list of info divided by colons,
-      and converts it to a JSON obj. Pass in the list, and true if it 
+      and converts it to a JSON obj. Pass in the list, and true if it
       has a header, or a string, if you want to check.
       DOES NOT standardize the keys. */
-   function convertColonListToJsonObj(colonList, hasHeader) {
-      var logStuff = false;
+   function convertColonListToJsonObj(colonList="", hasHeader=false) {
+      var logStuff = false,
+          pastedFromMARx = isPastingFromMARx(colonList),
+          pastedFromMP = isPastingFromMP(colonList),
           emptyValProtection = colonList.replaceAll(/:\s*\r?\n/g,": -\n"),
           tabAfterColon = emptyValProtection.replaceAll(/:[ \t]+/g,":\t"),
           infoAry = tabAfterColon.split(/\s*\r?\n|:\s*/g),
-          listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
+          // listDividers = tabAfterColon.match(/\r?\n|:?\t/g), // if starts w/ \r\n >> has header, if :?\t >> list
           returnObj = {},
           iter = 0;
 
@@ -938,6 +1342,18 @@
       if(typeof colonList != "string") {
          console.warn("Could not convert colon list: ", colonList.slice(0,15));
          return returnObj;
+      }
+
+      // Handle the MARx Address issue
+      if(pastedFromMARx) {
+         infoAry[13]+=infoAry[14];
+         infoAry.splice(14,1);
+      }
+
+      // Handle the MP Address issue
+      if(pastedFromMP) {
+         infoAry[12]+=infoAry[13];
+         infoAry.splice(13,1);
       }
 
       // Skip the header
@@ -954,65 +1370,68 @@
       return returnObj;
    }
 
-   /* Function firstCommentPreProcessing
-      Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
-      */
+   /** Function firstCommentPreProcessing
+     * ** Need in library for now--dependency
+     * Puts new lines into the first comment from an RFI, so that it can be processed by convertColonListToJsonObj
+     */
    function firstCommentPreProcessing(copiedText="") {
       var terms = /(Customer Name|DOB|Agent Name|Agent W.*\/SAN|Agent.*?ID|Medicare ID|Sub Date|Eff Date|Due Date|Case.*?United\*\)|Policy.*ID|Reason)\s*:\s*/g,
+          killBadDate = /1900-01-00/g,
           dateFix = /(\d\d\d\d)-(\d\d)-(\d\d)/g;
-
-      return copiedText.replaceAll(terms,"\n$1:").replaceAll(dateFix,"$2/$3/$1");
-
+      return copiedText.replaceAll(terms,"\n$1:").replaceAll(killBadDate,"-").replaceAll(dateFix,"$2/$3/$1");
    }
 
-   /* Function getObjFromCopiedText
-      Also calls standardizeCuInfo, which is specific to cu info, 
-      but I'm including it b/c it's simpler than knowing you have 
-      to always pair the two fn's.
-      CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
-      */
-   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString) {
-      var data;
+   /**
+    * Function getObjFromCopiedText
+    * Also calls standardizeCuInfo, which is specific to cu info,
+    * but I'm including it b/c it's simpler than knowing you have
+    * to always pair the two fn's.
+    * CALLS standardizeCuInfo TO STANDARDIZE THE INPUT FOR MCD LOOKUPS
+    */
+   function getObjFromCopiedText(copiedText="", hasHeaderOrHeaderString=false) {
+      var data, standardizedInfo;
       try {
          data = JSON.parse(copiedText);
       } catch(error) {
-         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){
+         if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){  // first comment in an RFI // still? It now has new lines
             data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
-         } else if(typeof hasHeaderOrHeaderString == "boolean" || typeof hasHeaderOrHeaderString == "undefined") {
+         } else if(typeof hasHeaderOrHeaderString == "boolean") {
             data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
          } else {
             data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
          }
-
-         // if(/DOB: ?[\d-]+ Agent Name/.test(copiedText)){ // First comment
-         //    data = convertColonListToJsonObj(firstCommentPreProcessing(copiedText), true);
-         // } else if(/Cu\/Agent Info/.test(copiedText)) { // Processed Cu/Agent info
-         //    data = convertColonListToJsonObj(copiedText, true);
-         // } else if(/^.*:.*\r?\n/.test(copiedText)) { // If its first line has a colon deliminated key:val pair
-         //    data = convertColonListToJsonObj(copiedText, false);
-         // } else if(typeof hasHeaderOrHeaderString == "string") { // if given a specific header to look for
-         //    data = convertColonListToJsonObj(copiedText, copiedText.search(hasHeaderOrHeaderString) >= 0);
-         // } else {
-         //    data = convertColonListToJsonObj(copiedText, hasHeaderOrHeaderString);
-         // }
       }
 
-      return standardizeCuInfo(data);
+      standardInfo =standardizeCuInfo(data);
+      return siteSpecificStandardize(standardInfo);
    }
 
-   /* Function standardizeCuInfo
-      Takes cu input from wherever I have copied it, in whatever format,
-      and standardizes the data names.
-      */
+   /**
+    *  Function standardizeCuInfo
+    *  Takes cu input from wherever I have copied it, in whatever format,
+    *  and standardizes the data names.
+    */
    function standardizeCuInfo(cuInfoObj) {
-      var newCuInfoObj = cuInfoObj, 
-          namePartsFirst, namePartsSecond, typeOfSub, npnPartyIdParts;
+      var newCuInfoObj = cuInfoObj, cuName, namePartsFirst, namePartsSecond, typeOfSub, npnPartyIdParts;
 
-      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State)
+      // ADDRESS INFO
+      var custAddress = cuInfoObj["Cust Addr"] || cuInfoObj.address || cuInfoObj.Address || "";
+
+      newCuInfoObj.state = (cuInfoObj.state || cuInfoObj.State);
       if(newCuInfoObj.state == undefined || newCuInfoObj.state == "") {
          stateFromAddr = (cuInfoObj["Cust Addr"] || "").match(/.* ([A-Z][A-Z]) \d{5}/)
          newCuInfoObj.state = stateFromAddr != null && stateFromAddr.length >= 0 ? stateFromAddr[1].toUpperCase() : "";
-      } 
+      }
+      if(custAddress == "" || custAddress == "no address given" || custAddress == undefined) {
+         newCuInfoObj.zip = "";
+      } else {
+         newCuInfoObj.zip = custAddress.match(/(\d{5})(-\d+)?$/)[1];
+      }
+
+      // CU INFO
+      newCuInfoObj.leadId = cuInfoObj["Lead ID"] || cuInfoObj["Lead Id"] || cuInfoObj["Lead id"] 
+                         || cuInfoObj["lead id"] || cuInfoObj["lead_id"] || cuInfoObj["leadId"]  
+                         || cuInfoObj["leadid"]  || cuInfoObj["LeadID"]  || cuInfoObj["LeadId"];
       newCuInfoObj.dob = cuInfoObj.dob || cuInfoObj.DOB || cuInfoObj["Date of Birth"] || cuInfoObj["Birth Date"] || "";
       newCuInfoObj.sex = cuInfoObj.sex || cuInfoObj.Gender || "";
       newCuInfoObj.mbi = cuInfoObj.mbi || cuInfoObj["Medicare ID"] || cuInfoObj["MBI Number"] || cuInfoObj.MBI || "";
@@ -1020,10 +1439,13 @@
       if(newCuInfoObj.mcdId == "-") {
          newCuInfoObj.mcdId = "";
       }
-      newCuInfoObj.leadId = cuInfoObj["Lead ID"] || cuInfoObj["Lead Id"] || cuInfoObj["Lead id"] || cuInfoObj["lead id"] || cuInfoObj["lead_id"]
-                         || cuInfoObj["leadId"]  || cuInfoObj["leadid"]  || cuInfoObj["LeadID"]  || cuInfoObj["LeadId"];
+      newCuInfoObj.phoneNum = cuInfoObj.phone || cuInfoObj.Phone || cuInfoObj["Phone Number"] || cuInfoObj["Phone Num"] || "";
+      newCuInfoObj.email = cuInfoObj.email || cuInfoObj.Email || cuInfoObj["Email Address"] || cuInfoObj["email address"] || "";
 
-      newCuInfoObj.fullName = cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "";
+      // NAME (cuInfoObj.Name is to get it from MARx )
+      newCuInfoObj.fullName = (cuInfoObj["Customer Name"] || cuInfoObj["Cust Name"] || cuInfoObj["Cu Name"] || "")
+                  .replace(/ [JS]r\.?| (I+|IV)/,"")   // get rid of Jr, etc
+                  .replace(/ [A-Z]\.? /," ");         // remove middle initials
       nameParts = newCuInfoObj.fullName.match(/([a-z]+( [a-z]+)?)( [a-z]\.?)? ([a-z]+( [a-z]+)?)/i);
       if(nameParts != null) {
          namePartsFirst = nameParts[1];
@@ -1032,16 +1454,7 @@
       newCuInfoObj.firstName = cuInfoObj.firstName || namePartsFirst || "";
       newCuInfoObj.lastName = cuInfoObj.lastName || namePartsSecond || "";
 
-      // ** Agent Info ** //
-      typeOfSub = getTypeOfSubmission(cuInfoObj);
-
-      if(typeOfSub == "GPS Legacy") { // just sold by the GPS agent
-         newCuInfoObj.agency = agencyInterpreter(cuInfoObj["Agent GH Info"]);
-         newCuInfoObj["Agent GH Info"] = "X / X / X / X"
-      } else if(typeOfSub == "vConnect Resolve") { // there is a T2 (vConn) and T3 (Resolve)
-         newCuInfoObj.agency = agencyInterpreter(cuInfoObj["T2 Agent"].split(" / ")[1]);
-      }
-
+      // AGENT INFO
       if(/\//.test(cuInfoObj["Agent NPN/Party ID"])) {
          npnPartyIdParts = cuInfoObj["Agent NPN/Party ID"].split(" / ");
          newCuInfoObj.npn = npnPartyIdParts[0];
@@ -1053,6 +1466,36 @@
      return newCuInfoObj;
    }
 
+   /**
+    * Function createColonList
+    * Takes an arbitrary number of parameters as sequential key-value pairs
+    * and returns a string where each pair is formatted as "key: \t value",
+    * separated by a newline.
+    *
+    * @param {...any} args - Sequential key-value arguments (e.g., 'Name', 'Alice', 'Age', 30).
+    * @returns {string} A single formatted string.
+    */
+   function createColonList(...args) {
+     const pairs = [];
+
+     // Iterate through the arguments two at a time (key and value)
+     for (let iter = 0; iter < args.length; iter += 2) {
+       const key = args[iter];
+       const value = args[iter + 1];
+
+       // Check if we have both a key and a value for this pair
+       if (key !== undefined && value !== undefined) {
+         // Create the formatted string for the pair: key: \t value
+         pairs.push(`${key}:\t${value}`);
+       } else if (key !== undefined) {
+         // TODO: Handle an odd number of arguments by adding the last key alone
+         console.warn(`Missing value for key: ${key}`);
+       }
+     }
+
+     // Join all the formatted pairs with a newline character
+     return pairs.join('\n');
+   }
 
 /*** UTILITY ***/
 
@@ -1061,37 +1504,41 @@
    /* Function setUpKeyboardShortcuts
       Sets up the keyboard listeners to the page */
    function setUpKeyboardShortcuts() {
-      document.addEventListener("keyup", triggerCopyTicketInfo);    // CTRL + SHIFT + X  // X b/c convenient
-      document.addEventListener("keyup", selectFirstComment);  // CTRL + SHIFT + F  // F for "first"
-      document.addEventListener("keyup", selectDNEInfo);       // CTRL + SHIFT + E  // E for "engage"
-      document.addEventListener("keyup", selectHumEmailInfo);  // CTRL + SHIFT + H  // H for "Humana"
-      document.addEventListener("keyup", selectUHCEmailInfo);  // CTRL + SHIFT + U  // U for "UHC"
-      document.addEventListener("keyup", selectUHCChatInfo);  // CTRL + SHIFT + ALT + U  // U for "UHC"
-      document.addEventListener("keyup", subjectFocus);        // CTRL + SHIFT + S  // S for subject
-      document.addEventListener("keyup", searchBoxFocus);      // CTRL + SHIFT + S  // S for Search
-      document.addEventListener("keyup", copyMBI);             // CTRL + SHIFT + B  // B b/c MBI
-      document.addEventListener("keyup", pasteTicketInfo);     // CTRL + SHIFT + V  // V b/c that's how it is
-      document.addEventListener("keyup", openBoLead);          // CTRL + SHIFT + L  // L for "Lead id"
-      document.addEventListener("keyup", fixUserNameIssue);    // CTRL + SHIFT + 1  // 1 b/c I wanted to
+      document.addEventListener("keyup", triggerCopyViewInfo);      // CTRL + SHIFT + X    // X b/c convenient
+      document.addEventListener("keyup", selectFirstComment);       // CTRL + SHIFT + F    // F for "first"
+      document.addEventListener("keyup", selectDNEInfo);            // CTRL + SHIFT + E    // E for "engage"
+      document.addEventListener("keyup", selectHumEmailInfo);       // CTRL + SHIFT + H    // H for "Humana"
+      document.addEventListener("keyup", selectUHCEmailInfo);       // CTRL + SHIFT + U    // U for "UHC"
+      document.addEventListener("keyup", selectUHCChatInfo);        // CTRL + SHIFT + ALT + U  // U for "UHC"
+      document.addEventListener("keyup", subjectFocus);             // CTRL + SHIFT + S    // S for subject
+      document.addEventListener("keyup", searchBoxFocus);           // CTRL + SHIFT + S    // S for Search
+      document.addEventListener("keyup", triggerGeneralSearchFocus);// CTRL + SHIFT + /    // / b/c that's the search key usually
+      document.addEventListener("keyup", copyMBI);                  // CTRL + SHIFT + B    // B b/c MBI
+      document.addEventListener("keyup", pasteTicketInfo);          // CTRL + SHIFT + V    // V b/c that's how it is
+      document.addEventListener("keyup", openBoLead);               // CTRL + SHIFT + L    // L for "Lead id"
+      document.addEventListener("keyup", openTepShortcut);          // CTRL + SHIFT + ALT + L  // secondary function
+      document.addEventListener("keyup", fixUserNameIssue);         // CTRL + SHIFT + 1    // 1 b/c I wanted to
 
-      document.addEventListener("keyup", setFocusToActiveNoteEl);  // CTRL + ALT + S  // Mimics the ZD shortcut
+      document.addEventListener("keyup", setFocusToActiveNoteEl);   // CTRL + ALT + S  // Mimics the ZD shortcut
       console.warn(">> set up shortcuts");
    }
 
    /* Function removeKeyboardShortcuts
       Sets up the keyboard listeners to the page */
    function removeKeyboardShortcuts() {
-      document.removeEventListener("keyup", triggerCopyTicketInfo);
+      document.removeEventListener("keyup", triggerCopyViewInfo);
       document.removeEventListener("keyup", selectFirstComment);
       document.removeEventListener("keyup", selectDNEInfo);
       document.removeEventListener("keyup", selectHumEmailInfo);
       document.removeEventListener("keyup", selectUHCEmailInfo);
-      document.removeEventListener("keyup", selectUHCChatInfo);      
+      document.removeEventListener("keyup", selectUHCChatInfo);
       document.removeEventListener("keyup", subjectFocus);
       document.removeEventListener("keyup", searchBoxFocus);
+      document.removeEventListener("keyup", triggerGeneralSearchFocus);
       document.removeEventListener("keyup", copyMBI);
       document.removeEventListener("keyup", pasteTicketInfo);
       document.removeEventListener("keyup", openBoLead);
+      document.removeEventListener("keyup", openTepShortcut);
       document.removeEventListener("keyup", fixUserNameIssue);
 
       document.removeEventListener("keyup", setFocusToActiveNoteEl);
@@ -1101,7 +1548,7 @@
    /* Function unload
       Removes the keyboard listeners from the page */
    function unload() {
-      unloadManagedMutators();
+      unloadAllManagedMutators();
       removeKeyboardShortcuts();
       removeNotificationEl();
       removeBOOpenerEl();
@@ -1115,13 +1562,13 @@
       To make things faster, ZD keeps tabs that have been loaded on the page,
       which makes selectors a beast. This fn is intended to simplify things
       by getting the active tab, so that you know you won't get any weirdness. */
-   /* fr-focus is only added when the focus is *inside* the tab. So it's not actually reliable. 
-      The "style" attr is updated to "visibility: hidden" on the tab's top-level div 
+   /* fr-focus is only added when the focus is *inside* the tab. So it's not actually reliable.
+      The "style" attr is updated to "visibility: hidden" on the tab's top-level div
       when it is not the active tab.
       There will be two sections in a tab after you access the "user" side of things
-   */ 
+   */
    function getActiveTabEl() {
-      var mainPanes = $("#main_panes"), 
+      var mainPanes = $("#main_panes"),
           activeTabEl = mainPanes.find(">div[style=''],>div:not([style])").filter(":not('.is-cached')");
 
       activeTabEl.getHeaderEl = () => {
@@ -1142,6 +1589,18 @@
 
    //// TICKET TYPE: TICKET INFO ////
 
+  	/* Function getActiveTicketId
+  	   Returns the ticket Id for the active ticket */
+  	function getActiveTicketId(){ 		
+      return getActiveTabEl().find("span:contains('Ticket #')").text().match("[0-9]+")[0];
+   }
+
+  	/* Function getActiveTicketStatus
+  	   Returns the ticket status for the active ticket */
+  	function getActiveTicketStatus(){ 		
+      return getActiveTabEl().find("span:contains('Ticket #')").text().split("\n")[0].trim();
+   }
+
    //// TICKET TYPE: COMMENT AREA ////
 
    //// TICKET TYPE: SIDEBAR ////
@@ -1157,84 +1616,149 @@
    /* Function getTicketFormFieldTopEl
       To make things faster, ZD keeps tabs that have been loaded on the page,
       which makes selectors a beast. This fn is intended to simplify things
-      by getting the active tab, so that you know you won't get any weirdness. 
+      by getting the active tab, so that you know you won't get any weirdness.
       TEXT LABEL IS CASE SENSITIVE */
    function getTicketFormFieldTopEl(formTextLabel="") {
       var returnEl,
           activeTktEl = getActiveTabEl().getTicketEl(),
-          sideBox = activeTktEl.find('.sidebar_box_container')
-      /* #wrapper
-            #main_panes
-               ..tabs..
-                  .ticket-panes-grid
-                     .ticket-panes-grid-layout.active
-                        forms (1)    // data-garden-id="pane", data-test-id="column-1" << this is the leftmost one
-                           .grid-ticket-fields-panel
-                              .ember-view.pane.left.section.ticket-sidebar
-                                 .ticket_fields.with_omnipanel
-                                    .sidebar_box_container
-                                       // form fields
-                        comments (2) // data-garden-id="pane", data-test-id="column-2"
-                        details (3)  // data-garden-id="pane", data-test-id="column-2"
-      */
+          sideBox = activeTktEl.find('#ticket_sidebar');
+
       // Sometimes the active el is not the section
       if(activeTktEl[0].nodeName != "SECTION") { // TODO: Figure out if we need this anymore
          activeTktEl = activeTktEl.closest("section.ember-view");
       }
 
-      returnEl = sideBox.find("[data-garden-container-id='containers.field.label']:contains('"+formTextLabel+"')").parents(".form_field");
+      returnEl = sideBox.find("[class^='StyledCol']").filter(":contains('"+formTextLabel+"')");
+      returnEl.isEmpty = function() {
+         // THIS FN PULLED IN PART FROM (get Ticket Form Field Val)
 
+         var formDataEl;
 
+         // DD
+         formDataEl = this.find("[class*='StyledSelect'] div");
+         if(formDataEl.length != 0) {
+            return formDataEl.html() == "-";
+         }
+
+         // Checkbox / Text
+         formDataEl = this.find("input");
+         if(formDataEl.length != 0) {
+            if(formDataEl.is(":text,input[type=number]")) {
+               return formDataEl.val() == "";
+            } else {
+               return !formDataEl.is(":checked");
+            }
+         }
+
+         // Textarea
+         formDataEl = this.find("textarea:not('[readonly]')");
+         if(formDataEl.length != 0) {
+            return formDataEl.val() == "";
+         }
+
+      }
+
+      // FIXED, BUT OLD WAY OF DOING IT
+      // returnEl = sideBox.find("[data-garden-container-id='containers.tooltip']:contains('"+formTextLabel+"')")
+      //                   .parents("[data-garden-id='grid.col']");
+
+      /* NOT UPDATED TO MOST RECENT HTML
       if(returnEl.length == 0) {
          returnEl = sideBox.find("[class*='custom_field']:contains('"+formTextLabel+"')");
-         if(returnEl.length == 0) 
+         if(returnEl.length != 0)
             console.warn("code edit: [class*='custom_field']:contains('"+formTextLabel+"') found something")
       }
 
       if(returnEl.length == 0) {
          returnEl = sideBox.find(".property_box>div").filter(":contains('"+formTextLabel+"')");
-         if(returnEl.length == 0) 
+         if(returnEl.length != 0)
             console.warn("code edit: (.property_box>div) .filter(:contains('"+formTextLabel+"') found something");
       }
+      */
 
-      // if(returnEl.length == 0 || formTextLabel == "Form") { //TODO: Make this better. It's a hack. 
+      // if(returnEl.length == 0 || formTextLabel == "Form") { //TODO: Make this better. It's a hack.
       //    // HACK: Basically, when it's a "Formulary issue", the first pull gets the wrong el.
       //    returnEl = sideBox.find(".form_field:contains('"+formTextLabel+"')");
-      //    if(returnEl.length == 0) 
+      //    if(returnEl.length == 0)
       //       console.warn("code edit: .form_field:contains('"+formTextLabel+"') found something");
       // }
 
       if(returnEl.length != 0) {
-         return returnEl;  
+         return returnEl;
       } else {
          return null;
       }
+   }
+
+   /* Function testGetTicketFormFieldTopEl
+      Tests the function, b/c it's one of the main ones used */
+   function testGetTicketFormFieldTopEl(){
+      var form = getActiveTabEl().find("label:contains('Form')").next().find("[title]").html();
+
+      console.log("Testing Form", getTicketFormFieldTopEl("Form"));
+      switch(form){
+      case "RFIs/D-SNP Denials":
+         console.log("Testing RFI Carrier", getTicketFormFieldTopEl("RFI Carrier"));
+         console.log("Testing Lead ID", getTicketFormFieldTopEl("Lead ID"));
+         console.log("Testing AOR (Name only)", getTicketFormFieldTopEl("AOR (Name only)"));
+         console.log("Testing UltiPro ID (Agent)", getTicketFormFieldTopEl("UltiPro ID (Agent)"));
+         console.log("Testing Agent NPN", getTicketFormFieldTopEl("Agent NPN"));
+         console.log("Testing Captive Region", getTicketFormFieldTopEl("Captive Region"));
+         console.log("Testing Type of Submission", getTicketFormFieldTopEl("Type of Submission"));
+         console.log("Testing Responsible Party", getTicketFormFieldTopEl("Responsible Party"));
+         console.log("Testing Due Date", getTicketFormFieldTopEl("Due Date"));
+         console.log("Testing Agent NPN", getTicketFormFieldTopEl("Agent NPN"));
+         console.log("Testing Program Manager", getTicketFormFieldTopEl("Program Manager"));
+         console.log("Testing Manager Name", getTicketFormFieldTopEl("Manager Name"));
+         console.log("Testing UltiPro ID", getTicketFormFieldTopEl("UltiPro ID"));
+      }
+         // console.log("Testing RFI Carrier", getTicketFormFieldTopEl("RFI Carrier"));
+         // console.log("Testing Lead ID:", getTicketFormFieldTopEl("Lead ID"));
+         // console.log("Testing State:", getTicketFormFieldTopEl("State"));
+         // console.log("Testing Email Address:", getTicketFormFieldTopEl("Email Address"));
+         // console.log("Testing Date of Submission:", getTicketFormFieldTopEl("Date of Submission"));
+         // console.log("Testing Carrier:", getTicketFormFieldTopEl("Carrier"));
+         // console.log("Testing Select if RFI Denial:", getTicketFormFieldTopEl("Select if RFI Denial"));
+         // console.log("Testing AOR:", getTicketFormFieldTopEl("AOR"));
+         // console.log("Testing Captive Region:", getTicketFormFieldTopEl("Captive Region"));
    }
 
    /* Function getTicketFormFieldVal
       Get the Form Element, then get the val from it */
    function getTicketFormFieldVal(formTextLabel="") {
       var formDataEl,
-          formEl = getTicketFormFieldTopEl(formTextLabel);
+          topEl = getTicketFormFieldTopEl(formTextLabel);
 
-      if(formEl == null) {
+      if(topEl == null) {
          return undefined;
       }
 
       // DD
-      formDataEl = formEl.find("[class*='StyledSelect'] div");
+      formDataEl = topEl.find("[class*='StyledSelect'] div");
+      if(formDataEl.length != 0) {
+         return formDataEl.html();
+      }
+
+      // ComboBox (yes, it's different)
+      formDataEl = topEl.find("[class*='StyledValue'] div");
       if(formDataEl.length != 0) {
          return formDataEl.html();
       }
 
       // Checkbox / Text
-      formDataEl = formEl.find("input");
+      formDataEl = topEl.find("input");
       if(formDataEl.length != 0) {
          if(formDataEl.is(":text,input[type=number]")) {
             return formDataEl.val();
          } else {
             return formDataEl.is(":checked");
          }
+      }
+
+      // Textarea
+      formDataEl = topEl.find("textarea:not('[readonly]')");
+      if(formDataEl.length != 0) {
+         return formDataEl.val();
       }
    }
 
@@ -1269,16 +1793,22 @@
 
    /* Function setTicketFormFieldVal
       Get the Form Element, then set the val on it */
-   function setTicketFormFieldVal(formTextLabel="", value="", ddAfterFn) {
-      var formType, formVal, formDataEl, ddLabel, ddMenu, 
+   function setTicketFormFieldVal(formTextLabel="", value="", protectOriginalValue=false, ddAfterFn) {
+      var formType, formVal, formDataEl, ddLabel, ddMenu,
           returnFocus = false,
-          topEl = getTicketFormFieldTopEl(formTextLabel);
+          topEl = getTicketFormFieldTopEl(formTextLabel),
+          currFieldVal = "";
 
       if(topEl == null) return false;
       if(value == "" || value == null) return false;
+      if(protectOriginalValue && !zd.overwriteValuesOnPaste && !topEl.isEmpty()) {
+         console.log(">> Skipped protected field: ",formTextLabel);
+         return false;
+      }
 
       formDataEl = topEl.find("input, textarea");
       if(formDataEl.length != 0) {
+   
 
          formType = getFieldType(topEl);
          switch(formType) {
@@ -1301,7 +1831,7 @@
                      // resemble it
                      if(targetLi.length > 1) {
                         targetLi = targetLi.find("span").filter((index,el)=>{
-                           // console.log(el.innerHTML, el.innerHTML.length==value.length); 
+                           // console.log(el.innerHTML, el.innerHTML.length==value.length);
                            return el.innerHTML.length==value.length
                         });
                      }
@@ -1340,7 +1870,7 @@
             setNativeValue(formDataEl[0], value);
             formDataEl[0].dispatchEvent(new Event('input', { bubbles: true }));
             break;
-            
+
          case "textarea":
             formDataEl = topEl.find("textarea");
             setNativeValue(formDataEl[0], value);
@@ -1364,32 +1894,13 @@
       return;
    }
 
-   /* Function setNativeValue
-      Web-based magic: https://stackoverflow.com/questions/40894637/how-to-programmatically-fill-input-elements-built-with-react
-      I copied this, b/c the page was written in React, so the React component needs to be alerted to the change. */
-   function setNativeValue(element, value) {
-      if(element.get != undefined) {
-         element = element.get(0);
-      }
-
-      const valueSetter = Object.getOwnPropertyDescriptor(element, 'value').set;
-      const prototype = Object.getPrototypeOf(element);
-      const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, 'value').set;
-
-      if (valueSetter && valueSetter !== prototypeValueSetter) {
-         prototypeValueSetter.call(element, value);
-      } else {
-         valueSetter.call(element, value);
-      }
-   }
-
    /* Function pasteTicketInfo
       Copies the MBI from the cu data */
    function pasteTicketInfo(evt) {
       // CTRL + SHIFT + V  //V b/c it's like paste
       if (evt.ctrlKey && evt.shiftKey && evt.which == 86) {
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: pasteTicketInfo");
          }
 
          var translateDismissBtn = getByDataTestId("conversation-translator-button-dismiss-translate");
@@ -1421,17 +1932,32 @@
             }
          }) */
 
-
-         if(isEmdeonChat()) {
+         var formName = getTicketFormFieldVal("Form");
+         switch(formName) {
+         case "":
             getClipboard().then(fillOutChatForm);
-         } else if(isPreventableIssue()) {
+            break;
+         case "*New* Preventable Issue":
             getClipboard().then(fillOutPIForm);
-         } else if(isRFI()) {
+            break;
+         case "RFIs/D-SNP Denials":
             getClipboard().then(fillOutRfiForm);
-         } else if(isT3Feedback()) {
+            break;
+         case "TM T2/T3 Feedback Form":
             getClipboard().then(fillOutT2FeedbackForm);
-         } else {
+            break;
+         case "":
             getClipboard().then(fillDeemingForm);
+            break;
+         case "CM Agent Engagement Outreach":
+            getClipboard().then(fillCmOutreachForm);
+            console.warn("Here I am!");
+            break;
+         // case "":
+         // case "":
+         // case "":
+         default:
+            console.warn("Could not find fill function for form type: ",formType);
          }
 
          flashNotificationEl();
@@ -1447,7 +1973,7 @@
 
       return /.*:\s+.*\r?\n/.test(copiedText);
    }
-   
+
    /* Function scrollFieldsIntoView
       Scrolls the Emdeon fields into view */
    function scrollFieldsIntoView(input) {
@@ -1465,8 +1991,8 @@
       Takes a el containing the cu info, and searches for the specified carrier */
    function isCarrierPlan(cuInfoEl,carrierName) {
       if(carrierName == undefined || carrierName == null) return false;
-      
-      var regExp = new RegExp("Plan Name:\\s+"+carrierName), 
+
+      var regExp = new RegExp("Plan Name:\\s+"+carrierName),
           carrierOnTicket = getTicketFormFieldVal("RFI Carrier"),
           returnVal;
 
@@ -1539,7 +2065,7 @@
    /* Function formatDateForZDForm
       */
    function formatDateForZDForm(dateString="") {
-      var date;
+      var date, moddedDateString;
 
       if(/GMT-\d{4}/.test(dateString) || (typeof dateString == "object" && dateString.getWeek != undefined)) {
          // already in expected format or is a date object
@@ -1554,7 +2080,7 @@
    }
 
    /* Function getTicketCreatedDate
-      Grabs the ticket created date from the tooltip on the first comment. 
+      Grabs the ticket created date from the tooltip on the first comment.
       A ticket cannot be created w/o a first comment. */
    function getTicketCreatedDate() {
       var firstTimeEl = getActiveTabEl().getTicketEl().find('time[data-test-id="timestamp-relative"]'),
@@ -1591,10 +2117,36 @@
    /* Function getRFICarrierFromPlanName*/
    function getRFICarrierFromPlanName(val="") {
       var carrier = val.split(" ")[0];
-      if(carrier == "AARP" || carrier == "UHC" || "UnitedHealthcare") carrier = "United";
+      if(carrier == "AARP" || carrier == "UHC" || carrier == "UnitedHealthcare") carrier = "United";
       if(carrier == "HumanaChoice") carrier = "Humana";
       if(carrier == "Wellcare") carrier = "WellCare";
       if(carrier == "Wellpoint") carrier = "Anthem";
+
+      return carrier.toProper();
+   }
+
+   /* Function getCarrierFromSubject*/
+   function getCarrierFromSubject() {
+      var carrier="",
+          subject = getSubjLineEl().value,
+          checker = /(United HealthCare)|WellCare|United|Humana|Anthem|Cigna|Highmark|Devoted|Aetna|AllWell|Zing|UHC/i,
+          result = subject.match(checker)[0];
+
+      switch(result.toProper()) {
+      case null:       carrier = "None"; break;
+      case "Aetna":    carrier = "Aetna"; break;
+      case "AllWell":  carrier = "AllWell"; break;
+      case "Anthem":   carrier = "Anthem"; break;
+      case "Cigna":    carrier = "Cigna"; break;
+      case "Devoted":  carrier = "Devoted"; break;
+      case "Highmark": carrier = "Highmark"; break;
+      case "Humana":   carrier = "Humana"; break;
+      case "United HealthCare":
+      case "United":
+      case "UHC":      carrier = "United"; break;
+      case "WellCare": carrier = "WellCare"; break;
+      case "Zing":     carrier = "Zing"; break;
+      }
 
       return carrier;
    }
@@ -1659,29 +2211,54 @@
          vConnect Resolve
          GPS Legacy
          GPS Express */
-   function getTypeOfSubmission(data) {
-      var leadId;
+   function getTypeOfSubmission(data={}) {
+      var leadId, cuName = getCuNameFromHeader();
+
+      // if the cu name gives us the hint, then we're good. Otherwise, just move on
+      switch(cuName) {
+      case "vConnect Member RFI/PI- DO NOT CHANGE": 
+         return "vConnect Resolve";
+      case "Cares RFIs": 
+         if(data["Transfer Code"]) {
+            return "vConnect Resolve";
+         } else {
+            return "Captive Legacy";
+         }
+      case "CRM Enrollment RFI": 
+         return "Captive Legacy";
+      case "GPS Legacy": 
+         return "GPS Legacy";
+      default:
+         break;
+      }
+
+      // check the campaign, if MS, then MS
+      if(data.campaign == "Member Services O65" || data.Campaign == "Member Services O65") {
+         return "Member Services Legacy";
+      }
 
       if(typeof data.leadId != "undefined") {
-         if (data.leadId == "-") { 
+         if (data.leadId == "-") {
             leadId = getLeadId();
             if(leadId == "999999999"){
                return "vConnect Resolve"; // there isn't a lead id in data, but the user's one is this one
-            } else if(leadId == "997997997") { 
+            } else if(leadId == "997997997") {
                return "GPS Legacy"; // there isn't a lead id in data, but the user's one is this one
             } else if(/\//.test(data['T2 Agent'])) {
-               return "vConnect Resolve";
+               return "vConnect Resolve";    // TODO: Fix this. It's conflicting with GPS Legacy
             }
-         } else if(/^\d+$/.test(data.leadId)) { 
+         } else if(/^\d+$/.test(data.leadId)) {
             if(data['T2 Agent'] == "-") {
                return "Captive Legacy"; // there's a lead id, but no T2 agent
             } else {
                return "Resolve"; // there's a lead id, and a T2 agent
             }
          }
+      } else if(/\d+/.test(getRequesterEmail())) {
+         return "Captive Legacy";
       }
 
-      return "unknown";
+      return "Unknown Submission Type";
    }
 
    /* Function closeTranslationBanner
@@ -1697,11 +2274,14 @@
       Takes the raw value from an RFI (usually a UHC Deeming ticket) and interprets it
       for the agency DD */
    function agencyInterpreter(agencyName){
-      switch(agencyName){
-      case "OneDigital": return "OneDigital";
-      case "OneDigital Medicare Services LLC": return "OneDigital";
-      case "Ping Health LLC": return "Ping Health";
-      case "Charles Tapert Agency": return "Charles W Tapert";
+      switch(agencyName.toUpperCase()){
+      case "ONEDIGITAL": return "OneDigital";
+      case "ONEDIGITAL MEDICARE SERVICES LLC": return "OneDigital";
+      case "PING HEALTH LLC": return "Ping Health";
+      case "CENTURY BENEFITS LLC": return "Century Benefits";
+      case "CHARLES TAPERT AGENCY": return "Charles W Tapert";
+      case "CHARLES W. TAPERT INS. AGENCY": return "Charles W Tapert";
+      case "HEALTH 65 LLC": return "Health 65";
       }
       return agencyName.toProper();
    }
@@ -1721,7 +2301,7 @@
       return cuName;
    }
 
-   /* Function getCuNameFromHeader 
+   /* Function getCuNameFromHeader
       Returns the contents even if they are not name-like (eg 123456@gohealth.com) */
    function getCuNameFromHeader() {
       var cuName = getActiveTabEl().getByDataTestId('card-header-label-test-id');  // "essentials-header-title" << old value?
@@ -1756,8 +2336,8 @@
    }
 
    /* Function getLeadId
-      Get's the lead id from the page. It could be either in the email address on the right, in 
-      the Cu/Agent Info post, in the ticket subject (Cares form) or in the Lead ID field on the 
+      Get's the lead id from the page. It could be either in the email address on the right, in
+      the Cu/Agent Info post, in the ticket subject (Cares form) or in the Lead ID field on the
       left */
    function getLeadId() {
       var leadId, subjectLineEl;
@@ -1768,11 +2348,12 @@
          leadId = leadId.replace('@gohealth.com','');
 
       // Check Cares form/Legal QA, which have the lead in the subj line
-      } else if(leadId && leadId.search("caresform") == 0 || getTicketFormFieldVal("Form") == "Legal QA") {
-         // TODO: cares form is not always a Resolve, so doesn't always have the lead id in the subject. 
+      } else if(leadId && isCaresForm() || getTicketFormFieldVal("Form") == "Legal QA") {
+         // TODO: cares form is not always a Resolve, so doesn't always have the lead id in the subject.
                   // a transfer code is 10 digits? so maybe we can use that?
          subjectLineEl = getSubjLineEl();
-         leadId = subjectLineEl.value.match(/\d{8,9}/)[0];
+         leadId = subjectLineEl.value.match(/\d{8,9}/);
+         leadId = leadId != null ? leadId[0] : null;
 
       // Check in the form elements
       } else {
@@ -1783,6 +2364,57 @@
       }
 
       return leadId;
+   }
+
+   /* Function getCustomerId
+      Get's the CRM customer id from the ticket. It could be either in the email address on the right. 
+      For other options, it may also be in the Cu/Agent Info post, or in the Lead ID field on the left */
+   function getCustomerId() {
+      var custId, custIdRegex = /[A-Z0-9]{13}@gohealth.com/i;
+
+      // Check email address
+      custId = getRequesterEmail();
+      if(custIdRegex.test(custId)) {
+         custId = custId.split('@')[0];
+
+      // Check in the form elements
+      } else {
+         custId = getTicketFormFieldVal("Customer ID");
+
+         if(!custIdRegex.test(custId)) {
+            custId = getTicketFormFieldVal("Lead ID");
+            
+            if(!custIdRegex.test(custId)) {
+               custId = null;
+            }
+         }
+      }
+
+      return custId.toUpperCase();
+   }
+
+   /** 
+    * Function siteSpecificStandardize
+    * Called by getObjFromCopiedText. This is intended to allow for modfying *incoming*
+    * copied info to be standardized per site
+    */
+   function siteSpecificStandardize(standardInfo){
+      // ** Agent Info ** //
+      var typeOfSub = getTypeOfSubmission(standardInfo),
+         newCuInfoObj = standardInfo;
+
+      newCuInfoObj.typeOfSub = typeOfSub;
+      if(typeOfSub == "GPS Legacy") { // just sold by the GPS agent
+         newCuInfoObj.agency = agencyInterpreter(cuInfoObj["Agent GH Info"] || cuInfoObj["Campaign"]);
+         newCuInfoObj["Agent GH Info"] = "X / X / X / X"
+      } else if(typeOfSub == "vConnect Resolve") { // there is a T2 (vConn) and T3 (Resolve)
+         if(cuInfoObj["T2 Agent"] != undefined && cuInfoObj["T2 Agent"] != null && cuInfoObj["T2 Agent"] != ""){
+            newCuInfoObj.agency = agencyInterpreter(cuInfoObj["T2 Agent"].split(" / ")[1]);
+         }
+      }
+
+
+      return newCuInfoObj;
    }
 
   //// TICKET TYPE: EMDEON CHAT ////
@@ -1816,20 +2448,20 @@
    function isDevotedRFI(el=null) {
       if(el == null) {
          return isDevotedRFI(getFirstCommentEl());
-      } 
+      }
 
       return (el.innerHTML || el.html()).search(/<table>/) == 0;
    }
 
-   /* Function isRegularRFI
+   /* Function hasRegularRfiFirstComment
       Decides if the el passed in is the regular type of first comment on a RFI
       (vs an RFI created using an email) */
-   function isRegularRFI(el=null) {
+   function hasRegularRfiFirstComment(el=null) {
       var html, result1, result2, result3;
 
       if(el == null) {
-         return isRegularRFI(getFirstCommentEl());
-      } 
+         return hasRegularRfiFirstComment(getFirstCommentEl());
+      }
 
       html = (el.innerHTML || el.html());
 
@@ -1847,7 +2479,7 @@
 
    /* Function isCaresForm*/
    function isCaresForm() {
-      return getTicketFormFieldVal("Requester") == "Cares Form" 
+      return getTicketFormFieldVal("Requester") == "Cares Form"
              || $(getFirstCommentEl()).parents("article").find("a>span:contains('Cares RFIs')").length > 0;
    }
 
@@ -1860,11 +2492,19 @@
       // if(el == null) {  // TODO: fix this. It's a pain b/c it causes stack issues
       //    firstCommentEl = getFirstCommentEl();
       //    return isT3Feedback(firstCommentEl);
-      // } 
+      // }
 
       if(el==null) return false;
 
       return (el.innerHTML || el.html()).search(/Hi Case Management/) != -1;
+   }
+
+  //// TICKET TYPE: COMPLIANCE INQUIRY ////
+
+   /* Function isComplianceInq
+      Returns if the active ticket is a Compliance Inquiry */
+   function isComplianceInq() {
+      return getTicketFormFieldVal('Form') == 'Compliance Inquiry';
    }
 
 
@@ -1881,8 +2521,8 @@
    function setFocusToActiveNoteEl(evt) {
       // CTRL + ALT + X          // Because it mirrors the ZD shorctut to switch to a private chat
       if (evt.ctrlKey && evt.altKey && evt.which == 88) {
-         if(zd.mydebug.isDB()) {
-                  console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: setFocusToActiveNoteEl");
          }
 
          getActiveNoteEl().focus();
@@ -1973,14 +2613,14 @@
 
 /*** GEN: FOCUS ACTIVE SEARCH ***/
 
-   /* Function getSearchBox
+   /* Function getActiveSearchBox
       Gets the search Box */
-   function getSearchBox() {
-      var searchBox = $('.search [data-garden-id="forms.faux_input"] input')[0];
-      if (searchBox == undefined) {
+   function getActiveSearchBox() {
+      var searchBoxEls = getByDataTestId("search_advanced-search-box_input-field_media-input");
+      if (searchBoxEls == undefined) {
          return null;
       } else {
-         return searchBox;
+         return searchBoxEls.filter((idx, el) => { return el.checkVisibility() })[0];
       }
    }
 
@@ -1989,7 +2629,11 @@
    function searchBoxFocus(evt) {
       // CTRL + SHIFT + S //s for Search
       if (evt.ctrlKey && evt.shiftKey && evt.which == 83) {
-         var searchBoxEl = getSearchBox();
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: searchBoxFocus");
+         }
+
+         var searchBoxEl = getActiveSearchBox();
          if(searchBoxEl == null) {
             console.warn(">> Could not find an active search box ",searchBoxEl);
             return;
@@ -2001,25 +2645,71 @@
    }
 
 
+/*** GEN: OPEN GENERAL SEARCH ***/
+
+   /* Function getGeneralSearchBoxEl
+      Gets the general/main search box el. In order to open it, you have to get the
+      grandchild of this el and click it */
+   function getGeneralSearchBoxEl() {
+      var searchBox = getByDataTestId("toolbar-search-box");
+      if (searchBox == undefined) {
+         return null;
+      } else {
+         return searchBox;
+      }
+   }
+
+   /* Function focusGeneralSearchBox
+      Gets the general/main search box el. In order to open it, you have to get the
+      grandchild of this el and click it */
+   function focusGeneralSearchBox() {
+      var searchBoxEl = getGeneralSearchBoxEl().children().children();
+      if(searchBoxEl == null) {
+         console.warn(">> Could not find the general search box ",searchBoxEl);
+         return;
+      }
+
+      if(searchBoxEl.find("section").length != 0) { //search box is open, and just needs to be focused.
+         searchBoxEl.find("input").focus();
+      } else { // search box isn't open
+         searchBoxEl.click();
+      }
+   }
+
+   /* Function triggerGeneralSearchFocus
+      Event fn that moves the focus to the active search box */
+   function triggerGeneralSearchFocus(evt) {
+      // CTRL + SHIFT + / // / b/c that's the search key usually
+      if (evt.ctrlKey && evt.shiftKey && evt.which == 191) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: triggerGeneralSearchFocus");
+         }
+
+         focusGeneralSearchBox();
+      }
+   }
+
+
 /*** GEN+: PASTE INTO DEEMING FORM ***/
 
    /* Function fillDeemingForm
       Puts the data in the sidebar form */
    function fillDeemingForm(copiedText) {
-      var data, agentInfo, uid, aorRegion, 
+      var data, agentInfo, uid, aorRegion,
+          protectOrigVal = true,
           activeEl = document.activeElement;
 
       // if it starts w/a "key: val\n" pair, then it doesn't have a header
       data = getObjFromCopiedText(copiedText,/^.*:.*\r?\n/.test(copiedText));
 
          // use the RFI one, b/c it has a similar UHC name
-      setTicketFormFieldVal("Carrier", data.carrier || getRFICarrierFromPlanName(data["Plan Name"])); 
-      setTicketFormFieldVal("Member Name", data.fullName);
-      setTicketFormFieldVal("Phone Number", data.phoneNumber);      
+      setTicketFormFieldVal("Carrier", data.carrier || getRFICarrierFromPlanName(data["Plan Name"]) || getCarrierFromSubject(), protectOrigVal);
+      setTicketFormFieldVal("Member Name", data.fullName, protectOrigVal);
+      setTicketFormFieldVal("Phone Number", data.phoneNumber, protectOrigVal);
       if(getTicketFormFieldVal("Lead ID") == "")
-         setTicketFormFieldVal("Lead ID", data.leadId || data["Ref #"]|| getLeadId());
-            
-      setTicketFormFieldVal("Requester", data.leadId || getLeadId());
+         setTicketFormFieldVal("Lead ID", data.leadId || data["Ref #"]|| getLeadId(), protectOrigVal);
+
+      setTicketFormFieldVal("Requester", data.leadId || getLeadId(), protectOrigVal);
 
       setTimeout(()=>activeEl.focus(),125);
    }
@@ -2055,12 +2745,12 @@
                           .replaceAll(/\n?<\/?(strong|b|br|u|span).*?>\n?/g," ")
                           .replaceAll(/\n?<\/?p.*?>\n?/g,"\n")
                           .replaceAll(/\n+ \n? */g,"\n"),
-          posOfTrasnfCodeEntry = noHtmlString.search(/Lead ID: +Transfer Code: [\d ]+ Ref. Number: [A-Z0-9]+/),
-          splitParts, specialParts, transCodePart, transferCode, refNumber, returnVal;
+          isVconn = /This is an  vConnect  submission/.test(noHtmlString),
+          splitParts, specialParts, transCodePart, transferCode, refNumber, returnVal, reason, reasonParse;
 
       console.warn("debugging processCaresFormComment");
 
-      if(posOfTrasnfCodeEntry != -1) {
+      if(isVconn) {
          transCodePart = noHtmlString.substring(250,400);
          transferCode = transCodePart.match(/Transfer Code: ([\d ]+)/)[1].replaceAll(" ","");
          refNumber = transCodePart.match(/Ref\. Number: ([A-Z0-9]+)/);
@@ -2070,22 +2760,73 @@
       splitParts = noHtmlString.split(/\n|: +/);
       specialParts = splitParts[2].match(/(.*?)\s+has submitted a potential\s+(.*?)\s+RFI to be looked into for\s+(.*?)\s+in a/);
 
+      reasonParse = noHtmlString.match(/a potential\s+(.*)\s+RFI/);
+      reason = reasonParse == null ? "couldn't parse" : reasonParse[1];
+      if(/\s(election period)|(enrollment code)\s/i.test(reason) || /\sINT|OEP|SEP|ACC\s/.test(reason) ) {
+         reason = "Invalid SEP";
+      } else if(/\smedicaid|D-?SNP\s/i.test(reason)) {
+         reason = "Medicaid";
+      } else if(/\sC-?SNP|VCC\s/i.test(reason)) {
+         reason = "C-SNP";
+      } else if(/\saddress\s/i.test(reason)) {
+         reason = "Proof of Address";
+      } else if(/\sSSBCI\s/i.test(reason)) {
+         reason = "Other";
+      }
+
+      switch(reason.trim()) {
+      case "C-SNP": 
+         reason = "C-SNP"; break;
+      case "Medicaid": 
+         reason = "Incorrect level of Medicaid eligibilty"; break;
+      case "XX": 
+         reason = "Invalid or Missing Medicare ID"; break;
+      case "Invalid SEP": 
+         reason = "Invalid SEP"; break;
+      case "DOB DIFFERENCE": 
+         reason = "Missing Basic Information (Name/DOB/etc.)"; break;
+      case "Medicaid Verification RFI": 
+         reason = "Need Medicaid verification"; break;
+      case "NO MATCHING RULE": 
+         reason = "Need Medicare verification"; break;
+      case "xx": 
+         reason = "Not Medicaid eligible"; break;
+      case "NO MATCHING BENEFICIARY": 
+      case "Other": 
+      case "BEQ NOT FOUND": 
+      case "SPECIAL HANDLING EXISTS": 
+         reason = "Other (listed in notes)"; break;
+      case "xx": 
+         reason = "Out of Service Area"; break;
+      case "xx": 
+         reason = "PCP Discrepancy"; break;
+      case "xx": 
+         reason = "Proof of A or B"; break;
+      case "Proof of Address": 
+         reason = "Proof of Address"; break;
+      case "xx": 
+         reason = "Wrong contract"; break;
+      default: break;
+      }
+
 
       returnVal = `Customer Name: ${specialParts[3]}
-         DOB: ${splitParts[14]}
+         DOB: ${standardizeFullDateString(splitParts[14])}
          Medicare ID: ${splitParts[10].replaceAll("-","")}
          Agent Name: ${specialParts[1]}
-         Campaign: 
-         Agent NPN/Party ID: 
-         Agent Writing Number/SAN : 
-         Sub Date: 
-         Eff Date: ${splitParts[16]} 
+         Campaign:
+         Agent NPN/Party ID:
+         Agent Writing Number/SAN :
+         Sub Date:
+         Eff Date: ${standardizeFullDateString(splitParts[16])}
          Due Date: 0
-         UHC Party ID: 
+         UHC Party ID:
          Case Number (Cigna*)/Broker Email (Aetna/United*):
-         Policy ID/Application ID: 
+         Policy ID/Application ID:
          Reason: ${specialParts[2]}
-         Lead Id: ${splitParts[6] || "-"}`.replaceAll(/\n +/g,"\n");
+         Lead Id: ${splitParts[6] || "-"}
+         Transfer Code: ${transferCode}
+         Reason: ${reason}`.replaceAll(/\n +/g,"\n");
 
          // use standardizeFullDateString
 
@@ -2101,7 +2842,7 @@
       " Agent NPN/Party ID: "+rfiParts[2]+" "+
       " Agent Writing Number/SAN :" +
       " Medicare ID: "+rfiParts[8]+" "+
-      " Sub Date: "+rfiParts[5]+" "+
+      " Sub Date: "+standardizeFullDateString(rfiParts[5])+" "+
       " Due Date: "+
       " Case Worker (Cigna*)/Broker Phone (Aetna/United*): "+
       " Case Number (Cigna*)/Broker Email (Aetna/United*): "+
@@ -2115,7 +2856,7 @@
       Processes the content of a Devoted RFI initial comment into the standardized format */
    function processT3FeedbackComment(el) {
       console.warn("yo");
-      var returnVal, salesAgentType, 
+      var returnVal, salesAgentType,
           commentParts= (el.innerHTML || el.html()).replaceAll(/:? ?<\/?(br|strong|u|p|b)>[\n]?(: )?( )?/g, "|").split(/\|+/g),
           salesAgentInfo = commentParts[3].replaceAll(/Employee ID:|Transferring Agent:|\/| Jr| Sr/g,""),
           leadId = getTicketFormFieldVal("Lead ID"),
@@ -2130,21 +2871,21 @@
       }
       // if(/[a-z, ]+ */i.test(salesAgentInfo)) {
       //    salesAgentType = "-";
-      // } else 
+      // } else
 
       returnVal =
-      "Date of Call:\t" + getTicketCreatedDate() + "\n" + 
-      "Transf Ref #:\t" + commentParts[9] + "\n" + 
-      "Transf Code:\t" + commentParts[7] + "\n" + 
-      "Lead Id:\t" +  leadId + "\n" + 
-      "Cu Phone #:\t" + commentParts[5].replaceAll(/[()-]/g,"") + "\n" + 
-      "T3 Agent:\t" + commentParts[1].replace(/ has submitted.*/,"") + "\n" + 
-      "T3 Team Mgr:\t" + commentParts[13] + "\n" + 
-      "T3 Director:\t" + commentParts[15] + "\n" + 
-      "T2 Agent:\t" + salesAgentInfo.replace(/ \d+( )*| One Digital| SHA/,"") + "\n" + 
-      "T2 UID:\t" + (salesAgentInfo.replace(/T2|[^\d]*/ig,"") || "-") + "\n" + 
-      "FB Action:\t" + commentParts[11] + "\n" + 
-      "FB Notes: \t" + commentParts[17].replaceAll(/\n|&nbsp;/g,"")  + "\n" + 
+      "Date of Call:\t" + getTicketCreatedDate() + "\n" +
+      "Transf Ref #:\t" + commentParts[9] + "\n" +
+      "Transf Code:\t" + commentParts[7] + "\n" +
+      "Lead Id:\t" +  leadId + "\n" +
+      "Cu Phone #:\t" + commentParts[5].replaceAll(/[()-]/g,"") + "\n" +
+      "T3 Agent:\t" + commentParts[1].replace(/ has submitted.*/,"") + "\n" +
+      "T3 Team Mgr:\t" + commentParts[13] + "\n" +
+      "T3 Director:\t" + commentParts[15] + "\n" +
+      "T2 Agent:\t" + salesAgentInfo.replace(/ \d+( )*| One Digital| SHA/,"") + "\n" +
+      "T2 UID:\t" + (salesAgentInfo.replace(/T2|[^\d]*/ig,"") || "-") + "\n" +
+      "FB Action:\t" + commentParts[11] + "\n" +
+      "FB Notes: \t" + commentParts[17].replaceAll(/\n|&nbsp;/g,"")  + "\n" +
       "Sales Agent Type:\t" + salesAgentType;
 
       return returnVal;
@@ -2153,24 +2894,35 @@
    /* Function selectFirstComment
       Event function that selects and copies the initial comment containing the RFI's info */
    function selectFirstComment(evt) {
+      var copyDidSucceed;
+
       // CTRL + SHIFT + F //(f for "first")
       if (evt.ctrlKey && evt.shiftKey && evt.which == 70) {
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: selectFirstComment");
          }
          var firstCommentEl = getFirstCommentEl();
 
          if(firstCommentEl == null) {
             console.warn("First comment not recognized");
             return;
-         } else if(isRegularRFI(firstCommentEl)) {
-            copyElToClipboard(firstCommentEl);
+         } else if(hasRegularRfiFirstComment(firstCommentEl)) {
+            copyDidSucceed = copyElToClipboard(firstCommentEl);
          } else if(isCaresForm()) {
-            copyStringToClipboard(processCaresFormComment(firstCommentEl));
+            copyStringToClipboard(processCaresFormComment(firstCommentEl))
+               .then(() => flashNotificationEl());
          } else if(isDevotedRFI(firstCommentEl)) {
-            copyStringToClipboard(processDevotedRFIComment(firstCommentEl));
+            copyStringToClipboard(processDevotedRFIComment(firstCommentEl))
+               .then(() => flashNotificationEl());
          } else if(isT3Feedback(firstCommentEl)) {
-            copyStringToClipboard(processT3FeedbackComment(firstCommentEl));
+            copyStringToClipboard(processT3FeedbackComment(firstCommentEl))
+               .then(() => flashNotificationEl());
+         } else if(hasOldRfiForm(firstCommentEl)) {
+            copyDidSucceed = copyElToClipboard(firstCommentEl);
+         }
+
+         if(copyDidSucceed) {
+            flashNotificationEl();
          }
 
          insertCuNameElIfNeeded();
@@ -2202,14 +2954,46 @@
       Event function that selects and copies the initial comment containing the RFI's info */
    function openBoLead(evt) {
       // CTRL + SHIFT + L // L for "Lead ID"
-      if (evt.ctrlKey && evt.shiftKey && evt.which == 76) {
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+      if (evt.ctrlKey && evt.shiftKey && !evt.altKey && evt.which == 76) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: openBoLead");
          }
 
          openBoTab(getLeadId());
          evt.stopImmediatePropagation(); // TEST IT OUT; TO KILL THE LINE BEING ADDED
          evt.preventDefault();
+      }
+   }
+
+
+/*** GEN: OPEN TEP PAGE IN NEW TAB ***/
+
+   /* Function openTepPage
+      Opens a specific TEP tab if given the id. Only PI's can use for now.  */
+   function openTepPage(tepId) {
+      var moddedTepId;
+
+      console.warn(">> running openTepPage: ", tepId);
+      if(tepId.substr(0,2) == "pe") {
+         moddedTepId = "PE"+tepId.slice(2).split("@")[0]; // needs to be capitals
+         window.open("https://telecare-enablement.prod.internal.gohealth.net/member/"+moddedTepId);
+         return true;
+      }
+      return false;
+   }
+
+   /* Function openTepShortcut
+      Event function that selects and copies the initial comment containing the RFI's info */
+   function openTepShortcut(evt) {
+      // CTRL + SHIFT + L // L for "Lead ID"
+      if (evt.ctrlKey && evt.shiftKey && evt.altKey && evt.which == 76) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: openTepShortcut");
+         }
+
+         openTepPage(getRequesterEmail());
+         // evt.stopImmediatePropagation(); // TEST IT OUT; TO KILL THE LINE BEING ADDED
+         // evt.preventDefault();
       }
    }
 
@@ -2227,8 +3011,8 @@
    function copyMBI(evt) {
       // CTRL + SHIFT + B  //B b/c MBI
       if (evt.ctrlKey && evt.shiftKey && evt.which == 66) {
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: copyMBI");
          }
 
          copyStringToClipboard(getMBIfromCuInfo());
@@ -2263,7 +3047,7 @@
       Used in a reduce fn to process an article to get the innerHTML from it */
    function getUserInfoFromAgentMessage(articles) {
       var agentsName = "", earlyExit = false, text = "";
-      
+
       text = Array.prototype.reduce.call(articles,(accum, article) => {
          if (earlyExit) {return accum;}
 
@@ -2284,13 +3068,13 @@
          }
 
          switch(textNode.children().length) {
-         case 0: 
+         case 0:
                return accum;
                break;
-         case 1: 
+         case 1:
                return accum + "\n" + textNode.html();
                break;
-         default: 
+         default:
                return accum + "\n" + Array.prototype.reduce.call(textNode.children(),(accum,el) => {
                   return accum + (el.innerHTML || el.html())
                },"");
@@ -2327,18 +3111,32 @@
       }
    }
 
-   /* Function triggerCopyTicketInfo
+
+/*** GEN: COPY VIEW ***/
+
+   /* Function triggerCopyViewInfo
       Event function that copies the most recent comment with the app's processed and formatted info */
-   function triggerCopyTicketInfo(evt) {
+   function triggerCopyViewInfo(evt) {
       // CTRL + SHIFT + X  // X b/c convenient, and kind of like cut
       if (evt.ctrlKey && evt.shiftKey && evt.which == 88) {
-
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: triggerCopyViewInfo");
          }
-         copyTicketInfo();
+         var tableEl, tableAry;
+
+         if(isSearchView()) {
+            tableEl = getActiveResultsTable();
+            tableAry = extractHtmlTableData(tableEl, [0,2,3,4,5,6,7,8]);
+            copyArrayToClipboard(tableAry);
+         } else if(isZDViewView()) {
+            tableEl = getActiveResultsTable();
+            tableAry = extractHtmlTableData(tableEl, [3,4,5,6,7,8,9,10,11,12]);
+            copyArrayToClipboard(tableAry);
+         } else if(isTicketView()) {
+            copyTicketInfo();
+            insertCuNameElIfNeeded();
+         }
          flashNotificationEl();
-         insertCuNameElIfNeeded();
       }
    }
 
@@ -2351,16 +3149,48 @@
          getAgentEmdeonInput(); // TODO: get this to return a string, so that it's standard
       } else if(isT3Feedback()){
          ticketInfo = getT3FeebackInfo();
-         copyStringToClipboard(ticketInfo);
+         copyStringToClipboard(ticketInfo)
+            .then(() => flashNotificationEl());
       } else if(getActiveTabEl().getTicketEl().find('div.zd-comment:contains("Cu/Agent Info")').length != 0){
          ticketInfoEl = getTicketInfoEl();
-         copyElToClipboard(ticketInfoEl);
+         copyDidSucceed = copyElToClipboard(ticketInfoEl);
+      } else if(isComplianceInq()){
+         copyStringToClipboard(getComplianceInqEntry())
+            .then(() => flashNotificationEl());
       } else {
          ticketInfoEl = getFirstCommentEl();
-         copyElToClipboard(ticketInfoEl);
+         copyDidSucceed = copyElToClipboard(ticketInfoEl);
       }
    }
 
+   /* Function isSearchView
+      Checks if the active tab is a search */
+   function isSearchView(){
+      var searchBox = getActiveSearchBox();
+      return searchBox != undefined;
+   }
+
+   /* Function isTicketView
+      Checks if the active tab is a ticket */
+   function isTicketView(){
+      var activeTabEl = getActiveTabEl();
+      return activeTabEl.length > 0;
+   }
+
+   /* Function isZDViewView
+      Checks if the active view is a View */
+   function isZDViewView(){
+      var viewEl = getByDataTestId("views_views-pane-div").is("visible"); 
+      return viewEl.length > 0;
+   }
+
+   // TODO: find a place for this
+   /* Function getActiveResultsTable
+      Gets the results table on a ZD search page */
+   function getActiveResultsTable(){
+      var searchTableEl = getByDataTestId("generic-table").filter((idx, el) => { return el.checkVisibility() })[0];
+      return searchTableEl;
+   }
 
 /*** GEN: INSERT CU NAME IN USER ***/  /// DEPRECATED, B/C THEY DON'T WANT US TO
 
@@ -2412,6 +3242,10 @@
    function fixUserNameIssue(evt) {
       // CTRL + SHIFT + 1 // (1 b/c I wasn't trying to be creative)
       if (evt.ctrlKey && evt.shiftKey && evt.which == 49) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: fixUserNameIssue");
+         }
+
          getNavToUser().click();
          replaceLeadIdWUserNameInUser();
          return;
@@ -2425,12 +3259,13 @@
        Find out if the name el already is using a name */
    function isTicketNameElAName(){
       var cuName = getCuNameFromHeader()
-      return cuName == undefined ? false : cuName.search(/@|\//) == -1 && cuName != "Cares Form" && cuName != "GPS Legacy RFI";
+      return cuName == undefined ? false 
+         : cuName.search(/@|\//) == -1 && cuName != "Cares RFIs" && cuName != "GPS Legacy" && cuName != "CRM Enrollment RFI";
    }
 
    /* Function insertCuNameEl
       Inserts an element with the cu's name just under where it should be in the "User Info" section.
-      But only if the name isn't already where it's supposed to be. 
+      But only if the name isn't already where it's supposed to be.
       Updates the name, if the el already exists. */
    function insertCuNameEl(name=null){
       var activeTab = getActiveTabEl(),
@@ -2465,12 +3300,13 @@
    }
 
 
+
 /*** EMD: EMDEON CHAT COPY INFO ***/
 
-   // SHORTCUT FOR THIS FUNCTIONALITY IS IN "CU INFO SELECT" -- triggerCopyTicketInfo
+   // SHORTCUT FOR THIS FUNCTIONALITY IS IN "CU INFO SELECT" -- triggerCopyViewInfo
 
    /* Function getDelimitedText
-      Essentially a pre-parser. Parses the raw text into a format more palatable for a computer. 
+      Essentially a pre-parser. Parses the raw text into a format more palatable for a computer.
       Adds a delimiter '|' in between key words/symbols to break up the text and make it easeier
       to parse the info out of */
    function getDelimitedText(clipText) {
@@ -2508,11 +3344,11 @@
             // ^^^^ putting these words in as a keyword breaks up the text flow, so it doesn't get mistaken for a name
             // double bar these? so that we can have it recognized anyway, when same is side-by-side?
 
-          /* 
+          /*
             This thing must:
             1. Be able to break up words that don't work, that look like names
             2. Seperate out the usual labels
-            3. Break things up by the assumed delimiter 
+            3. Break things up by the assumed delimiter
             4. Remove spaces in the edges (can be done in a different step)
           */
 
@@ -2522,9 +3358,9 @@
 
       delimitedText = preDelimitedText
             // these ones are guaranteed not to have accidental issues
-         // .replaceAll(new RegExp("\\|?( *)?("+keywordLiterals.join("|")+")( *)?\\|?","ig"),"|$2|") 
+         // .replaceAll(new RegExp("\\|?( *)?("+keywordLiterals.join("|")+")( *)?\\|?","ig"),"|$2|")
             // get rid of spaces around keywords and delimit them
-         .replaceAll(new RegExp("\\|?( *)?[^A-Z0-9]("+keywords.join("|")+")[^A-Z0-9]( *)?\\|?","ig"),"|$2|") 
+         .replaceAll(new RegExp("\\|?( *)?[^A-Z0-9]("+keywords.join("|")+")[^A-Z0-9]( *)?\\|?","ig"),"|$2|")
             // get rid of spaces around |, and combine excess |
          .replaceAll(/\|?( *)?\|( *)?\|?/g,"|");
 
@@ -2549,7 +3385,7 @@
 
       // TODO: Make sure this doesn't pick up numbers in the middle of numbers
 
-      
+
       // if(cuLeadId == null) { // to catch it when posted behind
       //    cuLeadId = delimitedText.match(/(())\|?(1(2|3)\d{7})( |\|)(LEAD ID)/i);
       //    cuLeadId != null ? cuLeadId[3] : "";
@@ -2613,7 +3449,7 @@
       // 3. Check w/the label, but not delimiters
       if(cuDOB == null){
          cuDOB = delimitedText.match(/(DOB|Date of Birth|Birth Date)[^\dA-Z](\d{6,8})/i);
-         
+
          if(cuDOB != null){ // grab the first two #'s, check for a 0
             modifiedDOB = cuDOB[2];
 
@@ -2668,11 +3504,11 @@
           stateNameList = allowedStatesDB.getNames(),
        // cuState = delimitedText.match(/(Most recent )?(state|State|ST)\|([A-Z^ID][A-Z^DR])\|/);
           cuState, stateFound, stateAbbrRegex;
-      /* 
+      /*
          Test w/state abbr, case sensitive, w/non-alphanum surrounding. State optional
          Test w/state name, not case sensitive, w/non-alphanum surrounding. State optional
          Test w/state abbr, not case sensitive, w/non-alphanum surrounding. State optional
-      */ 
+      */
 
       // TODO: Get the state, if labeled, despite county
 
@@ -2712,7 +3548,7 @@
    /* Function getMcdIdFromDelimitedText
       Parses delimitedText to get McdId*/
    function getMcdIdFromDelimitedText(delimitedText, state="", ...excludeData) {
-      var stateInfo, mcdIdRegex, cuMcdId=null, excludeDataFiltered, moddedDelimited,  
+      var stateInfo, mcdIdRegex, cuMcdId=null, excludeDataFiltered, moddedDelimited,
           mcdIdHasLetters = ["AZ", "CA", "CO", "HI", "IA", "NC", "ND", "NY", "OR", "TN", "WA"].contains(state);
 
           // TODO: If Mcd id is 9 digits, TC is picking it up. Or Lead ID. Hm.
@@ -2769,8 +3605,8 @@
    /* Function getCuNameFromDelimitedText
       Parses delimitedText to get Name.
       We know these will fail: #2, #10 */
-   function getCuNameFromDelimitedText(delimitedText, ...excludeData) { // Can pass in 
-      var cuName, moddedDelimited, cuFirst, cuLast, firstReplace, 
+   function getCuNameFromDelimitedText(delimitedText, ...excludeData) { // Can pass in
+      var cuName, moddedDelimited, cuFirst, cuLast, firstReplace,
           excludeDataFiltered, excludeDataJoined, keywordsJoined,
           keywords = [  // selected list of keywords to remove prior to processing. Pulls from getDelimitedText
             "lead id",
@@ -2780,7 +3616,7 @@
             "Most recent County",
             "MBI Number",
             "(MCD|Medicaid)( Number| id| level)?"];
-      
+
       // build the parser regex
       excludeDataFiltered = excludeData.filter((val) => {
           return val != "";
@@ -2788,7 +3624,7 @@
       excludeDataJoined = excludeDataFiltered.length > 0 ? "|"+excludeDataFiltered.join("|") : "";
       keywordsJoined = "[^A-Z0-9]("+keywords.join("|")+excludeDataJoined+")[^A-Z0-9]";
 
-      /* LEAD ID keeps cropping up, b/c it's sometimes next to something else, 
+      /* LEAD ID keeps cropping up, b/c it's sometimes next to something else,
          which means the regex skips the second term. Ex: |state|lead id| */
       firstReplace = delimitedText.replaceAll(new RegExp(keywordsJoined,"ig"),"|");
       moddedDelimited = firstReplace.replaceAll(new RegExp(keywordsJoined,"ig"),"|");
@@ -2798,12 +3634,12 @@
       // 1. Cu name w/middle names/initial and a label
       cuName = moddedDelimited.match(/((Customer )?name)(\|)([a-z]+ ([a-z]+|[a-z]\.?) [a-z]+( [a-z]+)?)/i);
 
-      // 2. Cu name w/middle names/initial and optional label 
+      // 2. Cu name w/middle names/initial and optional label
       if(cuName == null) {
          cuName = moddedDelimited.match(/((Customer )?name)?(\|)([a-z]+ ([a-z]+|[a-z]\.?) [a-z]+( [a-z]+)?)/i);
       }
 
-      // 3. Cu name w/optional middle names/initial and label 
+      // 3. Cu name w/optional middle names/initial and label
       if(cuName == null) {
          cuName = moddedDelimited.match(/((Customer )?name)(\|)([a-z]+ ([a-z]+ |[a-z]\.? )?[a-z]+( [a-z]+)?)/i);
       }
@@ -2930,7 +3766,7 @@
             .bo-opener-transition {
                transition: background 1s linear(0 0%, -0 83.09%, 1 100%);
             }
-            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/     
+            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/
             /* need to add the color, then the transition, then remove the color */
             `,
          domEl = $("<div>BO</div>"),
@@ -2951,7 +3787,7 @@
    },1500);
 
    /* Function addTransitionClass
-      Adds back the 'bo-opener-transition' class to the 
+      Adds back the 'bo-opener-transition' class to the
       BO Opener element, so that it transitions off */
    addBOTransitionClass = debounce(() => {
       $(".bo-opener").addClass("bo-opener-transition");
@@ -3000,7 +3836,7 @@
             .copy-notifier-transition {
                transition: background .75s linear(0 0%, -0 83.09%, 1 100%);
             }
-            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/     
+            /* add a fade off -- transition: background 2s linear(0 0%, -0 83.09%, 1 100%);*/
             /* need to add the color, then the transition, then remove the color */
             `,
          domEl = $('<div></div>'),
@@ -3021,7 +3857,7 @@
    },300);
 
    /* Function addTransitionClass
-      Adds back the 'copy-notifier-transition' class to the 
+      Adds back the 'copy-notifier-transition' class to the
       notification element, so that it transitions off */
    addTransitionClass = debounce(() => {
       $(".copy-notifier").addClass("copy-notifier-transition");
@@ -3058,9 +3894,9 @@
          return;
       }
 
-      if(data.leadId != "")       { trackingNum = data.leadId       } else 
+      if(data.leadId != "")       { trackingNum = data.leadId       } else
       if(data.refNumber != "")    { trackingNum = data.refNumber    } else
-      if(data.transferCode != "") { trackingNum = data.transferCode }  
+      if(data.transferCode != "") { trackingNum = data.transferCode }
 
       if(trackingNum != "") {
          setTicketFormFieldVal("Lead ID", trackingNum.replaceAll(/ |[A-Z]/gi,""));
@@ -3091,35 +3927,35 @@
    /* Function fillOutPIForm
       Puts the data in the sidebar form */
    function fillOutPIForm(copiedText) {;
-      var data, agentInfo, uid, aorRegion, typeOfSub,
+      var data, agentInfo, uid, aorRegion,
+          protectOrigVal = true,
           activeEl = document.activeElement,
 
       data = getObjFromCopiedText(copiedText,/ Cu\/Agent Info/.test(copiedText));
-      typeOfSub = getTypeOfSubmission(data);
 
       closeTranslationBanner();
 
       console.warn("debugging: fillOutPIForm");
 
       // SPECIAL PROCESSING
-      setTicketFormFieldVal("Type of Submission", typeOfSub);
-      if(typeOfSub == "GPS Legacy" || typeOfSub == "vConnect Resolve"){
+      setTicketFormFieldVal("Type of Submission", data.typeOfSub, protectOrigVal);
+      if(data.typeOfSub == "GPS Legacy" || data.typeOfSub == "vConnect Resolve"){
          setTimeout(()=>{
             // THIS IS CASE SENSITIVE
-            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency));
+            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency), protectOrigVal);
          }, 1000);
       }
 
       // NOT NEEDED (probably). This field is usually filled out, anyway
       // if(getTicketFormFieldVal("Lead ID or Phone Number") == "")
-      //    setTicketFormFieldVal("Lead ID or Phone Number", getLeadId());
+      //    setTicketFormFieldVal("Lead ID or Phone Number", getLeadId(), protectOrigVal);
 
       setTimeout(()=>{
          if(getTicketFormFieldVal("Lead ID") == "")
-            setTicketFormFieldVal("Lead ID", data.leadId || getLeadId());
+            setTicketFormFieldVal("Lead ID", data.leadId || getLeadId(), protectOrigVal);
       }, 900);
 
-      // AOR 
+      // AOR
       if(data["T3 Agent"] != "-" && typeof data["T3 Agent"] != "undefined") {
          agentInfo = data["T3 Agent"].split(" / ");
       } else {
@@ -3129,12 +3965,12 @@
       uid = agentInfo[1];
       aorRegion = agentInfo[2];
 
-      setTicketFormFieldVal("Date of Submission", data["Sub Date"]);
-      setTicketFormFieldVal("AOR (Name only)", aorName);
-      setTicketFormFieldVal("UltiPro ID (Agent)", uid);
-      setTicketFormFieldVal("Agent NPN", data["Agent NPN"]);
-      setTicketFormFieldVal("Captive Region", aorRegion == "Ntnl" ? "National" : aorRegion);
-      setTicketFormFieldVal("Carrier", data.carrier || getPICarrierFromPlanName(data["Plan Name"]));
+      setTicketFormFieldVal("Date of Submission", data["Sub Date"], protectOrigVal);
+      setTicketFormFieldVal("AOR (Name only)", aorName, protectOrigVal);
+      setTicketFormFieldVal("UltiPro ID (Agent)", uid, protectOrigVal);
+      setTicketFormFieldVal("Agent NPN", data["Agent NPN"], protectOrigVal);
+      setTicketFormFieldVal("Captive Region", aorRegion == "Ntnl" ? "National" : aorRegion, protectOrigVal);
+      setTicketFormFieldVal("Carrier", data.carrier || getPICarrierFromPlanName(data["Plan Name"]), protectOrigVal);
 
       setTimeout(()=>activeEl.focus(),125);
       scrollChatFieldsIntoView();
@@ -3186,7 +4022,7 @@
          (parsedCuInfo["Cust Name"] || parsedCuInfo["Cu Name"])+ '\t' +
          parsedCuInfo["DOB"] + '\t' +
          parsedCuInfo["Cust Addr"].slice(-5) + '\t' +
-         parsedCuInfo["Medicare ID"] + 
+         parsedCuInfo["Medicare ID"] +
          (isCarePlusPlan ? "\tThis is a CarePlus Plan" : "");
 
       return finalString;
@@ -3198,7 +4034,7 @@
    function selectHumEmailInfo(evt) {
       // CTRL + SHIFT + H // (h for "Humana")
       if (evt.ctrlKey && evt.shiftKey && evt.which == 72) {
-         if(zd.mydebug.isDB()) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
             console.warn(">> debug on: selectHumEmailInfo");
          }
 
@@ -3287,24 +4123,24 @@
 
       console.warn("in it", nextBtn);
 
-      /* This fn is essentially the loop. When a change is made (next button clicked, so 
-          tab els change), it alters the structure of the tabs. Once the tabs are changed, 
-          this fires the passed-in function, and clicks the next button, waiting for there 
-          to be a change again.       */ 
+      /* This fn is essentially the loop. When a change is made (next button clicked, so
+          tab els change), it alters the structure of the tabs. Once the tabs are changed,
+          this fires the passed-in function, and clicks the next button, waiting for there
+          to be a change again.       */
        // function mutatorFn(mutaRecord, mutaObs) {
-       //    /* There are two mutations of the workspaces when you move 
+       //    /* There are two mutations of the workspaces when you move
        //       to the next ticket in a view. Each has two mutations:
- 
+
        //       A) First:
        //          1. remove old tab (add nothing)
        //          2. add placeholder tab (remove nothing)
- 
-       //       B) Second: 
+
+       //       B) Second:
        //          1. remove placeholder tab (add nothing)
        //          2. add new tab (remove nothing)
        //    */
        //    console.warn(">> mutaRecord",mutaRecord);
- 
+
        //    if(mutaRecord.length == 1){
        //       // If mutaRecord only contains one mutation, then a temp tab wasn't added.
        //       // A temp tab is only added when there's a new tab to replace it.
@@ -3312,36 +4148,36 @@
        //       mutaObs.disconnect();
        //       return;
        //    }
- 
+
        //    if(mutaRecord[1].addedNodes.length > 0){
        //       console.log("adding nodes");
        //       // B2: Added new tab. Header/nextBtn can now be found
        //       if($(mutaRecord[1].addedNodes).find("[data-test-id='header-tab-title']").length != 0){
-       //          console.log("added new tab", mutaRecord[1]); 
+       //          console.log("added new tab", mutaRecord[1]);
        //             // need to make sure the new tab is fully loaded.
        //                // ? setTimeout? Messy. >> could have issues...don't like it
-       //                // ? MutaObs w/a debounced fn? really messy. 
-       //                // x Listener? but what if element doesn't exist >> there is no "rendered" event, 
-       //          /* 
+       //                // ? MutaObs w/a debounced fn? really messy.
+       //                // x Listener? but what if element doesn't exist >> there is no "rendered" event,
+       //          /*
        //          promise for when ticket finishes loading
        //          fnToRun();
        //          */
- 
+
        //          var thing2 = getByDataTestId("omnipanel-pane-wrapper-customer-context",getActiveWorkspace());
        //          var debouncedThingy = (mutaList, obs) => {
-       //             // passInFn()                  // 
+       //             // passInFn()                  //
        //             // disconnect()
        //          };
- 
+
        //          // debounce(debouncedThingy,150); << put this in as the fn to run
- 
+
        //          addMutationObs(thing2,debouncedThingy,{childList:true,subtree:true});
- 
+
        //          nextBtn.click();
        //       }
        //    }
        // }
- 
+
        // outerThingy = workspacesMutationObs = addManagedMutationObs(workspaceTabs, mutatorFn, {childList: true})
 
 
@@ -3424,7 +4260,7 @@
    ///// CONVENIENCE FUNCTIONS /////
 
    /* Function autoCollectHMEmailInfo
-      Runs through the view starting from a specific ticket and 
+      Runs through the view starting from a specific ticket and
       appends the HM info into a single pasteable thing.
       */
    function autoCollectHMEmailInfo() {
@@ -3449,7 +4285,7 @@
           cuInfo = getTicketInfoEl(),
           isCarePlusPlan = false;
 
-      if(cuInfo == undefined || isDevotedRFI() || !isRegularRFI()) {
+      if(cuInfo == undefined || isDevotedRFI() || !hasRegularRfiFirstComment()) {
          return;
       }
 
@@ -3494,7 +4330,7 @@
       }
 
       var finalString =
-         parsedCuInfo["Agent Name"] + '\t' +           // Agent Name  
+         parsedCuInfo["Agent Name"] + '\t' +           // Agent Name
          partyId + '\t' +                              // Party ID
          writingNum + '\t' +                           // Writing ID
          '\t' +                                        // Tax ID
@@ -3520,7 +4356,7 @@
    function selectUHCEmailInfo(evt) {
       // CTRL + SHIFT + U // (u for "UHC")
       if (evt.ctrlKey && evt.shiftKey && !evt.altKey && evt.which == 85) {
-         if(zd.mydebug.isDB()) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
             console.warn(">> debug on: selectUHCEmailInfo");
          }
 
@@ -3536,14 +4372,14 @@
       Formats app info into the best option for UHC chat
 
       OUTPUT:
-      Member Name  
-      DOB  
-      MBI  
+      Member Name
+      DOB
+      MBI
       Eff Date
 
-      Agent Name  
-      Party ID 
-      Writing ID  
+      Agent Name
+      Party ID
+      Writing ID
       */
    function constructUHCChatInfo() {
       //If not an RFI w/a cu el
@@ -3565,14 +4401,14 @@
       firstCommentText = getFirstCommentElText();
 
       var finalString =
-         "Agent Name:\t"      + parsedCuInfo["Agent Name"] + '\n' +                                 
-         "Party ID: \t"       + parsedCuInfo.partyId + '\n' +                 
-         "Writing Number: \t" + parsedCuInfo["Agent Writing #"] + '\n' +     
-         // firstCommentText.match(/(Eff Date: )([\d-]+)/)[2] + '\n' +     
-                                '\n' +  
-         "Cu Name: \t"        + parsedCuInfo["Cust Name"] + '\n' +    
-         "DOB:\t"             + parsedCuInfo["DOB"] + '\n' +          
-         "Medicare ID:\t"     + parsedCuInfo["Medicare ID"];          
+         "Agent Name:\t"      + parsedCuInfo["Agent Name"] + '\n' +
+         "Party ID: \t"       + parsedCuInfo.partyId + '\n' +
+         "Writing Number: \t" + parsedCuInfo["Agent Writing #"] + '\n' +
+         // firstCommentText.match(/(Eff Date: )([\d-]+)/)[2] + '\n' +
+                                '\n' +
+         "Cu Name: \t"        + parsedCuInfo["Cust Name"] + '\n' +
+         "DOB:\t"             + parsedCuInfo["DOB"] + '\n' +
+         "Medicare ID:\t"     + parsedCuInfo["Medicare ID"];
 
       return finalString;
    }
@@ -3583,7 +4419,7 @@
    function selectUHCChatInfo(evt) {
       // CTRL + SHIFT + ALT + U // (u for "UHC")
       if (evt.ctrlKey && evt.shiftKey && evt.altKey && evt.which == 85) {
-         if(zd.mydebug.isDB()) {
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
             console.warn(">> debug on: selectUHCChatInfo");
          }
 
@@ -3601,8 +4437,8 @@
    function selectDNEInfo(evt) {
       // CTRL + SHIFT + E // (e for "engage")
       if (evt.ctrlKey && evt.shiftKey && evt.which == 69) {
-         if(zd.mydebug.isDB()) {
-            console.warn(">> debug on");
+         if(zd.mydebug.isDB() || zd.mydebug.verboseShortcuts) {
+            console.warn(">> debug on: selectDNEInfo");
          }
 
          var commentEl = $(getFirstCommentEl()),
@@ -3634,59 +4470,100 @@
    /* Function fillOutRfiForm
       Puts the data in the sidebar form */
    function fillOutRfiForm(copiedText="") {
-      var data = getObjFromCopiedText(copiedText),
+      var effDate, effDate2,
+          data = getObjFromCopiedText(copiedText),
           activeEl = document.activeElement,
-          typeOfSub = getTypeOfSubmission(data);
+          protectOrigVal = true;
 
       closeTranslationBanner();
 
       // SPECIAL PROCESSING
-      setTicketFormFieldVal("Type of Submission", typeOfSub);
-      if(typeOfSub == "GPS Legacy"){
+      setTicketFormFieldVal("Type of Submission", data.typeOfSub, protectOrigVal);
+      if(data.typeOfSub == "GPS Legacy"){
          // data.agency = data["Agent GH Info"];
          // data["Agent GH Info"] = "X / X / X / X"
 
-         setTimeout(()=>{
+         setTimeout(()=>{  // TODO: NEED TO DO LEAD ID?
             // THIS IS CASE SENSITIVE
             console.warn("Setting Agency as:",agencyInterpreter(data.agency));
-            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency));
+            setTicketFormFieldVal("Agency", agencyInterpreter(data.agency), protectOrigVal);
          }, 925);
       }
 
-      agentGHInfo = (data["Agent GH Info"] || "").split(" / ");
+      if(data["Agent Name"] == "Vijay Kotte") {
+         agentGHInfo = [0,,,"National"]
+      } else {
+         agentGHInfo = (data["Agent GH Info"] || "").split(" / ");
+      }
 
       // FORM ASSIGNMENT
          //SPECIALS:
          if(isCSNP()) {
-            setTicketFormFieldVal("Responsible Party", "Member");
-            setTicketFormFieldVal("Select if RFI Denial ", "No");
+            setTicketFormFieldVal("Responsible Party", "Member", protectOrigVal);
+            setTicketFormFieldVal("Select if RFI Denial ", "No", protectOrigVal);
+            setTicketFormFieldVal("Please summarize case",
+                                  "CSNP needed VCC form confirmation. Checked MARx, plan was active. Sent CSNP form request to doctor.", 
+                                  protectOrigVal);
          }
 
          setTimeout(()=>{
-            if(getTicketFormFieldVal("Lead ID") == "")
-               setTicketFormFieldVal("Lead ID", getLeadId() || data.leadId || data["Lead ID"] || data["Lead Id"]);
+            if(getTicketFormFieldVal("Lead ID") == ""){
+               setTicketFormFieldVal("Lead ID", getLeadId() || data.leadId || data["Lead ID"] || data["Lead Id"], protectOrigVal);
+            } else if(getTicketFormFieldVal("Transfer Reference Number") == "") {
+               // THIS IS NOT SUPPOSED TO HAPPEN. BUT THE FIELD IS REQUIRED, AND THIS IS THE BEST WE GOT
+               setTicketFormFieldVal("Transfer Reference Number", data["Transfer Code"]); 
+            }
          }, 900);
 
 
-      setTicketFormFieldVal("RFI Carrier", getRFICarrierFromPlanName(data['Plan Name']));
+      setTicketFormFieldVal("RFI Carrier", getRFICarrierFromPlanName(data['Plan Name']) || getCarrierFromSubject(), protectOrigVal);
          /* Aetna   AllWell   Anthem   CarePlus   Cigna   Devoted   Highmark   Humana
             Kaiser  Simply    United   WellCare   Zing   */
+      setTicketFormFieldVal("RFI/D-SNP Denial Reason", data.Reason, protectOrigVal);
+
       if(data["SEP on App"] != "-") {
-         setTicketFormFieldVal("SEP Used", data["SEP on App"]);
+         setTicketFormFieldVal("SEP Used", data["SEP on App"], protectOrigVal);
       } else if(getTicketFormFieldVal("SEP Used") == "-"){
-         setTicketFormFieldVal("SEP Used", "Other SEP");
+         setTicketFormFieldVal("SEP Used", "Other SEP", protectOrigVal);
       }
-      setTicketFormFieldVal("Due Date", formatDateForZDForm(data["Apx Due Date"]));
-      setTicketFormFieldVal("AOR", data["Agent Name"]);
-      setTicketFormFieldVal("UltiPro ID", agentGHInfo[0]);
-      setTicketFormFieldVal("Agent NPN", data["Agent NPN/Party ID"].split(" / ")[0]);
-      setTicketFormFieldVal("Program Manager", agentGHInfo[1]);
-      setTicketFormFieldVal("Manager Name", agentGHInfo[2]);
-      setTicketFormFieldVal("Captive Region", agentGHInfo[3] == "Ntnl" || agentGHInfo[3] == "X" ? "National" : agentGHInfo[3]);
+      if(data["Apx Due Date"] != undefined) {
+         setTicketFormFieldVal("Due Date", formatDateForZDForm(data["Apx Due Date"]), protectOrigVal);
+      } else if(isCSNP()){
+         effDate = new Date(formatDateForZDForm(data["Eff Date"]));
+         effDate2 = new Date(effDate.getYear()+1900, effDate.getMonth()+2,0);
+         setTicketFormFieldVal("Due Date", formatDateForZDForm(effDate2.toLocaleString().split(",")[0]), protectOrigVal);
+      }
+      setTicketFormFieldVal("AOR", (data["Agent Name"] || "").toProper(), protectOrigVal);
+      setTicketFormFieldVal("UltiPro ID", agentGHInfo[0], protectOrigVal);
+      if(data["Agent NPN/Party ID"] != undefined && data["Agent NPN/Party ID"] != "-") {
+         setTicketFormFieldVal("Agent NPN", data["Agent NPN/Party ID"].split(" / ")[0], protectOrigVal);
+      } else if(data["Agent NPN"] != undefined && data["Agent NPN"] != "-") {
+         setTicketFormFieldVal("Agent NPN", data["Agent NPN"], protectOrigVal);
+      } else {
+         console.warn("!!!! Could not set Agent NPN, value is:", data["Agent NPN"], data);
+      }
+      setTicketFormFieldVal("Program Manager", agentGHInfo[1], protectOrigVal);
+      setTicketFormFieldVal("Manager Name", agentGHInfo[2], protectOrigVal);
+      setTicketFormFieldVal("Captive Region", agentGHInfo[3] == "Ntnl" || agentGHInfo[3] == "X" ? "National" : agentGHInfo[3], protectOrigVal);
 
       console.log("==>> activeEl", activeEl);
       setTimeout(()=>{ activeEl.focus() },980);
       scrollChatFieldsIntoView();
+
+
+      if(zd.triage) {
+         if(!isCSNP()) {
+            setTicketFormFieldVal("Responsible Party", "Sales Agent", protectOrigVal);
+            setTicketFormFieldVal("Please summarize case", "Closing out due to triage. Checked plan status in a carrier portal.",protectOrigVal);
+         } else {
+            setTicketFormFieldVal("Please summarize case", "CSNP needed VCC form confirmation. Checked with carrier portal, plan was active.", protectOrigVal);
+         }
+         setTicketFormFieldVal("RFI/D-SNP Denial Contact Outcome", "Spoke to Medicare",protectOrigVal);
+         setTicketFormFieldVal("Select if RFI Denial", "No",protectOrigVal);
+         setTicketFormFieldVal("Captive Region", "National",protectOrigVal);
+         setTicketFormFieldVal("UltiPro ID", "0",protectOrigVal);
+         setTicketFormFieldVal("Agent NPN:", "0",protectOrigVal);
+      }
    }
 
 
@@ -3718,6 +4595,7 @@
 
       return  returnString;
    }
+
 
 /*** T2F: PASTE INTO FEEDBACK INFO ***/
 
@@ -3757,22 +4635,23 @@
       addManagedMutationObs(agentTypeDDTopEl, fillT2Form,{childList: true, subtree:true});
 
       fillT2Form = () => setTimeout(() => {
+         var protectOrigVal = true;
       // fillT2Form = () => {
-         setTicketFormFieldVal("Transfer Reference Num", data["Transf Ref #"]);
-         setTicketFormFieldVal("Captive Agent Name", t2AgentData[0]);  // Both here b/c doing both doesn't
-         setTicketFormFieldVal("vConnect Agent Name", t2AgentData[0]); // have any adverse affect.
-         setTicketFormFieldVal("UltiProID (Captive Agent)", t2AgentData[1]);
-         // setTicketFormFieldVal("Select Feedback Coaching", "Not sure how to handle this... it's tiered");
-         setTicketFormFieldVal("Is this feedback founded", foundedStatus.toProper());
-         setTicketFormFieldVal("TeleCare/T3 Agent Name", data["Res. (T3) Agent"]);
-         setTicketFormFieldVal("select Case Management support agent", "Stephen S");
+         setTicketFormFieldVal("Transfer Reference Num", data["Transf Ref #"], protectOrigVal);
+         setTicketFormFieldVal("Captive Agent Name", t2AgentData[0], protectOrigVal);  // Both here b/c doing both doesn't
+         setTicketFormFieldVal("vConnect Agent Name", t2AgentData[0], protectOrigVal); // have any adverse affect.
+         setTicketFormFieldVal("UltiProID (Captive Agent)", t2AgentData[1], protectOrigVal);
+         // setTicketFormFieldVal("Select Feedback Coaching", "Not sure how to handle this... it's tiered", protectOrigVal);
+         setTicketFormFieldVal("Is this feedback founded", foundedStatus.toProper(), protectOrigVal);
+         setTicketFormFieldVal("TeleCare/T3 Agent Name", data["Res. (T3) Agent"], protectOrigVal);
+         setTicketFormFieldVal("select Case Management support agent", "Stephen S", protectOrigVal);
          setTimeout(() => setTicketFormFieldVal("Date Coaching sent", formatDateForZDForm(new Date().toString())),400);
-         setTicketFormFieldVal("context and detailed notes", feedbackNote);
+         setTicketFormFieldVal("context and detailed notes", feedbackNote, protectOrigVal);
       },100);
       // };
 
       if(data["Sales Agent Type"] != undefined) {
-         setTicketFormFieldVal("Are you submitting feedback for a T2/T3 Agent", data["Sales Agent Type"],fillT2Form);
+         setTicketFormFieldVal("Are you submitting feedback for a T2/T3 Agent", data["Sales Agent Type"],fillT2Form, true);
       }
 
       scrollChatFieldsIntoView();
@@ -3788,12 +4667,152 @@
    }
 
 
+
+/*** CMP: GET COMPLIANCE ENTRY ***/
+
+   /* Function getComplianceInqEntry
+      Returns the tab-deliminated string that mirrors the ZD Compliance Report.
+      Ties into the Ct+Sh+X shortcut for cutting from a ticket 
+      Gets this info:
+	      Lead ID
+			Beneficiary Phone Number
+			Affiliate Company
+			PTC Affiliate Company
+			PTC Affiliate ID
+			PTC Affiliate Link ID
+			Case ID (if applicable)
+			Beneficiary Name
+			Claim Carrier
+			Complaint Due Date - Date
+			Enrollment Date - Date
+			Complaint Notification Date - Date
+			Ticket status
+			Agent Name
+			Ticket ID
+			Campaign
+			Agency
+			PTC Request
+			Alt Status
+			Tickets
+		*/
+   function getComplianceInqEntry() {
+      var conclusionComment, returnString,
+			 leadId = getTicketFormFieldVal("Lead ID"),
+			 phoneNum = getTicketFormFieldVal("Beneficiary Phone Number"),
+			 affComp = "None Given, check PTC Req",
+			 affComp2 = "",
+			 affCompId = "",
+			 affCompLinkId = "",
+			 caseId = getTicketFormFieldVal("Case ID (if applicable)"),
+			 cuName = getTicketFormFieldVal("Beneficiary Name"),
+			 carrier = getTicketFormFieldVal("Claim Carrier"),
+			 dueDt = getTicketFormFieldVal("Complaint Due Date"),
+			 enrollDt = getTicketFormFieldVal("Enrollment Date"),
+			 notifDt = getTicketFormFieldVal("Complaint Notification Date"),
+			 tktStatus = getActiveTicketStatus(),
+			 agentName = getTicketFormFieldVal("Agent Name"),
+			 tktId = getActiveTicketId(),
+			 campaign = getTicketFormFieldVal("Campaign"),
+			 agency = getTicketFormFieldVal("Agency"),
+			 ptcReq = getTicketFormFieldVal("PTC Request"),
+			 altStatus = getTicketFormFieldVal("Alt Status");
+
+
+		if(/Yes/.test(ptcReq)) {
+			affComp = getTicketFormFieldVal("Affiliate Company");
+			if(affComp == "Other"){
+				affComp2 = getTicketFormFieldVal("PTC Affiliate Company");
+			}
+			affCompId = getTicketFormFieldVal("PTC Affiliate ID");
+			affCompLinkId = getTicketFormFieldVal("PTC Affiliate Link ID");
+		}
+
+		returnString = leadId + "\t" +
+			phoneNum + "\t" + 
+			affComp + "\t" + 
+			affComp2 + "\t" + 
+			affCompId + "\t" + 
+			affCompLinkId + "\t" + 
+			caseId + "\t" + 
+			cuName + "\t" + 
+			carrier + "\t" + 
+			dueDt + "\t" + 
+			enrollDt + "\t" + 
+			notifDt + "\t" + 
+			tktStatus + "\t" + 
+			agentName + "\t" + 
+			tktId + "\t" + 
+			campaign + "\t" + 
+			agency + "\t" + 
+			ptcReq + "\t" + 
+			altStatus + "\t" + 
+			"1"; // Tickets
+
+		// console.log("leadId",leadId);
+		// console.log("phoneNum",phoneNum);
+		// console.log("affComp",affComp);
+		// console.log("affComp2",affComp2);
+		// console.log("affCompId",affCompId);
+		// console.log("affCompLinkId",affCompLinkId);
+		// console.log("caseId",caseId);
+		// console.log("cuName",cuName);
+		// console.log("carrier",carrier);
+		// console.log("dueDt",dueDt);
+		// console.log("enrollDt",enrollDt);
+		// console.log("notifDt",notifDt);
+		// console.log("tktStatus",tktStatus);
+		// console.log("agentName",agentName);
+		// console.log("tktId",tktId);
+		// console.log("campaign",campaign);
+		// console.log("agency",agency);
+		// console.log("ptcReq",ptcReq);
+		// console.log("altStatus",altStatus);
+
+      return  returnString;
+   }
+
+
+/*** CMO: FILL CM OUTREACH TICKET ***/
+
+   /* Function fillCmOutreachForm
+      Puts the data in the sidebar form */
+   function fillCmOutreachForm(copiedText) {
+      var data, agentInfo, uid, aorRegion,
+          protectOrigVal = true,
+          activeEl = document.activeElement;
+
+      // TODO: Might not be colon seperated....split on tabs, and known col's
+
+      // Member's Phone Number
+      // Member's Lead ID
+      // Carrier
+      // What type of plan
+      // Plan Name
+      // When did the GoHealth Plan Effectuate
+      // Attempt
+
+      // if it starts w/a "key: val\n" pair, then it doesn't have a header
+      data = getObjFromCopiedText(copiedText,/^.*:.*\r?\n/.test(copiedText));
+
+         // use the RFI one, b/c it has a similar UHC name
+      setTicketFormFieldVal("Carrier", data.carrier || getRFICarrierFromPlanName(data["Plan Name"]) || getCarrierFromSubject(), protectOrigVal);
+      setTicketFormFieldVal("Member Name", data.fullName, protectOrigVal);
+      setTicketFormFieldVal("Phone Number", data.phoneNumber, protectOrigVal);
+      if(getTicketFormFieldVal("Lead ID") == "")
+         setTicketFormFieldVal("Lead ID", data.leadId || data["Ref #"]|| getLeadId(), protectOrigVal);
+
+      setTicketFormFieldVal("Requester", data.leadId || getLeadId(), protectOrigVal);
+
+      setTimeout(()=>activeEl.focus(),125);
+   }
+
 /*************
 * LOGIC
 **************/
 if(typeof zd == "undefined") {
    window.zd = {
-      ranSetup: false
+      ranSetup: false,
+      overwriteValuesOnPaste: false
    };
 }
 if(zd.ranSetup != true) {
@@ -3839,3 +4858,12 @@ function startTesting() {
    showClipText = true;
    showOutpout=true;
 }
+
+/* Function startTriage
+   Sets triage and marks it, so that I don't do it accidentally */
+function startTriage(){
+   zd.triage = true;
+   $('.copy-notifier')[0].style = "background: red";
+}
+
+
