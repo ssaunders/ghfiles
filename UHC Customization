@@ -19,16 +19,17 @@
       // TODO: 
 
 /** DONE **/
+   // TODO: Added auto-nav from the One Healthcare ID website
 
    /**** Post Version Release ****/
-   // TODO: Add Ctrl + Shift + V shortcut
-   // TODO: Add Ctrl Enter
-   // TODO: Add the getters for buttons
-   // TODO: Test AutoNav
-   // TODO: Make sure it inserts into page correctly
-   // TODO: Figure out what kind of jquery/$ it uses
-   // TODO: Add the getters for buttons
-   // TODO: Add the getters/setters for fields
+   // DONE: Add Ctrl + Shift + V shortcut
+   // DONE: Add Ctrl Enter
+   // DONE: Add the getters for buttons
+   // DONE: Test AutoNav
+   // DONE: Make sure it inserts into page correctly
+   // DONE: Figure out what kind of jquery/$ it uses
+   // DONE: Add the getters for buttons
+   // DONE: Add the getters/setters for fields
 
 /*************
 * DATABASES
@@ -79,6 +80,12 @@
       }
    };
 
+   evt = { // For debugging/testing
+      ctrlKey:true,
+      shiftKey:true,
+      which:70
+   }
+
    /* Function copyStringToClipboard
       Copies a string to the computer clipboard */
    window.copyStringToClipboard = function(string) {
@@ -128,49 +135,6 @@
       }
 
       return promise;
-   }
-
-   /* Function addCssEl
-      Adds the passed in CSS text to the document body */
-   window.addCssEl = function(cssText, doc=document) {
-      const css_el = doc.createElement("style");
-
-      if (cssText!=null) {
-         css_el.textContent = cssText;
-         doc.head.appendChild(css_el);
-      }
-      
-      return css_el;
-   }
-
-   /* Function addJsScript
-      Adds the passed in script text to the document body */
-   window.addJsScript = function(scriptText, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-      
-      const js_el = doc.createElement("script");
-
-      if (scriptText!=null) {
-         js_el.textContent = scriptText;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
-   }
-
-   /* Function addJsFromURL
-      Adds the passed in script text to the document body */
-   window.addJsFromURL = function(url, doc) {
-      doc = (doc == null || doc == undefined) ? document : doc;
-
-      const js_el = doc.createElement("script");
-
-      if (url!=null) {
-         js_el.src = url;
-         doc.head.appendChild(js_el);
-      }
-
-      return js_el;
    }
 
    /* Function getCurrentTimestamp
@@ -255,12 +219,6 @@
       return properized;
    }
 
-   evt = { // For debugging/testing
-      ctrlKey:true,
-      shiftKey:true,
-      which:70
-   }
-
    /* Function debounceFn
       Debounces a fn */
    window.debounce = function(callback, wait=0, timing={'leading': false,'trailing': true}) {
@@ -294,32 +252,48 @@
       console.log(a,b,c);
    }
 
-   /* Function standardizeFullDateString
-      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX. 
+   /** Function standardizeFullDateString
+      Takes in 4-8 numbers, w/ or w/out delimiters. Requires 19XX or 20XX.
+      Can handle date ordering of mdyy, mmdyy, mddyy and the yyyy equivalent.
+      With delimiters of " ",/,-, or .
+      Can handle yyyymmdd if it has a delimiter
       Returns xx/xx/xxxx
-      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day */
-   window.standardizeFullDateString = function(fullDate) {
+      Fixes DOB formatting (- or " " or . vs /) and 0 pads Month/Day
+    */
+   window.standardizeFullDateString =  function(fullDate) {
+      if(typeof fullDate != "string") {
+         return fullDate;
+      }
+
       var moddedDate = fullDate.replaceAll(/[\.\- ]/g,"/"),
-          partsAry;
+          partsAry, yearHolder;
 
-      if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, not preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
-         // If it has a 4-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
-         // If it has a 2-digit year, preceded by a /
-         moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
-         // if you want to default to another century, do "+defaultCentury+" on the line above
-      } 
+      // Handle if it's YEAR FIRST
+      if(moddedDate.search("/") == 4) {
+         partsAry = moddedDate.split("/");
+         yearHolder = partsAry.shift();
+         partsAry.push(yearHolder);
+      } else { // MONTH FIRST
 
-      // Split it into parts, so that you can 0 pad
-      partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
-      if(partsAry == null ) {
-         console.warn("~~ full date", fullDate);
+         if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, not preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)?\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(19|20)\d{2}/.test(moddedDate)) {
+            // If it has a 4-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?((19|20)\d{2})$/,"$1/$2/$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         } else if(/(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?\d{2}/.test(moddedDate)) {
+            // If it has a 2-digit year, preceded by a /
+            moddedDate = moddedDate.replace(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/?(\d{2})$/,"$1/$2/19$3");
+            // if you want to default to another century, do "+defaultCentury+" on the line above
+         }
+
+         // Split it into parts, so that you can 0 pad
+         partsAry = moddedDate.match(/^(0?[0-9]|1[0-2])\/?(0?[1-9]|[12][0-9]|3[01])\/(\d{4})$/);
+         if(partsAry == null ) {
+            console.warn("~~ full date", fullDate);
+         }
       }
 
       return ("0"+partsAry[1]).slice(-2) + "\/" + ("0"+partsAry[2]).slice(-2) + "\/" + ("19"+partsAry[3]).slice(-4);
@@ -423,6 +397,49 @@
      return newCuInfoObj;
    }
 
+   /* Function addCssEl
+      Adds the passed in CSS text to the document body */
+   window.addCssEl = function(cssText, doc=document) {
+      const css_el = doc.createElement("style");
+
+      if (cssText!=null) {
+         css_el.textContent = cssText;
+         doc.head.appendChild(css_el);
+      }
+      
+      return css_el;
+   }
+
+   /* Function addJsScript
+      Adds the passed in script text to the document body */
+   window.addJsScript = function(scriptText, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+      
+      const js_el = doc.createElement("script");
+
+      if (scriptText!=null) {
+         js_el.textContent = scriptText;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
+   /* Function addJsFromURL
+      Adds the passed in script text to the document body */
+   window.addJsFromURL = function(url, doc) {
+      doc = (doc == null || doc == undefined) ? document : doc;
+
+      const js_el = doc.createElement("script");
+
+      if (url!=null) {
+         js_el.src = url;
+         doc.head.appendChild(js_el);
+      }
+
+      return js_el;
+   }
+
    // https://raw.githubusercontent.com/ssaunders/ghfiles/refs/heads/main/AE%20customization.js
 
 
@@ -500,6 +517,7 @@
 
 
 /*** GETTERS & SETTERS ***/
+   
    // GENERAL SETTER FN'S //    
    /* Function setInputField
       Gets the First Name field */
@@ -966,7 +984,8 @@ if(firstStepBtn != null && firstStepBtn.length != 0) {
    firstStepBtn.click();
 } else if(secondStepBtn != null && secondStepBtn.length != 0) {
    secondStepBtn.click();
-} else if(window.location.href == "https://www.uhcjarvis.com/content/jarvis/en/secure/home.html") {
+} else if(window.location.href == "https://www.uhcjarvis.com/content/jarvis/en/secure/home.html"
+   || window.location.href == "https://identity.onehealthcareid.com/oneapp/index.html#/home") {
    window.location.assign("https://www.uhcjarvis.com/content/jarvis/en/secure/tools/eligibility_lookup.html");
 } else {
    //** PAGE LOGIC **//
